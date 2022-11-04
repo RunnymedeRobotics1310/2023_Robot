@@ -12,4 +12,34 @@ package frc.robot;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants {}
+public final class Constants {
+
+    public static final class OiConstants {
+        public static final int DRIVER_CONTROLLER_PORT = 0;
+    }
+
+    public static final class AutoConstants {
+        public static final String AUTO_PATTERN_DO_NOTHING = "Do nothing";
+        public static final String AUTO_PATTERN_SHOOT = "Shoot";
+    }
+
+    public static final class IntakeConstants {
+
+        public static final int     INTAKE_MOTOR_ADDRESS  = 30;
+        public static final boolean INTAKE_MOTOR_REVERSED = false;
+
+        public static final int INTAKE_ROLLER_PISTON_ADDRESS = 0;
+        public static final int INTAKE_HOOD_PISTON_ADDRESS   = 2;
+    }
+
+    public static final class ShooterConstants {
+
+        public static final int     SHOOTER_MOTOR_ADDRESS  = 51;
+        public static final boolean SHOOTER_MOTOR_REVERSED = true;
+
+        public static final int     KICKER_MOTOR_ADDRESS  = 50;
+        public static final boolean KICKER_MOTOR_REVERSED = true;
+
+        public static final int BALL_SENSOR_ADDRESS = 0;
+    }
+}
