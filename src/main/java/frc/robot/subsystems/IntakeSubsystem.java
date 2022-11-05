@@ -26,6 +26,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     Value intakeRollerValue = Value.kReverse;
 
+    /**
+     * The hood piston is used to open and close the hood at the front
+     * of the intake area.
+     */
     private DoubleSolenoid intakeHoodPiston = new DoubleSolenoid(
             PneumaticsModuleType.CTREPCM,
             IntakeConstants.INTAKE_HOOD_PISTON_ADDRESS,
