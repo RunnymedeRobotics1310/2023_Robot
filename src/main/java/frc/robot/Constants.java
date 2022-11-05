@@ -43,6 +43,6 @@ public final class Constants {
         public static final int BALL_SENSOR_ADDRESS = 0;
 
         public static final double SHOOT_HIGH_SPEED = .75d;
-        public static final double SHOOT_LOW_SPEED  = .35d;
+        public static final double SHOOT_LOW_SPEED  = .30d;
     }
 }
