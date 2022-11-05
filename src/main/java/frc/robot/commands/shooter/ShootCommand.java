@@ -4,15 +4,13 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
-public class ShootCommand extends CommandBase{
-
-    private final double shooterSpeed;
+public class ShootCommand extends CommandBase {
 
     private final ShooterSubsystem shooterSubsystem;
     private final IntakeSubsystem intakeSubsystem;
-
     private long shotStartTime = 0;
 
+    private final float SHOOTER_SPEED = 0.75f;
     private final float KICKER_SPEED = 0.75f;
 
     private final int EXCECUTE_TIME_SECONDS = 3;
@@ -20,11 +18,9 @@ public class ShootCommand extends CommandBase{
 
     private final int MILLISECONDS_TO_SECONDS = 1000;
 
-    public ShootCommand(double shooterSpeed, ShooterSubsystem shooterSubsystem, IntakeSubsystem intakeSubsystem) {
-
+    public ShootCommand(ShooterSubsystem shooterSubsystem, IntakeSubsystem intakeSubsystem) {
         this.shooterSubsystem = shooterSubsystem;
         this.intakeSubsystem = intakeSubsystem;
-        this.shooterSpeed    = shooterSpeed;
 
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(shooterSubsystem, intakeSubsystem);
@@ -35,11 +31,9 @@ public class ShootCommand extends CommandBase{
     public void initialize() {
 
         // Start the shooter motor and capture the start time
-        shooterSubsystem.setShooterMotorSpeed(shooterSpeed);
+        shooterSubsystem.setShooterMotorSpeed(SHOOTER_SPEED);
         shotStartTime = System.currentTimeMillis();
-
-        // Move the rollers out of the way of the shot
-        intakeSubsystem.deployRollerArm();
+        intakeSubsystem.setRollerPiston(true);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -57,14 +51,15 @@ public class ShootCommand extends CommandBase{
     @Override
     public void end(boolean interrupted) {
         shooterSubsystem.stop();
-        intakeSubsystem.retractRollerArm();
+        intakeSubsystem.setRollerPiston(false);
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
 
-        //return (System.currentTimeMillis() - shotStartTime > finishTime) ? true : false;
+        // return (System.currentTimeMillis() - shotStartTime > finishTime) ? true :
+        // false;
 
         // Stop the shooter after a set time
         if (System.currentTimeMillis() - shotStartTime > (FINISH_TIME_SECONDS * MILLISECONDS_TO_SECONDS)) {

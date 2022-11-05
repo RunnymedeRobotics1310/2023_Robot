@@ -16,15 +16,14 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private double shooterMotorSetpoint = 0;
     private double kickerMotorSetpoint = 0;
-
     private final DigitalInput ballSensor = new DigitalInput(ShooterConstants.BALL_SENSOR_ADDRESS);
 
-    public ShooterSubsystem(){
-        //Initialize rotation direction
-        shooterMotor .setInverted(ShooterConstants.SHOOTER_MOTOR_REVERSED);
-        shooterMotor .setIdleMode(IdleMode.kBrake);
-        kickerMotor  .setInverted(ShooterConstants.KICKER_MOTOR_REVERSED);
-        kickerMotor  .setIdleMode(IdleMode.kBrake);
+    public ShooterSubsystem() {
+        // Initialize rotation direction
+        shooterMotor.setInverted(ShooterConstants.SHOOTER_MOTOR_REVERSED);
+        shooterMotor.setIdleMode(IdleMode.kBrake);
+        kickerMotor.setInverted(ShooterConstants.KICKER_MOTOR_REVERSED);
+        kickerMotor.setIdleMode(IdleMode.kBrake);
 
     }
 
@@ -34,7 +33,8 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterMotor.set(speed);
 
     }
-    public boolean getBallSensor(){
+
+    public boolean getBallSensor() {
         return !ballSensor.get();
     }
 
