@@ -13,10 +13,10 @@ import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OiConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.auto.AutonomousCommand;
 import frc.robot.commands.shooter.DefaultShooterCommand;
 import frc.robot.commands.shooter.ShootCommand;
-import frc.robot.commands.shooter.ShootLowCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
@@ -66,8 +66,15 @@ public class RobotContainer {
         Button shootLowButton = new JoystickButton(driverController, XboxController.Button.kX.value);
 
         // Button binding
-        shootButton.whenPressed(new ShootCommand(shooterSubsystem, intakeSubsystem));
-        shootLowButton.whenPressed(new ShootLowCommand(shooterSubsystem, intakeSubsystem));
+        shootButton   .whenPressed(
+                new ShootCommand(
+                        ShooterConstants.SHOOT_HIGH_SPEED,
+                        shooterSubsystem, intakeSubsystem));
+
+        shootLowButton.whenPressed(
+                new ShootCommand(
+                        ShooterConstants.SHOOT_LOW_SPEED,
+                        shooterSubsystem, intakeSubsystem));
     }
 
     /**

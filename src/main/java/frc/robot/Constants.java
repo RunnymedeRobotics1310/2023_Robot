@@ -41,5 +41,8 @@ public final class Constants {
         public static final boolean KICKER_MOTOR_REVERSED = true;
 
         public static final int BALL_SENSOR_ADDRESS = 0;
+
+        public static final double SHOOT_HIGH_SPEED = .75d;
+        public static final double SHOOT_LOW_SPEED  = .35d;
     }
 }

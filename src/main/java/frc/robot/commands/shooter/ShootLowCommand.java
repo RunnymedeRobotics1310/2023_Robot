@@ -58,10 +58,11 @@ public class ShootLowCommand extends CommandBase {
     @Override
     public boolean isFinished() {
 
-        //return System.currentTimeMillis() - shotStartTime > (FINISH_TIME_SECONDS * MILLISECONDS_TO_SECONDS);
+        // return System.currentTimeMillis() - shotStartTime > (FINISH_TIME_SECONDS *
+        // MILLISECONDS_TO_SECONDS);
 
         // Stop the shooter after a set time
-        if (System.currentTimeMillis() - shotStartTime > (FINISH_TIME_SECONDS * MILLISECONDS_TO_SECONDS)) { 
+        if (System.currentTimeMillis() - shotStartTime > (FINISH_TIME_SECONDS * MILLISECONDS_TO_SECONDS)) {
             return true;
         }
 

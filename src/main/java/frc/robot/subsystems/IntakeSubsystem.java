@@ -13,8 +13,7 @@ import frc.robot.Constants.IntakeConstants;
 public class IntakeSubsystem extends SubsystemBase {
 
     // The motors on the top part of the intake thing.
-    private final VictorSPX intakeMotor =
-            new VictorSPX(IntakeConstants.INTAKE_MOTOR_ADDRESS);
+    private final VictorSPX intakeMotor = new VictorSPX(IntakeConstants.INTAKE_MOTOR_ADDRESS);
 
     private double intakeMotorSetpoint = 0;
 
@@ -64,8 +63,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
         if (deploy) {
             intakeHoodValue = Value.kReverse;
-        }
-        else {
+        } else {
             intakeHoodValue = Value.kForward;
         }
 
@@ -76,8 +74,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
         if (deploy) {
             intakeRollerValue = Value.kReverse;
-        }
-        else {
+        } else {
             intakeRollerValue = Value.kForward;
         }
 
@@ -99,6 +96,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     /**
      * Set the speed on the intake motor
+     * 
      * @param speed in the range -1.0 to 1.0, 0 = stopped;
      */
     public void setMotorSpeed(double speed) {
@@ -108,8 +106,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Intake Motor",  intakeMotorSetpoint);
-        SmartDashboard.putString("Intake Hood",   intakeHoodValue.toString());
+        SmartDashboard.putNumber("Intake Motor", intakeMotorSetpoint);
+        SmartDashboard.putString("Intake Hood", intakeHoodValue.toString());
         SmartDashboard.putString("Intake Roller", intakeRollerValue.toString());
     }
 }
