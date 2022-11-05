@@ -16,6 +16,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private double shooterMotorSetpoint = 0;
     private double kickerMotorSetpoint = 0;
+
     private final DigitalInput ballSensor = new DigitalInput(ShooterConstants.BALL_SENSOR_ADDRESS);
 
     public ShooterSubsystem(){
