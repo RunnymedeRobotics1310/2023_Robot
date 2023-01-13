@@ -21,6 +21,7 @@ public final class Constants {
     public static final class AutoConstants {
         public static final String AUTO_PATTERN_DO_NOTHING = "Do nothing";
         public static final String AUTO_PATTERN_SHOOT = "Shoot";
+        public static final String AUTO_PATTERN_MID_DIRECT_CHARGE = "Start in the middle, head directly to the charge station";
     }
 
     public static final class IntakeConstants {

@@ -27,21 +27,24 @@ public class AutonomousCommand extends SequentialCommandGroup {
         }
 
         // Placeholder for auto commands
+        System.out.println("Selected auto command: "+selectedAuto);
         switch (selectedAuto) {
 
         case AutoConstants.AUTO_PATTERN_DO_NOTHING:
             // Do nothing
-            System.out.println("Do nothing auto selected");
             addCommands(new InstantCommand());
             break;
 
         case AutoConstants.AUTO_PATTERN_SHOOT:
             // Do nothing
-            System.out.println("Do shoot selected");
             addCommands(
                     new ShootCommand(
                             ShooterConstants.SHOOT_HIGH_SPEED,
                             shooterSubsystem, intakeSubsystem));
+            break;
+
+        case AutoConstants.AUTO_PATTERN_MID_DIRECT_CHARGE:
+            addCommands(new MidDirectChargeCommand());
             break;
 
         default:
