@@ -159,3 +159,7 @@ gradle-app.setting
 bin/
 imgui.ini
 
+# IDEA
+.idea
+*.iml
+
