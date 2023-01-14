@@ -160,6 +160,6 @@ bin/
 imgui.ini
 
 # IDEA
-.idea
-*.iml
+*/.idea/workspace.xml
+*/.idea/tasks.xml
 
