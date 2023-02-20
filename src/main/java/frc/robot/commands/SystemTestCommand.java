@@ -28,7 +28,7 @@ public class SystemTestCommand extends CommandBase {
     private boolean              previousRightBumper = false;
 
     /**
-     * Cancel the commands running on all subsystems.
+     * System Test Command
      *
      * All subsystems must be passed to this command, and each subsystem should have a stop command
      * that safely stops the robot from moving.

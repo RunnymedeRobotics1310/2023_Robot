@@ -75,6 +75,9 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureButtonBindings();
+
+        // Initialize the SmartDashboad test mode indicator
+        SmartDashboard.putBoolean("Test Mode", false);
     }
 
     private void initAutoSelectors() {
@@ -159,8 +162,7 @@ public class RobotContainer {
             .onTrue(new CancelCommand(driveSubsystem));
 
         // Enter Test Mode (Start and Back pressed at the same time)
-        new Trigger(() -> (driverController.getStartButton()
-            && driverController.getBackButton()))
+        new Trigger(() -> (driverController.getStartButton() && driverController.getBackButton()))
             .onTrue(new SystemTestCommand(driverController,
                 driveSubsystem, armSubsystem));
 
