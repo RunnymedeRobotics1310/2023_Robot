@@ -89,6 +89,16 @@ public final class Constants {
 
         /** Time to switch pipelines and acquire a new vision target */
         public static final double VISION_SWITCH_TIME_SEC = .25;
+        
+        /** The camera view */
+        public enum CameraView {
+            /** Point at an angle to view the intake */
+            LOW,
+            /** Point towards the high goal */
+            HIGH
+        };
+
+        public static final int CAMERA_SERVO_PWM_PORT = 0;
     }
 
     public static final class ArmConstants {

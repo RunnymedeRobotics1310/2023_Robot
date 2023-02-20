@@ -1,33 +1,24 @@
 package frc.robot.commands.drive;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class ResetGyroPitchCommand extends CommandBase {
+public class ResetGyroPitchCommand extends InstantCommand {
 
-    private final DriveSubsystem driveSubsystem;
-
-    /**
-     * Set the current heading in the driveSubsystem
-     *
-     * @param heading value 0-360
-     * @param driveSubsystem
-     */
     public ResetGyroPitchCommand(DriveSubsystem driveSubsystem) {
 
-        this.driveSubsystem = driveSubsystem;
+        super(() -> {
+
+            System.out.println("ResetGyroPitchCommand: Reset the gyro pitch to zero");
+
+            driveSubsystem.setGyroPitch(0);
+        });
     }
 
     @Override
-    public void initialize() {
-
-        System.out.println("Reset the gyro pitch to zero");
-
-        driveSubsystem.setGyroPitch(0);
-    }
-
-    @Override
-    public boolean isFinished() {
+    public boolean runsWhenDisabled() {
+        // Allow the pitch to be reset when disabled
         return true;
     }
+
 }

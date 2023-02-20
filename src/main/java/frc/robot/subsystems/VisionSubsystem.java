@@ -3,8 +3,10 @@ package frc.robot.subsystems;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.VisionConstants.CameraView;
 
 public class VisionSubsystem extends SubsystemBase {
 
@@ -47,6 +49,13 @@ public class VisionSubsystem extends SubsystemBase {
     NetworkTableEntry         tl                        = table.getEntry("tl");
 
     private VisionTargetType  currentVisionTargetType   = VisionTargetType.NONE;
+
+    private Servo             cameraServo               = new Servo(0);
+    private CameraView        cameraView                = CameraView.LOW;
+
+    public VisionSubsystem() {
+        setCameraView(CameraView.LOW);
+    }
 
     /**
      * Tell the vision subsystem the coordinates that it can see (on the floor).
@@ -91,6 +100,10 @@ public class VisionSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Limelight Pipeline", pipeline.getInteger(-1L));
         SmartDashboard.putBoolean("Cone Targed Acquired", isConeTargetAcquired());
         SmartDashboard.putBoolean("Cube Targed Acquired", isCubeTargetAcquired());
+        SmartDashboard.putString("Camera view", cameraView.toString());
+        if (cameraServo != null) {
+            SmartDashboard.putData("Camera Servo", cameraServo);
+        }
     }
 
     /**
@@ -138,10 +151,6 @@ public class VisionSubsystem extends SubsystemBase {
 
         case CONE_POST:
             // FIXME: Implement a post detection pipe
-            break;
-
-        case NONE:
-            System.out.println("Setting vision target type to NONE is not yet supported");
             break;
 
         default:
@@ -258,6 +267,31 @@ public class VisionSubsystem extends SubsystemBase {
         }
         return false;
 
+    }
+
+    public CameraView getCameraView() {
+        return cameraView;
+    }
+
+    public void setCameraView(CameraView cameraView) {
+
+        if (this.cameraView == cameraView) {
+            return;
+        }
+
+        // The Servo may or may not be installed
+        if (cameraServo != null) {
+            switch (cameraView) {
+            case LOW:
+                cameraServo.set(-1);
+                break;
+            case HIGH:
+                cameraServo.set(1);
+                break;
+            }
+        }
+
+        this.cameraView = cameraView;
     }
 
     public double getTargetOffset() {
