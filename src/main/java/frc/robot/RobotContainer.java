@@ -16,6 +16,7 @@ import frc.robot.Constants.AutoConstants.Orientation;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.OiConstants;
 import frc.robot.commands.CancelCommand;
+import frc.robot.commands.SystemTestCommand;
 import frc.robot.commands.auto.AutonomousCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DefaultDriveCommand;
@@ -24,6 +25,7 @@ import frc.robot.commands.drive.DriveOnHeadingCommand;
 import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.commands.vision.SwitchVisionTargetCommand;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
@@ -39,6 +41,7 @@ public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     private final DriveSubsystem    driveSubsystem                = new DriveSubsystem();
     private final VisionSubsystem   visionSubsystem               = new VisionSubsystem();
+    private final ArmSubsystem      armSubsystem                  = new ArmSubsystem();
 
     // A set of choosers for autonomous patterns
     SendableChooser<AutoLane>       startingLaneChooser           = new SendableChooser<>();
@@ -150,8 +153,16 @@ public class RobotContainer {
     private void configureButtonBindings() {
 
         // Cancel all commands on the XBox controller three lines (aka. start) button
+        // NOTE: The SystemTestCommand uses the same button, so update the code in the
+        // SystemTestCommand if this button changes
         new Trigger(() -> driverController.getStartButton())
             .onTrue(new CancelCommand(driveSubsystem));
+
+        // Enter Test Mode (Start and Back pressed at the same time)
+        new Trigger(() -> (driverController.getStartButton()
+            && driverController.getBackButton()))
+            .onTrue(new SystemTestCommand(driverController,
+                driveSubsystem, armSubsystem));
 
         // Reset the Gyro heading to zero on the menu (aka. back) button
         new Trigger(() -> driverController.getBackButton())
@@ -174,9 +185,8 @@ public class RobotContainer {
         new Trigger(() -> (driverController.getLeftBumper()))
             .onTrue(new SwitchVisionTargetCommand(visionSubsystem));
 
-        new Trigger(() -> (driverController.getAButton())).onTrue(new BalanceCommand(driveSubsystem));
-
-
+        new Trigger(() -> (driverController.getAButton()))
+            .onTrue(new BalanceCommand(driveSubsystem));
     }
 
     /**
@@ -196,6 +206,5 @@ public class RobotContainer {
             exitZoneActionChooser,
             secondGamePieceScoringChooser,
             balanceChooser);
-
     }
 }
