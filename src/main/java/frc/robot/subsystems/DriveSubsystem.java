@@ -1,13 +1,12 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
@@ -15,52 +14,52 @@ import frc.robot.Constants.DriveConstants;
 public class DriveSubsystem extends SubsystemBase {
 
     // The motors on the left side of the drive.
-    private final TalonSRX     leftPrimaryMotor         = new TalonSRX(DriveConstants.LEFT_MOTOR_PORT);
-    private final TalonSRX     leftFollowerMotor        = new TalonSRX(DriveConstants.LEFT_MOTOR_PORT + 1);
+    private final CANSparkMax leftPrimaryMotor         = new CANSparkMax(DriveConstants.LEFT_MOTOR_PORT, MotorType.kBrushless);
+    private final CANSparkMax leftFollowerMotor        = new CANSparkMax(DriveConstants.LEFT_MOTOR_PORT + 1,
+        MotorType.kBrushless);
 
     // The motors on the right side of the drive.
-    private final TalonSRX     rightPrimaryMotor        = new TalonSRX(DriveConstants.RIGHT_MOTOR_PORT);
-    private final TalonSRX     rightFollowerMotor       = new TalonSRX(DriveConstants.RIGHT_MOTOR_PORT + 1);
-
-    private final DigitalInput targetSensor             = new DigitalInput(0);
+    private final CANSparkMax rightPrimaryMotor        = new CANSparkMax(DriveConstants.RIGHT_MOTOR_PORT, MotorType.kBrushless);
+    private final CANSparkMax rightFollowerMotor       = new CANSparkMax(DriveConstants.RIGHT_MOTOR_PORT + 1,
+        MotorType.kBrushless);
 
     // Conversion from volts to distance in cm
     // Volts distance
     // 0.12 30.5 cm
     // 2.245 609.6 cm
-    private final AnalogInput  ultrasonicDistanceSensor = new AnalogInput(0);
+    private final AnalogInput ultrasonicDistanceSensor = new AnalogInput(0);
 
-    private final double       ULTRASONIC_M             = (609.6 - 30.5) / (2.245 - .12);
-    private final double       ULTRASONIC_B             = 609.6 - ULTRASONIC_M * 2.245;
+    private final double      ULTRASONIC_M             = (609.6 - 30.5) / (2.245 - .12);
+    private final double      ULTRASONIC_B             = 609.6 - ULTRASONIC_M * 2.245;
 
 
-    private double             leftSpeed                = 0;
-    private double             rightSpeed               = 0;
+    private double            leftSpeed                = 0;
+    private double            rightSpeed               = 0;
 
-    private AHRS               navXGyro                 = new AHRS() {
-                                                            // Override the "Value" in the gyro
-                                                            // sendable to use the angle instead of
-                                                            // the yaw.
-                                                            // Using the angle makes the gyro appear
-                                                            // in the correct position accounting
-                                                            // for the
-                                                            // offset. The yaw is the raw sensor
-                                                            // value which appears incorrectly on
-                                                            // the dashboard.
-                                                            @Override
-                                                            public void initSendable(SendableBuilder builder) {
-                                                                builder.setSmartDashboardType("Gyro");
-                                                                builder.addDoubleProperty("Value", this::getAngle, null);
-                                                            }
-                                                        };
+    private AHRS              navXGyro                 = new AHRS() {
+                                                           // Override the "Value" in the gyro
+                                                           // sendable to use the angle instead of
+                                                           // the yaw.
+                                                           // Using the angle makes the gyro appear
+                                                           // in the correct position accounting
+                                                           // for the
+                                                           // offset. The yaw is the raw sensor
+                                                           // value which appears incorrectly on
+                                                           // the dashboard.
+                                                           @Override
+                                                           public void initSendable(SendableBuilder builder) {
+                                                               builder.setSmartDashboardType("Gyro");
+                                                               builder.addDoubleProperty("Value", this::getAngle, null);
+                                                           }
+                                                       };
 
-    private double             zeroX                    = 0;
-    private double             zeroY                    = 0;
+    private double            zeroX                    = 0;
+    private double            zeroY                    = 0;
 
-    private double             gyroHeadingOffset        = 0;
-    private double             gyroPitchOffset          = 0;
-    private double             lastPitch                = 0;
-    private double             pitchRate                = 0;
+    private double            gyroHeadingOffset        = 0;
+    private double            gyroPitchOffset          = 0;
+    private double            lastPitch                = 0;
+    private double            pitchRate                = 0;
 
     private enum GyroAxis {
         YAW, PITCH, ROLL
@@ -69,14 +68,11 @@ public class DriveSubsystem extends SubsystemBase {
     /** Creates a new DriveSubsystem. */
     public DriveSubsystem() {
 
-        // We need to invert one side of the drivetrain so that positive voltages
-        // result in both sides moving forward. Depending on how your robot's
-        // gearbox is constructed, you might have to invert the left side instead.
         leftPrimaryMotor.setInverted(DriveConstants.LEFT_MOTOR_REVERSED);
         leftFollowerMotor.setInverted(DriveConstants.LEFT_MOTOR_REVERSED);
 
-        leftPrimaryMotor.setNeutralMode(NeutralMode.Brake);
-        leftFollowerMotor.setNeutralMode(NeutralMode.Brake);
+        leftPrimaryMotor.setIdleMode(IdleMode.kBrake);
+        leftFollowerMotor.setIdleMode(IdleMode.kBrake);
 
         leftFollowerMotor.follow(leftPrimaryMotor);
 
@@ -84,14 +80,13 @@ public class DriveSubsystem extends SubsystemBase {
         rightPrimaryMotor.setInverted(DriveConstants.RIGHT_MOTOR_REVERSED);
         rightFollowerMotor.setInverted(DriveConstants.RIGHT_MOTOR_REVERSED);
 
-        rightPrimaryMotor.setNeutralMode(NeutralMode.Brake);
-        rightFollowerMotor.setNeutralMode(NeutralMode.Brake);
+        rightPrimaryMotor.setIdleMode(IdleMode.kBrake);
+        rightFollowerMotor.setIdleMode(IdleMode.kBrake);
 
         rightFollowerMotor.follow(rightPrimaryMotor);
 
         // Setting both encoders to 0
         resetEncoders();
-
     }
 
     /**
@@ -277,20 +272,13 @@ public class DriveSubsystem extends SubsystemBase {
         this.leftSpeed  = leftSpeed;
         this.rightSpeed = rightSpeed;
 
-        leftPrimaryMotor.set(ControlMode.PercentOutput, leftSpeed);
-        rightPrimaryMotor.set(ControlMode.PercentOutput, rightSpeed);
-
-        // NOTE: The follower motors are set to follow the primary
-        // motors
+        leftPrimaryMotor.set(leftSpeed);
+        rightPrimaryMotor.set(rightSpeed);
     }
 
     /** Safely stop the subsystem from moving */
     public void stop() {
         setMotorSpeeds(0, 0);
-    }
-
-    public boolean isTargetDetected() {
-        return !targetSensor.get();
     }
 
     @Override

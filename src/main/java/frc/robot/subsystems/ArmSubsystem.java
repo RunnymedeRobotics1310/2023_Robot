@@ -4,33 +4,35 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
 
-    private static final MotorType motorType      = MotorType.kBrushless;
+    private static final MotorType motorType         = MotorType.kBrushless;
 
     // The motors for the arm lifting
-    private final CANSparkMax      topArmMotor    = new CANSparkMax(ArmConstants.TOP_MOTOR_PORT, motorType);
-    private final CANSparkMax      bottomArmMotor = new CANSparkMax(ArmConstants.BOTTOM_MOTOR_PORT, motorType);
+    private final CANSparkMax      topArmMotor       = new CANSparkMax(ArmConstants.TOP_MOTOR_PORT, motorType);
+    private final CANSparkMax      bottomArmMotor    = new CANSparkMax(ArmConstants.BOTTOM_MOTOR_PORT, motorType);
 
     // motors for extension and pincher
-    private final CANSparkMax      extendArmMotor = new CANSparkMax(ArmConstants.EXTEND_MOTOR_PORT, motorType);
+    private final CANSparkMax      extendArmMotor    = new CANSparkMax(ArmConstants.EXTEND_MOTOR_PORT, motorType);
     // private final CANSparkMax
 
-    private RelativeEncoder        liftEncoder    = topArmMotor.getEncoder();
-    private RelativeEncoder        extendEncoder  = extendArmMotor.getEncoder();
+    private RelativeEncoder        liftEncoder       = topArmMotor.getEncoder();
+    private RelativeEncoder        extendEncoder     = extendArmMotor.getEncoder();
 
-    private double                 liftSpeed      = 0;
-    private double                 extendSpeed    = 0;
+    private double                 liftSpeed         = 0;
+    private double                 extendSpeed       = 0;
+
+    private final DigitalInput     gamePieceDetector = new DigitalInput(0);
+
+
 
     /** Creates a new ArmSubsystem */
     public ArmSubsystem() {
-
-        // TODO Do we need to invert any motors?
-        // reset encoders?
 
         bottomArmMotor.follow(topArmMotor);
 
@@ -61,9 +63,16 @@ public class ArmSubsystem extends SubsystemBase {
         extendEncoder.setPosition(0);
     }
 
+    /** Determine if a game piece is detected in the claw */
+    public boolean isGamePieceDetected() {
+        // The game piece detector (infra-red sensor) returns false when a game
+        // piece is detected
+        return !gamePieceDetector.get();
+    }
+
     /**
      * Set the speed of the lift motors
-     * 
+     *
      * @param speed
      */
     public void setLiftSpeed(double speed) {
@@ -79,7 +88,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     /**
      * Set the speed of the extension motor
-     * 
+     *
      * @param speed
      */
     public void setExtendSpeed(double speed) {
@@ -93,8 +102,19 @@ public class ArmSubsystem extends SubsystemBase {
         setExtendSpeed(0);
     }
 
+    public void checkArmLimits() {
+        // TODO:
+    }
+
+    public void checkClawLimits() {
+        // TODO:
+    }
+
     @Override
     public void periodic() {
+
+        checkArmLimits();
+        checkClawLimits();
 
         SmartDashboard.putNumber("Lift Motor", liftSpeed);
         SmartDashboard.putNumber("Extend  Motor", extendSpeed);
