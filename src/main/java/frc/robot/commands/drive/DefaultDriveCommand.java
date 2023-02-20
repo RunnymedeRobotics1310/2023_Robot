@@ -241,7 +241,7 @@ public class DefaultDriveCommand extends CommandBase {
         }
         else {
 
-            if (Math.abs(speed) + Math.abs(turn) >= max) {
+            if (Math.abs(speed) + Math.abs(turn) <= max) {
 
                 // If the speed + turn is less than the max, then apply the turn equally to
                 // the left and right side.
