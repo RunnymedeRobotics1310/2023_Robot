@@ -273,6 +273,11 @@ public class VisionSubsystem extends SubsystemBase {
         return cameraView;
     }
 
+    /** Set the camera servo to the specified position in the range -1.0 to 1.0 */
+    public void setCameraServoPosition(double servoPostion) {
+        cameraServo.set(servoPostion);
+    }
+
     public void setCameraView(CameraView cameraView) {
 
         if (this.cameraView == cameraView) {

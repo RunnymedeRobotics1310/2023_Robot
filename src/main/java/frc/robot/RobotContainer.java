@@ -164,7 +164,7 @@ public class RobotContainer {
         // Enter Test Mode (Start and Back pressed at the same time)
         new Trigger(() -> (driverController.getStartButton() && driverController.getBackButton()))
             .onTrue(new SystemTestCommand(driverController,
-                driveSubsystem, armSubsystem));
+                driveSubsystem, armSubsystem, visionSubsystem));
 
         // Reset the Gyro heading to zero on the menu (aka. back) button
         new Trigger(() -> driverController.getBackButton())

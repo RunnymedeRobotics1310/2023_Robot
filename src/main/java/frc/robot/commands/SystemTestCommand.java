@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 
 /**
  * This command is used to safely stop the robot in its current position, and to
@@ -13,19 +14,20 @@ import frc.robot.subsystems.DriveSubsystem;
 public class SystemTestCommand extends CommandBase {
 
     private enum Motor {
-        NONE, DRIVE_LEFT, DRIVE_RIGHT, ARM_LIFT, ARM_EXTEND, PINCHER
+        NONE, DRIVE_LEFT, DRIVE_RIGHT, ARM_LIFT, ARM_EXTEND, PINCHER, CAMERA
     };
 
-    private final XboxController controller;
-    private final DriveSubsystem driveSubsystem;
-    private final ArmSubsystem   armSubsystem;
+    private final XboxController  controller;
+    private final DriveSubsystem  driveSubsystem;
+    private final ArmSubsystem    armSubsystem;
+    private final VisionSubsystem visionSubsystem;
 
-    private long                 startTime           = 0;
-    private Motor                selectedMotor       = Motor.NONE;
-    private double               motorSpeed          = 0;
+    private long                  startTime           = 0;
+    private Motor                 selectedMotor       = Motor.NONE;
+    private double                motorSpeed          = 0;
 
-    private boolean              previousLeftBumper  = false;
-    private boolean              previousRightBumper = false;
+    private boolean               previousLeftBumper  = false;
+    private boolean               previousRightBumper = false;
 
     /**
      * System Test Command
@@ -34,13 +36,14 @@ public class SystemTestCommand extends CommandBase {
      * that safely stops the robot from moving.
      */
     public SystemTestCommand(XboxController controller, DriveSubsystem driveSubsystem,
-        ArmSubsystem armSubsystem) {
+        ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem) {
 
-        this.controller     = controller;
-        this.driveSubsystem = driveSubsystem;
-        this.armSubsystem   = armSubsystem;
+        this.controller      = controller;
+        this.driveSubsystem  = driveSubsystem;
+        this.armSubsystem    = armSubsystem;
+        this.visionSubsystem = visionSubsystem;
 
-        addRequirements(driveSubsystem, armSubsystem);
+        addRequirements(driveSubsystem, armSubsystem, visionSubsystem);
     }
 
     /**
@@ -171,6 +174,11 @@ public class SystemTestCommand extends CommandBase {
 
         case PINCHER:
             armSubsystem.setPincherSpeed(motorSpeed);
+            break;
+
+        case CAMERA:
+            // Use the motor speed to position the camera angle
+            visionSubsystem.setCameraServoPosition(motorSpeed);
             break;
         }
     }
