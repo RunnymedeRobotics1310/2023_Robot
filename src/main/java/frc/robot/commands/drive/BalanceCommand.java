@@ -10,6 +10,11 @@ public class BalanceCommand extends CommandBase {
     private final DriveSubsystem driveSubsystem;
     long                         startTime = 0;
 
+    // Track the gyro pitch.
+    double                       pitch     = 0;
+    double                       pitchRate = 0;
+    double                       speed     = 0;
+
     /**
      * Drive on a specified compass heading (0-360 degrees) for the specified distance in cm.
      *
@@ -35,9 +40,9 @@ public class BalanceCommand extends CommandBase {
     public void execute() {
 
         // Track the gyro pitch.
-        double pitch     = driveSubsystem.getPitch();
-        double pitchRate = driveSubsystem.getPitchRate();
-        double speed     = 0;
+        pitch     = driveSubsystem.getPitch();
+        pitchRate = driveSubsystem.getPitchRate();
+
 
         // if (Math.abs(pitchRate) > 1) {
         // speed = 0;
@@ -48,6 +53,9 @@ public class BalanceCommand extends CommandBase {
         else if (pitch < -1) {
             speed = -.15;
         }
+        else {
+            speed = 0;
+        }
 
         driveSubsystem.setMotorSpeeds(speed, speed);
 
@@ -56,6 +64,15 @@ public class BalanceCommand extends CommandBase {
     @Override
     public boolean isFinished() {
 
+        // Track the gyro pitch.
+        pitch     = driveSubsystem.getPitch();
+        pitchRate = driveSubsystem.getPitchRate();
+
+        // FIXME: Only finish when it has been still for a couple of seconds. Instantaneous 0 is too
+        // soon, because the charger may be in the middle of passing through 0 while rocking.
+        if (pitch < 0.5 && pitch > -0.5) {
+            return true;
+        }
         if (System.currentTimeMillis() - startTime > 10000) {
             return true;
         }
