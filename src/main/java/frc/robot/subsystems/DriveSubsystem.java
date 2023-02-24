@@ -61,6 +61,8 @@ public class DriveSubsystem extends SubsystemBase {
     private double            lastPitch                = 0;
     private double            pitchRate                = 0;
 
+    private static IdleMode   currentIdleMode          = null;
+
     private enum GyroAxis {
         YAW, PITCH, ROLL
     };
@@ -71,19 +73,10 @@ public class DriveSubsystem extends SubsystemBase {
         leftPrimaryMotor.setInverted(DriveConstants.LEFT_MOTOR_REVERSED);
         leftFollowerMotor.setInverted(DriveConstants.LEFT_MOTOR_REVERSED);
 
-        leftPrimaryMotor.setIdleMode(IdleMode.kBrake);
-        leftFollowerMotor.setIdleMode(IdleMode.kBrake);
-
-        leftFollowerMotor.follow(leftPrimaryMotor);
-
-
         rightPrimaryMotor.setInverted(DriveConstants.RIGHT_MOTOR_REVERSED);
         rightFollowerMotor.setInverted(DriveConstants.RIGHT_MOTOR_REVERSED);
 
-        rightPrimaryMotor.setIdleMode(IdleMode.kBrake);
-        rightFollowerMotor.setIdleMode(IdleMode.kBrake);
-
-        rightFollowerMotor.follow(rightPrimaryMotor);
+        setIdleMode(IdleMode.kBrake);
 
         // Setting both encoders to 0
         resetEncoders();
@@ -269,11 +262,30 @@ public class DriveSubsystem extends SubsystemBase {
      */
     public void setMotorSpeeds(double leftSpeed, double rightSpeed) {
 
+        // when this method is called, the motors should be set to brake.
+        setIdleMode(IdleMode.kBrake);
+
         this.leftSpeed  = leftSpeed;
         this.rightSpeed = rightSpeed;
 
         leftPrimaryMotor.set(leftSpeed);
+        leftFollowerMotor.set(leftSpeed);
+
         rightPrimaryMotor.set(rightSpeed);
+        rightFollowerMotor.set(rightSpeed);
+    }
+
+    public void setTestMotorSpeeds(double leftPrimaryMotorSpeed, double leftFollowerMotorSpeed,
+        double rightPrimaryMotorSpeed, double rightFollowerMotorSpeed) {
+    
+        // When this method is called, the motors should be set to coast.
+        setIdleMode(IdleMode.kCoast);
+    
+        leftPrimaryMotor.set(leftPrimaryMotorSpeed);
+        leftFollowerMotor.set(leftFollowerMotorSpeed);
+    
+        rightPrimaryMotor.set(rightPrimaryMotorSpeed);
+        rightFollowerMotor.set(rightFollowerMotorSpeed);
     }
 
     /** Safely stop the subsystem from moving */
@@ -308,4 +320,21 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Gyro Heading", getHeading());
         SmartDashboard.putNumber("Gyro Pitch", getPitch());
     }
+
+    private void setIdleMode(IdleMode idleMode) {
+
+        if (currentIdleMode != null && currentIdleMode == idleMode) {
+            return;
+        }
+
+        currentIdleMode = idleMode;
+
+        leftPrimaryMotor.setIdleMode(idleMode);
+        leftFollowerMotor.setIdleMode(idleMode);
+
+        rightPrimaryMotor.setIdleMode(idleMode);
+        rightFollowerMotor.setIdleMode(idleMode);
+    }
+
+
 }

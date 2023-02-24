@@ -14,7 +14,13 @@ import frc.robot.subsystems.VisionSubsystem;
 public class SystemTestCommand extends CommandBase {
 
     private enum Motor {
-        NONE, DRIVE_LEFT, DRIVE_RIGHT, ARM_LIFT, ARM_EXTEND, PINCHER, CAMERA
+        NONE,
+        DRIVE_LEFT_1, DRIVE_LEFT_2, DRIVE_LEFT,
+        DRIVE_RIGHT_1, DRIVE_RIGHT_2, DRIVE_RIGHT,
+        ARM_LIFT_1, ARM_LIFT_2, ARM_LIFT,
+        ARM_EXTEND,
+        PINCHER,
+        CAMERA
     };
 
     private final XboxController  controller;
@@ -46,12 +52,17 @@ public class SystemTestCommand extends CommandBase {
         addRequirements(driveSubsystem, armSubsystem, visionSubsystem);
     }
 
-    /**
-     * The SystemTestCommand is not interruptible, and prevents all other commands that try to
-     * interrupt it. Only the cancel button will end the SystemTestCommand.
-     */
+    @Override
+    public boolean runsWhenDisabled() {
+        return true;
+    }
+
     @Override
     public InterruptionBehavior getInterruptionBehavior() {
+        /*
+         * The SystemTestCommand is not interruptible, and prevents all other commands that try to
+         * interrupt it. Only the cancel button will end the SystemTestCommand.
+         */
         return InterruptionBehavior.kCancelIncoming;
     }
 
@@ -121,7 +132,7 @@ public class SystemTestCommand extends CommandBase {
 
         if (pov == 0) {
 
-            motorSpeed += 0.04;
+            motorSpeed += 0.004;
 
             if (motorSpeed > 1.0) {
                 motorSpeed = 1.0;
@@ -130,7 +141,7 @@ public class SystemTestCommand extends CommandBase {
 
         if (pov == 180) {
 
-            motorSpeed -= 0.04;
+            motorSpeed -= 0.004;
 
             if (motorSpeed < -1.0) {
                 motorSpeed = -1.0;
@@ -156,12 +167,36 @@ public class SystemTestCommand extends CommandBase {
         case NONE:
             break;
 
+        case DRIVE_LEFT_1:
+            driveSubsystem.setTestMotorSpeeds(motorSpeed, 0, 0, 0);
+            break;
+
+        case DRIVE_LEFT_2:
+            driveSubsystem.setTestMotorSpeeds(0, motorSpeed, 0, 0);
+            break;
+
         case DRIVE_LEFT:
             driveSubsystem.setMotorSpeeds(motorSpeed, 0);
             break;
 
+        case DRIVE_RIGHT_1:
+            driveSubsystem.setTestMotorSpeeds(0, 0, motorSpeed, 0);
+            break;
+
+        case DRIVE_RIGHT_2:
+            driveSubsystem.setTestMotorSpeeds(0, 0, 0, motorSpeed);
+            break;
+
         case DRIVE_RIGHT:
             driveSubsystem.setMotorSpeeds(0, motorSpeed);
+            break;
+
+        case ARM_LIFT_1:
+            armSubsystem.setArmLiftTestSpeed(motorSpeed, 0);
+            break;
+
+        case ARM_LIFT_2:
+            armSubsystem.setArmLiftTestSpeed(0, motorSpeed);
             break;
 
         case ARM_LIFT:

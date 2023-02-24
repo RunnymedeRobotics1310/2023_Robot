@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxLimitSwitch;
@@ -43,6 +44,7 @@ public class ArmSubsystem extends SubsystemBase {
     private double                 armLiftEncoderOffset   = 0;
     private double                 pincherEncoderOffset   = 0;
 
+    private IdleMode               currentArmLiftIdleMode = null;
     /*
      * Limit Switches
      */
@@ -61,8 +63,6 @@ public class ArmSubsystem extends SubsystemBase {
 
     /** Creates a new ArmSubsystem */
     public ArmSubsystem() {
-
-        armLiftFollower.follow(armLiftMotor);
 
     }
 
@@ -152,8 +152,19 @@ public class ArmSubsystem extends SubsystemBase {
      */
     public void setArmLiftSpeed(double speed) {
 
+        setArmLiftIdleMode(IdleMode.kBrake);
+
         armLiftSpeed = checkArmLiftLimits(speed);
         armLiftMotor.set(armLiftSpeed);
+        armLiftFollower.set(armLiftSpeed);
+    }
+
+    public void setArmLiftTestSpeed(double armLiftMotorSpeed, double armLiftFollowerSpeed) {
+
+        setArmLiftIdleMode(IdleMode.kCoast);
+
+        armLiftMotor.set(armLiftMotorSpeed);
+        armLiftFollower.set(armLiftFollowerSpeed);
     }
 
     /**
@@ -202,6 +213,7 @@ public class ArmSubsystem extends SubsystemBase {
          */
         armLiftSpeed = checkArmLiftLimits(armLiftSpeed);
         armLiftMotor.set(armLiftSpeed);
+        armLiftFollower.set(armLiftSpeed);
 
         armExtendSpeed = checkArmExtendLimits(armExtendSpeed);
         armExtendMotor.set(armExtendSpeed);
@@ -346,5 +358,17 @@ public class ArmSubsystem extends SubsystemBase {
         }
 
         return inputSpeed;
+    }
+
+    private void setArmLiftIdleMode(IdleMode idleMode) {
+
+        if (currentArmLiftIdleMode != null && currentArmLiftIdleMode == idleMode) {
+            return;
+        }
+
+        currentArmLiftIdleMode = idleMode;
+
+        armLiftMotor.setIdleMode(idleMode);
+        armLiftFollower.setIdleMode(idleMode);
     }
 }
