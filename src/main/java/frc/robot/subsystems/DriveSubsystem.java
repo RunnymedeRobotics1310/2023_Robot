@@ -4,6 +4,7 @@ import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -14,54 +15,62 @@ import frc.robot.Constants.DriveConstants;
 public class DriveSubsystem extends SubsystemBase {
 
     // The motors on the left side of the drive.
-    private final CANSparkMax leftPrimaryMotor         = new CANSparkMax(DriveConstants.LEFT_MOTOR_PORT, MotorType.kBrushless);
-    private final CANSparkMax leftFollowerMotor        = new CANSparkMax(DriveConstants.LEFT_MOTOR_PORT + 1,
+    private final CANSparkMax     leftPrimaryMotor         = new CANSparkMax(DriveConstants.LEFT_MOTOR_PORT,
+        MotorType.kBrushless);
+    private final CANSparkMax     leftFollowerMotor        = new CANSparkMax(DriveConstants.LEFT_MOTOR_PORT + 1,
         MotorType.kBrushless);
 
     // The motors on the right side of the drive.
-    private final CANSparkMax rightPrimaryMotor        = new CANSparkMax(DriveConstants.RIGHT_MOTOR_PORT, MotorType.kBrushless);
-    private final CANSparkMax rightFollowerMotor       = new CANSparkMax(DriveConstants.RIGHT_MOTOR_PORT + 1,
+    private final CANSparkMax     rightPrimaryMotor        = new CANSparkMax(DriveConstants.RIGHT_MOTOR_PORT,
         MotorType.kBrushless);
+    private final CANSparkMax     rightFollowerMotor       = new CANSparkMax(DriveConstants.RIGHT_MOTOR_PORT + 1,
+        MotorType.kBrushless);
+
+    private double                leftSpeed                = 0;
+    private double                rightSpeed               = 0;
+
+    private IdleMode              idleMode                 = null;
+
+    // Encoders
+    private final RelativeEncoder leftEncoder              = leftPrimaryMotor.getEncoder();
+    private final RelativeEncoder rightEncoder             = rightPrimaryMotor.getEncoder();
+
+    private double                leftEncoderOffset        = 0;
+    private double                rightEncoderOffset       = 0;
 
     // Conversion from volts to distance in cm
     // Volts distance
     // 0.12 30.5 cm
     // 2.245 609.6 cm
-    private final AnalogInput ultrasonicDistanceSensor = new AnalogInput(0);
+    private final AnalogInput     ultrasonicDistanceSensor = new AnalogInput(0);
 
-    private final double      ULTRASONIC_M             = (609.6 - 30.5) / (2.245 - .12);
-    private final double      ULTRASONIC_B             = 609.6 - ULTRASONIC_M * 2.245;
+    private final double          ULTRASONIC_M             = (609.6 - 30.5) / (2.245 - .12);
+    private final double          ULTRASONIC_B             = 609.6 - ULTRASONIC_M * 2.245;
 
+    /*
+     * Gyro
+     */
+    private AHRS                  navXGyro                 = new AHRS() {
+                                                               // Override the "Value" in the gyro
+                                                               // sendable to use the angle instead
+                                                               // of
+                                                               // the yaw.
+                                                               // Using the angle makes the gyro
+                                                               // appear
+                                                               // in the correct position accounting
+                                                               // for the
+                                                               // offset. The yaw is the raw sensor
+                                                               // value which appears incorrectly on
+                                                               // the dashboard.
+                                                               @Override
+                                                               public void initSendable(SendableBuilder builder) {
+                                                                   builder.setSmartDashboardType("Gyro");
+                                                                   builder.addDoubleProperty("Value", this::getAngle, null);
+                                                               }
+                                                           };
 
-    private double            leftSpeed                = 0;
-    private double            rightSpeed               = 0;
-
-    private AHRS              navXGyro                 = new AHRS() {
-                                                           // Override the "Value" in the gyro
-                                                           // sendable to use the angle instead of
-                                                           // the yaw.
-                                                           // Using the angle makes the gyro appear
-                                                           // in the correct position accounting
-                                                           // for the
-                                                           // offset. The yaw is the raw sensor
-                                                           // value which appears incorrectly on
-                                                           // the dashboard.
-                                                           @Override
-                                                           public void initSendable(SendableBuilder builder) {
-                                                               builder.setSmartDashboardType("Gyro");
-                                                               builder.addDoubleProperty("Value", this::getAngle, null);
-                                                           }
-                                                       };
-
-    private double            zeroX                    = 0;
-    private double            zeroY                    = 0;
-
-    private double            gyroHeadingOffset        = 0;
-    private double            gyroPitchOffset          = 0;
-    private double            lastPitch                = 0;
-    private double            pitchRate                = 0;
-
-    private static IdleMode   currentIdleMode          = null;
+    private double                gyroHeadingOffset        = 0;
+    private double                gyroPitchOffset          = 0;
 
     private enum GyroAxis {
         YAW, PITCH, ROLL
@@ -187,28 +196,18 @@ public class DriveSubsystem extends SubsystemBase {
         return gyroPitch;
     }
 
-    public double getPitchRate() {
-        return pitchRate;
-    }
-
     /**
      * Gets the average distance of the two encoders.
      *
      * @return the average of the two encoder readings
      */
-    public double getAverageEncoderCounts() {
+    public double getAverageEncoderValue() {
         return (getLeftEncoder() + getRightEncoder()) / 2;
     }
 
     public double getEncoderDistanceCm() {
 
-        // FIXME: Use the NavX distance for now, but change this to encoder distance when possible
-        double xCm = (navXGyro.getDisplacementX() - zeroX) * 100;
-        double yCm = (navXGyro.getDisplacementY() - zeroY) * 100;
-
-        return Math.round(Math.sqrt(xCm * xCm + yCm * yCm));
-
-        // return getAverageEncoderCounts() * DriveConstants.INCHES_PER_ENCODER_COUNT;
+        return getAverageEncoderValue() * DriveConstants.DISTANCE_IN_CM_PER_ROTATION;
     }
 
     /**
@@ -217,7 +216,7 @@ public class DriveSubsystem extends SubsystemBase {
      * @return the left drive encoder
      */
     public double getLeftEncoder() {
-        return 0; // leftEncoder.getPosition();
+        return leftEncoder.getPosition() + leftEncoderOffset;
     }
 
     /**
@@ -226,23 +225,14 @@ public class DriveSubsystem extends SubsystemBase {
      * @return the right drive encoder
      */
     public double getRightEncoder() {
-        return 0; // rightEncoder.getPosition();
+        return rightEncoder.getPosition() + rightEncoderOffset;
     }
 
     /** Resets the drive encoders to currently read a position of 0. */
     public void resetEncoders() {
 
-        // FIXME: This routine captures the current NavX position (x, y)
-        // which is used in the getDistanceCm.
-        zeroX = navXGyro.getDisplacementX();
-        zeroY = navXGyro.getDisplacementY();
-
-        // rightEncoder.setPosition(0);
-        // leftEncoder.setPosition(0);
-
-        // FIXME: If using a NavX, pull the distance estimate off the NavX gyro.
-        // For the reset routine, just store the current NavX value and
-        // then return the delta from that value on all subsequent reads
+        leftEncoderOffset  = -leftEncoder.getPosition();
+        rightEncoderOffset = -rightEncoder.getPosition();
     }
 
     public double getUltrasonicDistanceCm() {
@@ -277,13 +267,13 @@ public class DriveSubsystem extends SubsystemBase {
 
     public void setTestMotorSpeeds(double leftPrimaryMotorSpeed, double leftFollowerMotorSpeed,
         double rightPrimaryMotorSpeed, double rightFollowerMotorSpeed) {
-    
+
         // When this method is called, the motors should be set to coast.
         setIdleMode(IdleMode.kCoast);
-    
+
         leftPrimaryMotor.set(leftPrimaryMotorSpeed);
         leftFollowerMotor.set(leftFollowerMotorSpeed);
-    
+
         rightPrimaryMotor.set(rightPrimaryMotorSpeed);
         rightFollowerMotor.set(rightFollowerMotorSpeed);
     }
@@ -295,9 +285,6 @@ public class DriveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-
-        pitchRate = (getPitch() - lastPitch) * 50; // 50Hz
-        lastPitch = getPitch();
 
         SmartDashboard.putNumber("Right Motor", rightSpeed);
         SmartDashboard.putNumber("Left  Motor", leftSpeed);
@@ -311,23 +298,17 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Ultrasonic Distance (cm)", getUltrasonicDistanceCm());
 
         SmartDashboard.putData("Gyro", navXGyro);
-
-        // Put the displacements on the smartDashboard for testing (round to nearest cm)
-        SmartDashboard.putNumber("NavX: X (cm)", Math.round(navXGyro.getDisplacementX() * 100));
-        SmartDashboard.putNumber("NavX: Y (cm)", Math.round(navXGyro.getDisplacementY() * 100));
-        SmartDashboard.putNumber("NavX: Z (cm)", Math.round(navXGyro.getDisplacementZ() * 100));
-
         SmartDashboard.putNumber("Gyro Heading", getHeading());
         SmartDashboard.putNumber("Gyro Pitch", getPitch());
     }
 
     private void setIdleMode(IdleMode idleMode) {
 
-        if (currentIdleMode != null && currentIdleMode == idleMode) {
+        if (idleMode != null && idleMode == this.idleMode) {
             return;
         }
 
-        currentIdleMode = idleMode;
+        this.idleMode = idleMode;
 
         leftPrimaryMotor.setIdleMode(idleMode);
         leftFollowerMotor.setIdleMode(idleMode);

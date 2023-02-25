@@ -321,4 +321,9 @@ public class VisionSubsystem extends SubsystemBase {
             throw new IllegalStateException("Cannot get an offset because no target has been acquired");
         }
     }
+
+    public void stop() {
+
+        // TODO: Safely stop all motors
+    }
 }

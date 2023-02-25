@@ -258,6 +258,7 @@ public class SystemTestCommand extends CommandBase {
 
         driveSubsystem.stop();
         armSubsystem.stop();
+        visionSubsystem.stop();
 
         motorSpeed = 0;
     }
