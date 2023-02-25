@@ -85,7 +85,7 @@ public class DefaultDriveCommand extends CommandBase {
         double rightSpeed = leftY - leftX / (leftY == 0 ? 1 : 2);
 
         // Boost
-        if (driverController.getRightBumper()) {
+        if (driverController.isBoost()) {
             driveSubsystem.setMotorSpeeds(leftSpeed, rightSpeed);
         }
         else {
@@ -99,7 +99,7 @@ public class DefaultDriveCommand extends CommandBase {
         double rightSpeed = driverController.getRawAxis(5);
 
         // Boost
-        if (driverController.getRightBumper()) {
+        if (driverController.isBoost()) {
             driveSubsystem.setMotorSpeeds(leftSpeed, rightSpeed);
         }
         else {
@@ -121,7 +121,7 @@ public class DefaultDriveCommand extends CommandBase {
         SmartDashboard.putNumber("Turn", rawTurn);
 
         double  turn      = rawTurn / 2;
-        boolean boost     = driverController.getRightBumper();
+        boolean boost     = driverController.isBoost();
 
         double  leftSpeed = 0, rightSpeed = 0;
 

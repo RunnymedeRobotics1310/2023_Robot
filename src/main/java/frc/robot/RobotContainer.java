@@ -25,7 +25,6 @@ import frc.robot.commands.drive.DriveOnHeadingCommand;
 import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.commands.operator.Runnymede2023GameController;
-import frc.robot.commands.vision.SwitchVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -186,10 +185,7 @@ public class RobotContainer {
         new Trigger(() -> (driverController.getPOV() == 270))
             .onTrue(new DriveOnHeadingCommand(270, .5, 400, driveSubsystem));
 
-        new Trigger(() -> (driverController.getLeftBumper()))
-            .onTrue(new SwitchVisionTargetCommand(visionSubsystem));
-
-        new Trigger(() -> (driverController.getAButton()))
+        new Trigger(() -> (driverController.isHigh()))
             .onTrue(new BalanceCommand(driveSubsystem));
     }
 

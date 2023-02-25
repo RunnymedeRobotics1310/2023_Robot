@@ -45,4 +45,40 @@ public class Runnymede2023GameController extends RunnymedeGameController {
     public boolean isSlowDown() {
         return this.getRightBumper();
     }
+
+    public boolean isHigh() {
+        return this.getYButton();
+    }
+
+    public boolean isMid() {
+        return this.getBButton();
+    }
+
+    public boolean isLow() {
+        return this.getAButton();
+    }
+
+    public boolean isDrop() {
+        return this.getXButton();
+    }
+
+    public boolean isPickUpCone() {
+        return this.getLeftTriggerAxis() > 0.1;
+    }
+
+    public boolean isPickUpCube() {
+        return this.getRightTriggerAxis() > 0.1;
+    }
+
+    public boolean isSubstation() {
+        return this.getPOV() == 270;
+    }
+
+    public boolean isAdjustHigher() {
+        return this.getPOV() == 0;
+    }
+
+    public boolean isAdjustLower() {
+        return this.getPOV() == 180;
+    }
 }
