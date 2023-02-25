@@ -38,5 +38,11 @@ public class Runnymede2023GameController extends RunnymedeGameController {
         System.out.println("2023 game controller says hi!");
     }
 
+    public boolean isBoost() {
+        return this.getLeftBumper();
+    }
 
+    public boolean isSlowDown() {
+        return this.getRightBumper();
+    }
 }
