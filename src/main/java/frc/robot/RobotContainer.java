@@ -67,7 +67,7 @@ public class RobotContainer {
 
         // Initialize all Subsystem default commands.
         driveSubsystem
-            .setDefaultCommand(new DefaultDriveCommand(driverController, driveSubsystem, driveModeSelector, visionSubsystem));
+            .setDefaultCommand(new DefaultDriveCommand(driverController, driveSubsystem, driveModeSelector));
 
         // calibrate subsystems
         calibrateVision();
@@ -210,5 +210,6 @@ public class RobotContainer {
             exitZoneActionChooser,
             secondGamePieceScoringChooser,
             balanceChooser);
+
     }
 }
