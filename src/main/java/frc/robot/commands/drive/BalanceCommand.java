@@ -41,8 +41,7 @@ public class BalanceCommand extends CommandBase {
     public void execute() {
 
         // Track the gyro pitch.
-        pitch     = driveSubsystem.getPitch();
-        pitchRate = driveSubsystem.getPitchRate();
+        pitch = driveSubsystem.getPitch();
 
         if (pitch > 1) {
             speed = .0375;
@@ -72,8 +71,7 @@ public class BalanceCommand extends CommandBase {
             return true;
         }
         // Track the gyro pitch.
-        pitch     = driveSubsystem.getPitch();
-        pitchRate = driveSubsystem.getPitchRate();
+        pitch = driveSubsystem.getPitch();
 
         // FIXME: Only finish when it has been still for a couple of seconds. Instantaneous 0 is too
         // soon, because the charger may be in the middle of passing through 0 while rocking.
