@@ -42,18 +42,17 @@ public class RunnymedeGameController extends XboxController {
      * Values < 0 or > 0.4 are ignored, and
      * the {@link #DEFAULT_AXIS_DEADBAND} value is used.
      */
-    public RunnymedeGameController(int port, double axisDeadband) {
+    public RunnymedeGameController(int port, final double axisDeadband) {
         super(port);
 
         if (axisDeadband < 0 || axisDeadband > 0.4) {
-
             System.out.println("Invalid axis deadband(" + axisDeadband + ") must be between 0 - 0.4. Overriding value to "
                 + DEFAULT_AXIS_DEADBAND);
-
-            axisDeadband = DEFAULT_AXIS_DEADBAND;
+            setAxisDeadband(DEFAULT_AXIS_DEADBAND);
         }
-
-        setAxisDeadband(axisDeadband);
+        else {
+            setAxisDeadband(axisDeadband);
+        }
     }
 
     @Override

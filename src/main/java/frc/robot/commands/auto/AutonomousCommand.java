@@ -192,7 +192,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
 
         // Drive out of the zone
         // This command may cause a rotation to heading 0.
-        addCommands(new DriveOnHeadingCommand(0, 0.5, 400, 2, driveSubsystem));
+        addCommands(new DriveOnHeadingCommand(0, 0.6, 400, 2, driveSubsystem));
 
         currentZone        = Zone.FIELD;
         currentOrientation = Orientation.FACE_FIELD;
@@ -246,6 +246,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
         }
 
         // Turn around and go back to the grid
+        addCommands(new DriveOnHeadingCommand(270.0, 0.5, 5, 3, driveSubsystem));
         addCommands(new DriveOnHeadingCommand(180.0, 0.5, 400, 3, driveSubsystem));
         addCommands(new DriveToTargetCommand(VisionTargetType.TAG, 0.3, driveSubsystem, visionSubsystem));
 

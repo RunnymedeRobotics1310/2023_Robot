@@ -4,11 +4,12 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants.DriveMode;
+import frc.robot.commands.operator.RunnymedeGameController;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 public class DefaultDriveCommand extends CommandBase {
-    private static final double     DRIVE_FILTER_VALUE = 0.2;
+
     private final DriveSubsystem    driveSubsystem;
     private final XboxController    driverController;
     private final DriveModeSelector driveModeSelector;
@@ -24,7 +25,7 @@ public class DefaultDriveCommand extends CommandBase {
      *
      * @param driveSubsystem The subsystem used by this command.
      */
-    public DefaultDriveCommand(XboxController driverController, DriveSubsystem driveSubsystem,
+    public DefaultDriveCommand(RunnymedeGameController driverController, DriveSubsystem driveSubsystem,
         DriveModeSelector driveModeSelector, VisionSubsystem visionSubsystem) {
 
         this.driverController  = driverController;
@@ -48,39 +49,18 @@ public class DefaultDriveCommand extends CommandBase {
 
         DriveMode driveMode = driveModeSelector.getDriveMode();
 
-        double    speed     = 0, turn = 0;
-
         switch (driveMode) {
-
         case ARCADE:
-            // FIXME: We could use Quentin for single stick arcade by
-            // passing in the appropriate speed and turn values from
-            // the different sticks
             setMotorSpeedsArcade();
             break;
-
         case TANK:
             setMotorSpeedsTank();
             break;
-
-        case DUAL_STICK_ARCADE:
-
-            // Left Y is speed, right X is turn
-            speed = getScaledValue(-driverController.getLeftY());
-            turn = getScaledValue(driverController.getRightX()) / 2;
-
-            setMotorSpeedsDualStickArcade(speed, turn);
+        case QUENTIN:
+            setMotorSpeedsQuentin();
             break;
-
-        case QUENTIN: // Quentin is the default drive mode.
         default:
-
-            // Left Y is speed, right X is turn
-            speed = getScaledValue(-driverController.getLeftY());
-            turn = getScaledValue(driverController.getRightX()) / 2;
-
-            setMotorSpeedsQuentin(speed, turn);
-
+            setMotorSpeedsQuentin();
             break;
         }
 
@@ -106,9 +86,11 @@ public class DefaultDriveCommand extends CommandBase {
         // while held. When the bumper is released, the joysticks will take over again.
         // Hopefully that is the intended design.
         //
-        if (driverController.getLeftBumper()) {
-            driveSubsystem.setMotorSpeeds(0, 0);
-        }
+        // Can delete if we don't need a deadstop
+        // Otherwise must be fixed
+        // if (driverController.getLeftBumper()) {
+        // driveSubsystem.setMotorSpeeds(0, 0);
+        // }
     }
 
     // Returns true when the command should end.
@@ -130,16 +112,11 @@ public class DefaultDriveCommand extends CommandBase {
 
     private void setMotorSpeedsArcade() {
 
-        // TODO: Filtering of joystick values to handle the deadband should be done in a
-        // joystick
-        // class
-        /** see {@link RunnymedeGameController}. */
-
         // Filter out low input values to reduce drivetrain drift
-        double leftY      = getScaledValue(driverController.getLeftY());
-        double leftX      = getScaledValue(driverController.getLeftX());
-        double leftSpeed  = leftY * -1 + leftX;
-        double rightSpeed = leftY * -1 - leftX;
+        double leftY      = driverController.getRawAxis(1);
+        double leftX      = driverController.getRawAxis(0);
+        double leftSpeed  = leftY + leftX / (leftY == 0 ? 1 : 2); // less sensitive when moving
+        double rightSpeed = leftY - leftX / (leftY == 0 ? 1 : 2);
 
         // Boost
         if (driverController.getRightBumper()) {
@@ -152,8 +129,8 @@ public class DefaultDriveCommand extends CommandBase {
 
     private void setMotorSpeedsTank() {
 
-        double leftSpeed  = getScaledValue(-driverController.getLeftY());
-        double rightSpeed = getScaledValue(-driverController.getRightY());
+        double leftSpeed  = driverController.getRawAxis(1);
+        double rightSpeed = driverController.getRawAxis(5);
 
         // Boost
         if (driverController.getRightBumper()) {
@@ -164,21 +141,28 @@ public class DefaultDriveCommand extends CommandBase {
         }
     }
 
-    private void setMotorSpeedsQuentin(double speed, double turn) {
+    private static final int AXIS_LEFT_Y  = 1;
+    private static final int AXIS_RIGHT_X = 4;
 
-        double  turn2 = turn;
-        boolean boost = driverController.getRightBumper();
+    private void setMotorSpeedsQuentin() {
+
+        // forwards/backwards speed
+        double       speed   = driverController.getRawAxis(AXIS_LEFT_Y);
+        // turn speed
+        final double rawTurn = driverController.getRawAxis(AXIS_RIGHT_X);
 
         SmartDashboard.putNumber("Speed", speed);
-        SmartDashboard.putNumber("Turn", turn);
+        SmartDashboard.putNumber("Turn", rawTurn);
 
-        double leftSpeed = 0, rightSpeed = 0;
+        double  turn      = rawTurn / 2;
+        boolean boost     = driverController.getRightBumper();
+
+        double  leftSpeed = 0, rightSpeed = 0;
 
         if (!boost) {
             speed = speed / 2;
         }
         else {
-            // Set the speed as full forward +1.0 or backwards -1.0
             speed = Math.signum(speed);
         }
 
@@ -192,11 +176,17 @@ public class DefaultDriveCommand extends CommandBase {
         }
         else if (boost) {
 
-            if (turn2 < 0) {
+            // Turning left
+            if (rawTurn < 0) {
+
+                // If boosted and at full speed, and the
+                // turn is limited to 0.5, then the max turn
+                // that can be achieved is 1.0 vs 0.5.
                 leftSpeed  = speed + turn;
                 rightSpeed = speed;
             }
-            else if (turn2 > 0) {
+            // Turning right
+            else if (rawTurn > 0) {
                 leftSpeed  = speed;
                 rightSpeed = speed - turn;
             }
@@ -206,11 +196,11 @@ public class DefaultDriveCommand extends CommandBase {
             }
         }
         else {
-            if (turn2 < 0) {
+            if (rawTurn < 0) {
                 leftSpeed  = speed;
                 rightSpeed = speed - turn;
             }
-            else if (turn2 > 0) {
+            else if (rawTurn > 0) {
                 leftSpeed  = speed + turn;
                 rightSpeed = speed;
             }
@@ -220,89 +210,5 @@ public class DefaultDriveCommand extends CommandBase {
             }
         }
         driveSubsystem.setMotorSpeeds(leftSpeed, rightSpeed);
-    }
-
-    private void setMotorSpeedsDualStickArcade(double speed, double turn) {
-
-        boolean boost     = driverController.getRightBumper();
-
-        double  leftSpeed = 0, rightSpeed = 0, max = 1.0;
-
-        if (!boost) {
-            speed /= 2;
-            turn  /= 2;
-            max   /= 2;
-        }
-
-        // If there is no forward movement, then spin on the spot
-        if (speed == 0) {
-            leftSpeed  = turn;
-            rightSpeed = -turn;
-        }
-        else {
-
-            if (Math.abs(speed) + Math.abs(turn) <= max) {
-
-                // If the speed + turn is less than the max, then apply the turn equally to
-                // the left and right side.
-                leftSpeed  = speed + turn;
-                rightSpeed = speed - turn;
-            }
-            else {
-
-                // If the speed + turn > 1 then we need to limit the one
-                // side of the robot to a speed of 1.0, and maintain the differential
-                // between the two sides (2 * turn).
-
-                if (speed > 0) {
-
-                    // Forward movement
-
-                    if (turn > 0) {
-
-                        leftSpeed  = max;
-                        rightSpeed = max - 2 * turn;
-                    }
-                    else {
-
-                        leftSpeed  = max + 2 * turn; // -ve turn value
-                        rightSpeed = max;
-                    }
-
-                }
-
-                else {
-
-                    // Backwards movement
-
-                    if (turn > 0) {
-
-                        leftSpeed  = -max + 2 * turn;
-                        rightSpeed = -max;
-                    }
-                    else {
-
-                        leftSpeed  = -max;
-                        rightSpeed = -max - 2 * turn; // -ve turn value
-
-                    }
-                }
-            }
-        }
-
-        // Apply the calculated speed to the motors
-        driveSubsystem.setMotorSpeeds(leftSpeed, rightSpeed);
-    }
-
-    private static double getScaledValue(double value) {
-
-        if (Math.abs(value) < DRIVE_FILTER_VALUE) {
-            value = 0;
-        }
-        else {
-            // Scale the range of [0.2-1.0] to [0.0-1.0];
-            value = ((Math.abs(value) - DRIVE_FILTER_VALUE) / (1 - DRIVE_FILTER_VALUE)) * Math.signum(value);
-        }
-        return value;
     }
 }
