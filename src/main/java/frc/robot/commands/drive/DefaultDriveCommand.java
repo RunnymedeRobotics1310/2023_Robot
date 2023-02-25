@@ -1,24 +1,23 @@
 package frc.robot.commands.drive;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants.DriveMode;
-import frc.robot.commands.operator.RunnymedeGameController;
+import frc.robot.commands.operator.Runnymede2023GameController;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class DefaultDriveCommand extends CommandBase {
 
-    private final DriveSubsystem    driveSubsystem;
-    private final XboxController    driverController;
-    private final DriveModeSelector driveModeSelector;
+    private final DriveSubsystem              driveSubsystem;
+    private final Runnymede2023GameController driverController;
+    private final DriveModeSelector           driveModeSelector;
 
     /**
      * Creates a new ExampleCommand.
      *
      * @param driveSubsystem The subsystem used by this command.
      */
-    public DefaultDriveCommand(RunnymedeGameController driverController, DriveSubsystem driveSubsystem,
+    public DefaultDriveCommand(Runnymede2023GameController driverController, DriveSubsystem driveSubsystem,
         DriveModeSelector driveModeSelector) {
 
         this.driverController  = driverController;
@@ -33,6 +32,8 @@ public class DefaultDriveCommand extends CommandBase {
     @Override
     public void initialize() {
         System.out.println("DefaultDriveCommand started.");
+        this.driverController.sayHello(); // FIXME: Kaelin remove this but see how you can talk to
+                                          // the custom controller.
     }
 
     // Called every time the scheduler runs while the command is scheduled.
