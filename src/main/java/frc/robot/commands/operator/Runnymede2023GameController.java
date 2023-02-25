@@ -7,7 +7,9 @@ package frc.robot.commands.operator;
  * This class ... FIXME: Kaelin....
  * 
  */
-public class Runnymede2023GameController extends RunnymedeGameController {
+public class Runnymede2023GameController {
+
+    private final RunnymedeGameController controller;
 
     /**
      * Construct a Runnymede2023GameController on the specified port
@@ -17,7 +19,7 @@ public class Runnymede2023GameController extends RunnymedeGameController {
      * @param port on the driver station which the joystick is plugged into
      */
     public Runnymede2023GameController(int port) {
-        super(port);
+        controller = new RunnymedeGameController(port);
     }
 
     /**
@@ -31,7 +33,7 @@ public class Runnymede2023GameController extends RunnymedeGameController {
      * the {@link #DEFAULT_AXIS_DEADBAND} value is used.
      */
     public Runnymede2023GameController(int port, final double axisDeadband) {
-        super(port, axisDeadband);
+        controller = new RunnymedeGameController(port, axisDeadband);
     }
 
     public void sayHello() {
@@ -39,46 +41,78 @@ public class Runnymede2023GameController extends RunnymedeGameController {
     }
 
     public boolean isBoost() {
-        return this.getLeftBumper();
+        return controller.getLeftBumper();
     }
 
     public boolean isSlowDown() {
-        return this.getRightBumper();
+        return controller.getRightBumper();
     }
 
     public boolean isHigh() {
-        return this.getYButton();
+        return controller.getYButton();
     }
 
     public boolean isMid() {
-        return this.getBButton();
+        return controller.getBButton();
     }
 
     public boolean isLow() {
-        return this.getAButton();
+        return controller.getAButton();
     }
 
     public boolean isDrop() {
-        return this.getXButton();
+        return controller.getXButton();
     }
 
     public boolean isPickUpCone() {
-        return this.getLeftTriggerAxis() > 0.1;
+        return controller.getLeftTriggerAxis() > 0.1;
     }
 
     public boolean isPickUpCube() {
-        return this.getRightTriggerAxis() > 0.1;
+        return controller.getRightTriggerAxis() > 0.1;
     }
 
     public boolean isSubstation() {
-        return this.getPOV() == 270;
+        return controller.getPOV() == 270;
     }
 
     public boolean isAdjustHigher() {
-        return this.getPOV() == 0;
+        return controller.getPOV() == 0;
     }
 
     public boolean isAdjustLower() {
-        return this.getPOV() == 180;
+        return controller.getPOV() == 180;
+    }
+
+    public boolean isUnnamed() {
+        return controller.getPOV() == 90;
+    }
+
+    public double leftX() {
+        return controller.getLeftX();
+    }
+
+    public double leftY() {
+        return controller.getLeftY();
+    }
+
+    public double rightX() {
+        return controller.getRightX();
+    }
+
+    public double rightY() {
+        return controller.getRightY();
+    }
+
+    public boolean isCancel() {
+        return controller.getStartButton();
+    }
+
+    public boolean isGyroReset() {
+        return controller.getBackButton();
+    }
+
+    public boolean isToggleTestMode() {
+        return controller.getBackButton() && controller.getStartButton();
     }
 }
