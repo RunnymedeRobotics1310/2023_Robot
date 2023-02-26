@@ -13,25 +13,28 @@ import frc.robot.Constants.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
 
-    private static final MotorType motorType              = MotorType.kBrushless;
+    private static final MotorType motorType            = MotorType.kBrushless;
 
-    // Arm lift motors
-    private final CANSparkMax      armLiftMotor           = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT, motorType);
-    private final CANSparkMax      armLiftFollower        = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT + 1, motorType);
+    /*
+     * Arm lift motors
+     */
+    private final CANSparkMax      armLiftMotor         = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT, motorType);
+    private final CANSparkMax      armLiftFollower      = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT + 1, motorType);
 
-    private RelativeEncoder        armLiftEncoder         = armLiftMotor.getEncoder();
+    private IdleMode               armLiftIdleMode      = null;
+    private double                 armLiftSpeed         = 0;
 
-    private double                 armLiftEncoderOffset   = 0;
+    // Arm lift encoder
+    private RelativeEncoder        armLiftEncoder       = armLiftMotor.getEncoder();
 
-    private double                 armLiftSpeed           = 0;
+    private double                 armLiftEncoderOffset = 0;
 
-    private IdleMode               currentArmLiftIdleMode = null;
     /*
      * Limit Switches
      */
 
     /** The arm down detector is an infra-red limit switch plugged into the RoboRio */
-    private DigitalInput           armDownDetector        = new DigitalInput(ArmConstants.ARM_DOWN_LIMIT_SWITCH_DIO_PORT);
+    private DigitalInput           armDownDetector      = new DigitalInput(ArmConstants.ARM_DOWN_LIMIT_SWITCH_DIO_PORT);
 
     /** Creates a new ArmSubsystem */
     public ArmSubsystem() {
@@ -92,7 +95,7 @@ public class ArmSubsystem extends SubsystemBase {
         armLiftFollower.set(armLiftFollowerSpeed);
     }
 
-    /** Set the armliftEncoderValue to the value specified */
+    /** Set the arm lift EncoderValue to the value specified */
     public void setArmLiftEncoder(double encoderValue) {
         armLiftEncoderOffset = encoderValue - armLiftEncoder.getPosition();
     }
@@ -249,11 +252,13 @@ public class ArmSubsystem extends SubsystemBase {
 
     private void setArmLiftIdleMode(IdleMode idleMode) {
 
-        if (currentArmLiftIdleMode != null && currentArmLiftIdleMode == idleMode) {
+        // If the idle mode is already set to the supplied
+        // value, there is nothing to do.
+        if (armLiftIdleMode == idleMode) {
             return;
         }
 
-        currentArmLiftIdleMode = idleMode;
+        armLiftIdleMode = idleMode;
 
         armLiftMotor.setIdleMode(idleMode);
         armLiftFollower.setIdleMode(idleMode);

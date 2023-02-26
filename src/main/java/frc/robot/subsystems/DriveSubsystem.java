@@ -18,12 +18,14 @@ public class DriveSubsystem extends SubsystemBase {
     // The motors on the left side of the drive.
     private final CANSparkMax     leftPrimaryMotor         = new CANSparkMax(DriveConstants.LEFT_MOTOR_PORT,
         MotorType.kBrushless);
+
     private final CANSparkMax     leftFollowerMotor        = new CANSparkMax(DriveConstants.LEFT_MOTOR_PORT + 1,
         MotorType.kBrushless);
 
     // The motors on the right side of the drive.
     private final CANSparkMax     rightPrimaryMotor        = new CANSparkMax(DriveConstants.RIGHT_MOTOR_PORT,
         MotorType.kBrushless);
+
     private final CANSparkMax     rightFollowerMotor       = new CANSparkMax(DriveConstants.RIGHT_MOTOR_PORT + 1,
         MotorType.kBrushless);
 
@@ -90,6 +92,10 @@ public class DriveSubsystem extends SubsystemBase {
 
         rightPrimaryMotor.setInverted(DriveConstants.RIGHT_MOTOR_REVERSED);
         rightFollowerMotor.setInverted(DriveConstants.RIGHT_MOTOR_REVERSED);
+
+        // Set the polarity on the encoders
+        leftEncoder.setInverted(DriveConstants.LEFT_ENCODER_REVERSED);
+        rightEncoder.setInverted(DriveConstants.RIGHT_ENCODER_REVERSED);
 
         setIdleMode(IdleMode.kBrake);
 
@@ -214,7 +220,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     public double getEncoderDistanceCm() {
 
-        return getAverageEncoderValue() * DriveConstants.DISTANCE_IN_CM_PER_ROTATION;
+        return getAverageEncoderValue() * DriveConstants.CM_PER_ENCODER_COUNT;
     }
 
     /**
@@ -298,7 +304,7 @@ public class DriveSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber("Right Encoder", getRightEncoder());
         SmartDashboard.putNumber("Left Encoder", getLeftEncoder());
-
+        SmartDashboard.putNumber("Avg Encoder", getAverageEncoderValue());
         SmartDashboard.putNumber("Distance (cm)", getEncoderDistanceCm());
 
         SmartDashboard.putNumber("Ultrasonic Voltage", ultrasonicDistanceSensor.getVoltage());
@@ -307,11 +313,17 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putData("Gyro", navXGyro);
         SmartDashboard.putNumber("Gyro Heading", getHeading());
         SmartDashboard.putNumber("Gyro Pitch", getPitch());
+
+        SmartDashboard.putNumber("Gyro Raw Yaw", getRawGyroAngle(GyroAxis.YAW));
+        SmartDashboard.putNumber("Gyro Raw Pitch", getRawGyroAngle(GyroAxis.PITCH));
+        SmartDashboard.putNumber("Gyro Raw Roll", getRawGyroAngle(GyroAxis.ROLL));
     }
 
     private void setIdleMode(IdleMode idleMode) {
 
-        if (idleMode != null && idleMode == this.idleMode) {
+        // If the idle mode is already set to the supplied
+        // value, there is nothing to do.
+        if (this.idleMode == idleMode) {
             return;
         }
 
