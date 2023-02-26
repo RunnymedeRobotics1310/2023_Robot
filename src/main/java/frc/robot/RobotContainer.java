@@ -17,6 +17,7 @@ import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.OiConstants;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.SystemTestCommand;
+import frc.robot.commands.arm.DefaultArmCommand;
 import frc.robot.commands.auto.AutonomousCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DefaultDriveCommand;
@@ -66,8 +67,11 @@ public class RobotContainer {
     public RobotContainer() {
 
         // Initialize all Subsystem default commands.
-        driveSubsystem
-            .setDefaultCommand(new DefaultDriveCommand(driverController, driveSubsystem, driveModeSelector));
+        driveSubsystem.setDefaultCommand(
+            new DefaultDriveCommand(driverController, driveSubsystem, driveModeSelector));
+
+        armSubsystem.setDefaultCommand(
+            new DefaultArmCommand(driverController, armSubsystem));
 
         // calibrate subsystems
         calibrateVision();
