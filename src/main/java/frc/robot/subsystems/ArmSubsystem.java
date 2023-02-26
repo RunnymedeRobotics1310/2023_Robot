@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.ExternalFollower;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -34,6 +35,18 @@ public class ArmSubsystem extends SubsystemBase {
 
     /** Creates a new ArmSubsystem */
     public ArmSubsystem() {
+
+        // Ensure that following is disabled
+        armLiftMotor.follow(ExternalFollower.kFollowerDisabled, 0);
+
+        // Set the polarity on the motors
+        armLiftMotor.setInverted(ArmConstants.ARM_LIFT_MOTOR_REVERSED);
+        armLiftFollower.setInverted(ArmConstants.ARM_LIFT_MOTOR_REVERSED);
+
+        setArmLiftIdleMode(IdleMode.kBrake);
+
+        // Setting both encoders to 0
+        setArmLiftEncoder(0);
 
     }
 

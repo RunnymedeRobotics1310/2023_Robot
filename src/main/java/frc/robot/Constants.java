@@ -98,35 +98,41 @@ public final class Constants {
 
     public static final class ArmConstants {
 
-        public static final int    ARM_LIFT_MOTOR_PORT            = 30;
-        public static final int    ARM_EXTEND_MOTOR_PORT          = 35;
-        public static final int    PINCHER_MOTOR_PORT             = 40;
+        public static final int     ARM_LIFT_MOTOR_PORT            = 30;
+        public static final boolean ARM_LIFT_MOTOR_REVERSED        = false;
 
-        public static final int    ARM_DOWN_LIMIT_SWITCH_DIO_PORT = 0;
+        public static final int     ARM_EXTEND_MOTOR_PORT          = 35;
+        public static final boolean ARM_EXTEND_MOTOR_REVERSED      = false;
+
+        public static final int     PINCHER_MOTOR_PORT             = 40;
+        public static final boolean PINCHER_MOTOR_REVERSED         = false;
+
+        public static final int     ARM_DOWN_LIMIT_SWITCH_DIO_PORT = 0;
 
         // lifter constants
-        public static final double TOP_CUBE_HEIGHT                = 30;
-        public static final double MIDDLE_CUBE_HEIGHT             = 20;
-        public static final double BOTTOM_CUBE_HEIGHT             = 10;
+        public static final double  TOP_CUBE_HEIGHT                = 30;
+        public static final double  MIDDLE_CUBE_HEIGHT             = 20;
+        public static final double  BOTTOM_CUBE_HEIGHT             = 10;
 
-        public static final double TOP_CONE_HEIGHT                = 30;
-        public static final double MIDDLE_CONE_HEIGHT             = 20;
-        public static final double BOTTOM_CONE_HEIGHT             = 10;
+        public static final double  TOP_CONE_HEIGHT                = 30;
+        public static final double  MIDDLE_CONE_HEIGHT             = 20;
+        public static final double  BOTTOM_CONE_HEIGHT             = 10;
 
         // extension constants
-        public static final double TOP_CUBE_EXTEND                = 30;
-        public static final double MIDDLE_CUBE_EXTEND             = 20;
-        public static final double BOTTOM_CUBE_EXTEND             = 10;
+        public static final double  TOP_CUBE_EXTEND                = 30;
+        public static final double  MIDDLE_CUBE_EXTEND             = 20;
+        public static final double  BOTTOM_CUBE_EXTEND             = 10;
 
-        public static final double TOP_CONE_EXTEND                = 30;
-        public static final double MIDDLE_CONE_EXTEND             = 20;
-        public static final double BOTTOM_CONE_EXTEND             = 10;
+        public static final double  TOP_CONE_EXTEND                = 30;
+        public static final double  MIDDLE_CONE_EXTEND             = 20;
+        public static final double  BOTTOM_CONE_EXTEND             = 10;
 
-        public static final double MAX_EXTEND_SPEED               = 1;
+        public static final double  MAX_EXTEND_SPEED               = 1;
 
         // pincher constants
-        public static final double CUBE_GRAB                      = 10;
-        public static final double CONE_GRAB                      = 5;
+        public static final double  CUBE_GRAB                      = 10;
+        public static final double  CONE_GRAB                      = 5;
+
 
     }
 }

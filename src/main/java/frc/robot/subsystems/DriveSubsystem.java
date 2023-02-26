@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.ExternalFollower;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -79,6 +80,11 @@ public class DriveSubsystem extends SubsystemBase {
     /** Creates a new DriveSubsystem. */
     public DriveSubsystem() {
 
+        // Ensure that following is disabled
+        leftPrimaryMotor.follow(ExternalFollower.kFollowerDisabled, 0);
+        rightPrimaryMotor.follow(ExternalFollower.kFollowerDisabled, 0);
+
+        // Set the polarity on the motors
         leftPrimaryMotor.setInverted(DriveConstants.LEFT_MOTOR_REVERSED);
         leftFollowerMotor.setInverted(DriveConstants.LEFT_MOTOR_REVERSED);
 
@@ -112,6 +118,7 @@ public class DriveSubsystem extends SubsystemBase {
      * NOTE: This is not the same as calibrating the gyro.
      */
     public void resetGyro() {
+
         setGyroHeading(0);
         setGyroPitch(0);
     }
