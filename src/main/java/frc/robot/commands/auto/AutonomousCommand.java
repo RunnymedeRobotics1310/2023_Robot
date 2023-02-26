@@ -270,42 +270,33 @@ public class AutonomousCommand extends SequentialCommandGroup {
     private void addStep4Commands_Balance() {
 
         // If the balance command was not selected, there is nothing to do
-
         if (balanceAction != AutoAction.BALANCE) {
             return;
         }
 
-        // FIXME:
-
-        // Determine the path to the platform
-
-        // Determine the path to the charging station based on the starting position, current
-        // orientation and current zone.
-
-        // NOTE: This is some complex logic, but essentially the charging station is
-        // in one of 6 directions from the robot.
-        // If N is toward the opposing alliance, the the charging station is NW, N, NE of
-        // the robot when the robot is at the Grid, SW, S, or SE when the robot is in the field.
-
-        // An Example:
-        // If the robot is in the Grid area, and the robot is on the Blue Alliance, and
-        // the robot has started in the low position, then the charging station is
-        // North-West of the robot.
-
-        // In the case of the Red alliance, the charging station will be to the North-East
-        // in the same scenario.
-
-        // NOTE: A small additional complexity is that the robot could be currently facing
-        // either toward the field or toward the grid.
-
         // Drive to the platform
-        addCommands(new DriveOnHeadingCommand(180, -.3, 50, 0.25, driveSubsystem));
-        addCommands(new DriveOnHeadingCommand(270, -.3, 450, 1.25, driveSubsystem));
-        addCommands(new DriveOnHeadingCommand(180, -.5, 400, 1.25, driveSubsystem));
+        if ((alliance == Alliance.Red && startingLane == AutoLane.BOTTOM)
+            || (alliance == Alliance.Blue && startingLane == AutoLane.TOP)) {
+
+            System.out.println("Balance Red/Bot or Blue/Top");
+            addCommands(new DriveOnHeadingCommand(180, -.3, 50, 0.25, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(270, -.3, 450, 1.25, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(180, -.5, 400, 1.25, driveSubsystem));
+        }
+        else if ((alliance == Alliance.Red && startingLane == AutoLane.TOP)
+            || (alliance == Alliance.Blue && startingLane == AutoLane.BOTTOM)) {
+
+            System.out.println("Balance Red/Top or Blue/Bottom");
+            addCommands(new DriveOnHeadingCommand(180, -.3, 50, 0.25, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(90, -.3, 450, 1.25, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(180, -.3, 400, 1.25, driveSubsystem));
+        }
+        else {
+            System.out.println("Balance 'else'");
+            addCommands(new DriveOnHeadingCommand(180, -.3, 400, 1.75, driveSubsystem));
+        }
 
         // Balance on the platform
-
-        // TODO: Integrate the code from the auto-balance branch.
         addCommands(new BalanceCommand(driveSubsystem));
     }
 }
