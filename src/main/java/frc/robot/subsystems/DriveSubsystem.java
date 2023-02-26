@@ -98,8 +98,6 @@ public class DriveSubsystem extends SubsystemBase {
         rightEncoder.setInverted(DriveConstants.RIGHT_ENCODER_REVERSED);
 
         setIdleMode(IdleMode.kBrake);
-
-        // Setting both encoders to 0
         resetEncoders();
     }
 

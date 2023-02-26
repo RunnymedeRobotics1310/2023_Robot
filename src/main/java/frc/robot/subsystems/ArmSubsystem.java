@@ -5,6 +5,8 @@ import com.revrobotics.CANSparkMax.ExternalFollower;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxLimitSwitch;
+import com.revrobotics.SparkMaxLimitSwitch.Type;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -13,32 +15,76 @@ import frc.robot.Constants.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
 
-    private static final MotorType motorType            = MotorType.kBrushless;
+    private static final MotorType motorType              = MotorType.kBrushless;
 
     /*
-     * Arm lift motors
+     * Arm lift motors and encoder
      */
-    private final CANSparkMax      armLiftMotor         = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT, motorType);
-    private final CANSparkMax      armLiftFollower      = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT + 1, motorType);
+    private final CANSparkMax      armLiftMotor           = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT, motorType);
+    private final CANSparkMax      armLiftFollower        = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT + 1, motorType);
 
-    private IdleMode               armLiftIdleMode      = null;
-    private double                 armLiftSpeed         = 0;
+    private IdleMode               armLiftIdleMode        = null;
+    private double                 armLiftSpeed           = 0;
 
     // Arm lift encoder
-    private RelativeEncoder        armLiftEncoder       = armLiftMotor.getEncoder();
+    private RelativeEncoder        armLiftEncoder         = armLiftMotor.getEncoder();
 
-    private double                 armLiftEncoderOffset = 0;
+    private double                 armLiftEncoderOffset   = 0;
+
+    /*
+     * Arm extend motor and encoder
+     */
+    private final CANSparkMax      armExtendMotor         = new CANSparkMax(ArmConstants.ARM_EXTEND_MOTOR_PORT, motorType);
+
+    private double                 armExtendSpeed         = 0;
+
+    // Arm lift encoder
+    private RelativeEncoder        armExtendEncoder       = armExtendMotor.getEncoder();
+
+    private double                 armExtendEncoderOffset = 0;
+
+    /*
+     * Pincher motor and encoder
+     */
+    private final CANSparkMax      pincherMotor           = new CANSparkMax(ArmConstants.ARM_EXTEND_MOTOR_PORT, motorType);
+
+    private double                 pincherSpeed           = 0;
+
+    // Arm lift encoder
+    private RelativeEncoder        pincherEncoder         = pincherMotor.getEncoder();
+
+    private double                 pincherEncoderOffset   = 0;
 
     /*
      * Limit Switches
      */
-
     /** The arm down detector is an infra-red limit switch plugged into the RoboRio */
-    private DigitalInput           armDownDetector      = new DigitalInput(ArmConstants.ARM_DOWN_LIMIT_SWITCH_DIO_PORT);
+    private DigitalInput           armDownDetector        = new DigitalInput(ArmConstants.ARM_DOWN_LIMIT_SWITCH_DIO_PORT);
+
+    /**
+     * The arm retracted detector is a hall effect limit switch that is normally open, plugged into
+     * the arm extender SparkMAX reverse limit.
+     */
+    private SparkMaxLimitSwitch    armRetractedDetector   = armExtendMotor.getReverseLimitSwitch(Type.kNormallyOpen);
+
+    /**
+     * The pincher open detector is a hall effect limit switch that is normally open, plugged into
+     * the pincher SparkMAX reverse limit.
+     */
+    private SparkMaxLimitSwitch    pincherOpenDetector    = pincherMotor.getReverseLimitSwitch(Type.kNormallyOpen);
+
+    /**
+     * The game piece detector is an infra-red sensor that is normally open, plugged into
+     * the pincher SparkMAX forward limit.
+     */
+    private SparkMaxLimitSwitch    gamePieceDetector      = pincherMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
     /** Creates a new ArmSubsystem */
     public ArmSubsystem() {
 
+        /*
+         * Arm Lift
+         */
         // Ensure that following is disabled
         armLiftMotor.follow(ExternalFollower.kFollowerDisabled, 0);
 
@@ -46,11 +92,40 @@ public class ArmSubsystem extends SubsystemBase {
         armLiftMotor.setInverted(ArmConstants.ARM_LIFT_MOTOR_REVERSED);
         armLiftFollower.setInverted(ArmConstants.ARM_LIFT_MOTOR_REVERSED);
 
+        // Set the polarity on the encoder
+        armLiftEncoder.setInverted(ArmConstants.ARM_LIFT_ENCODER_REVERSED);
+
         setArmLiftIdleMode(IdleMode.kBrake);
 
-        // Setting both encoders to 0
         setArmLiftEncoder(0);
 
+        /*
+         * Arm Extend
+         */
+        // Set the polarity on the motor
+        armExtendMotor.setInverted(ArmConstants.ARM_EXTEND_MOTOR_REVERSED);
+
+        // Set the polarity on the encoder
+        armExtendEncoder.setInverted(ArmConstants.ARM_EXTEND_ENCODER_REVERSED);
+
+        // Set the arm extender to always brake
+        armExtendMotor.setIdleMode(IdleMode.kBrake);
+
+        setArmExtendEncoder(0);
+
+        /*
+         * Pincher
+         */
+        // Set the polarity on the motor
+        pincherMotor.setInverted(ArmConstants.PINCHER_MOTOR_REVERSED);
+
+        // Set the polarity on the encoder
+        pincherEncoder.setInverted(ArmConstants.PINCHER_ENCODER_REVERSED);
+
+        // Set the arm extender to always brake
+        pincherMotor.setIdleMode(IdleMode.kBrake);
+
+        setPincherEncoder(0);
     }
 
     /**
@@ -62,6 +137,24 @@ public class ArmSubsystem extends SubsystemBase {
         return armLiftEncoder.getPosition() + armLiftEncoderOffset;
     }
 
+    /**
+     * Gets the extend motor encoder.
+     *
+     * @return the extend motor encoder position
+     */
+    public double getArmExtendEncoder() {
+        return armExtendEncoder.getPosition() + armExtendEncoderOffset;
+    }
+
+    /**
+     * Gets the pincher motor encoder. (top lift motor)
+     *
+     * @return the pincher motor encoder position
+     */
+    public double getPincherEncoder() {
+        return pincherEncoder.getPosition() + pincherEncoderOffset;
+    }
+
     /** Determine if the arm is fully down */
     public boolean isArmDown() {
 
@@ -71,6 +164,36 @@ public class ArmSubsystem extends SubsystemBase {
         // no object is detected, and pulled-to-low (0) when an
         // when an object is detected and the switch is closed.
         return !armDownDetector.get();
+    }
+
+    /** Determine if the arm is fully retracted */
+    public boolean isArmRetracted() {
+
+        // NOTE: the arm retracted detector is a hall-effect
+        // magnetic sensor that "isPressed" when the sensor detects a magnet.
+        // This sensor is not inverted because the CANLimitSwitch
+        // is configured for a normally open switch.
+        return armRetractedDetector.isPressed();
+    }
+
+    /** Determine if a game piece is detected in the pincher */
+    public boolean isGamePieceDetected() {
+
+        // NOTE: the game piece detector is an infra-red sensor
+        // that "isPressed" when the infra-red detects an object.
+        // This sensor is not inverted because the CANLimitSwitch
+        // is configured for a normally open switch.
+        return gamePieceDetector.isPressed();
+    }
+
+    /** Determine if the pincher fully open */
+    public boolean isPincherOpen() {
+
+        // NOTE: the arm retracted detector is a hall-effect
+        // magnetic sensor that "isPressed" when the sensor detects a magnet.
+        // This sensor is not inverted because the CANLimitSwitch
+        // is configured for a normally open switch.
+        return pincherOpenDetector.isPressed();
     }
 
     /**
@@ -95,14 +218,48 @@ public class ArmSubsystem extends SubsystemBase {
         armLiftFollower.set(armLiftFollowerSpeed);
     }
 
-    /** Set the arm lift EncoderValue to the value specified */
+    /**
+     * Set the speed of the extension motor
+     *
+     * @param speed
+     */
+    public void setArmExtendSpeed(double speed) {
+
+        armExtendSpeed = checkArmExtendLimits(speed);
+        armExtendMotor.set(armExtendSpeed);
+    }
+
+    /**
+     * Set the speed of the pincher motor
+     *
+     * @param speed
+     */
+    public void setPincherSpeed(double speed) {
+
+        pincherSpeed = checkPincherLimits(speed);
+        pincherMotor.set(pincherSpeed);
+    }
+
+    /** Set the armliftEncoderValue to the value specified */
     public void setArmLiftEncoder(double encoderValue) {
         armLiftEncoderOffset = encoderValue - armLiftEncoder.getPosition();
+    }
+
+    /** Set the armliftEncoderValue to the value specified */
+    public void setArmExtendEncoder(double encoderValue) {
+        armExtendEncoderOffset = encoderValue - armExtendEncoder.getPosition();
+    }
+
+    /** Set the pincherEncoderValue to the value specified */
+    public void setPincherEncoder(double encoderValue) {
+        pincherEncoderOffset = encoderValue - pincherEncoder.getPosition();
     }
 
     /** Safely stop the all arm motors from moving */
     public void stop() {
         setArmLiftSpeed(0);
+        setArmExtendSpeed(0);
+        setPincherSpeed(0);
     }
 
     @Override
@@ -120,28 +277,57 @@ public class ArmSubsystem extends SubsystemBase {
         armLiftMotor.set(armLiftSpeed);
         armLiftFollower.set(armLiftSpeed);
 
+        armExtendSpeed = checkArmExtendLimits(armExtendSpeed);
+        armExtendMotor.set(armExtendSpeed);
+
+        pincherSpeed = checkPincherLimits(pincherSpeed);
+        pincherMotor.set(pincherSpeed);
+
         /*
          * Update the SmartDashboard
          */
 
         SmartDashboard.putNumber("Lift Motor", armLiftSpeed);
-
         SmartDashboard.putNumber("Lift Encoder", getArmLiftEncoder());
-
         SmartDashboard.putNumber("Raw Lift Encoder", armLiftEncoder.getPosition());
 
+        SmartDashboard.putNumber("Extend  Motor", armExtendSpeed);
+        SmartDashboard.putNumber("Extend Encoder", getArmExtendEncoder());
+        SmartDashboard.putNumber("Raw Extend Encoder", armExtendEncoder.getPosition());
+
+        SmartDashboard.putNumber("Pincher  Motor", pincherSpeed);
+        SmartDashboard.putNumber("Pincher Encoder", getPincherEncoder());
+        SmartDashboard.putNumber("Raw Pincher Encoder", pincherEncoder.getPosition());
+
         SmartDashboard.putBoolean("Arm Down", isArmDown());
+        SmartDashboard.putBoolean("Arm Retracted", isArmRetracted());
+        SmartDashboard.putBoolean("Game Piece", isGamePieceDetected());
+        SmartDashboard.putBoolean("Pincher Open", isPincherOpen());
+    }
+
+    private void setArmLiftIdleMode(IdleMode idleMode) {
+
+        // If the idle mode is already set to the supplied
+        // value, there is nothing to do.
+        if (armLiftIdleMode == idleMode) {
+            return;
+        }
+
+        armLiftIdleMode = idleMode;
+
+        armLiftMotor.setIdleMode(idleMode);
+        armLiftFollower.setIdleMode(idleMode);
     }
 
     /**
-     * Check the arm extend limits and return the appropriate
+     * Check the arm lift limits and return the appropriate
      * output speed based on the limits
      *
      * @param inputSpeed
-     * @return output speed for the arm extender based on the
-     * current extender position.
+     * @return output speed for the arm lift based on the
+     * current lift position.
      */
-    private double checkArmExtendLimits(double inputSpeed) {
+    private double checkArmLiftLimits(double inputSpeed) {
 
         boolean atLimit = false;
 
@@ -173,14 +359,14 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     /**
-     * Check the arm lift limits and return the appropriate
+     * Check the arm extend limits and return the appropriate
      * output speed based on the limits
      *
      * @param inputSpeed
-     * @return output speed for the arm lift based on the
-     * current lift position.
+     * @return output speed for the arm extender based on the
+     * current extender position.
      */
-    private double checkArmLiftLimits(double inputSpeed) {
+    private double checkArmExtendLimits(double inputSpeed) {
 
         boolean atLimit = false;
 
@@ -248,19 +434,5 @@ public class ArmSubsystem extends SubsystemBase {
         }
 
         return inputSpeed;
-    }
-
-    private void setArmLiftIdleMode(IdleMode idleMode) {
-
-        // If the idle mode is already set to the supplied
-        // value, there is nothing to do.
-        if (armLiftIdleMode == idleMode) {
-            return;
-        }
-
-        armLiftIdleMode = idleMode;
-
-        armLiftMotor.setIdleMode(idleMode);
-        armLiftFollower.setIdleMode(idleMode);
     }
 }
