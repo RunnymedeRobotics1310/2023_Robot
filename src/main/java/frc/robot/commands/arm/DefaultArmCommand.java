@@ -33,6 +33,13 @@ public class DefaultArmCommand extends CommandBase {
     @Override
     public void execute() {
 
+        // zero the encoders if required
+        if (driverController.getBackButton()) {
+            armSubsystem.setArmLiftEncoder(0);
+            armSubsystem.setArmExtendEncoder(0);
+            armSubsystem.setPincherEncoder(0);
+        }
+
         // POV controls the arm up down extend/retract
         int armMovement = driverController.getPOV();
 
