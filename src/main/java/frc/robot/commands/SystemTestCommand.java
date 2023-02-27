@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.commands.operator.Runnymede2023GameController;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -41,10 +42,10 @@ public class SystemTestCommand extends CommandBase {
      * All subsystems must be passed to this command, and each subsystem should have a stop command
      * that safely stops the robot from moving.
      */
-    public SystemTestCommand(XboxController controller, DriveSubsystem driveSubsystem,
+    public SystemTestCommand(Runnymede2023GameController driverController, DriveSubsystem driveSubsystem,
         ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem) {
 
-        this.controller      = controller;
+        this.controller      = driverController.getRawRunnymedeController();
         this.driveSubsystem  = driveSubsystem;
         this.armSubsystem    = armSubsystem;
         this.visionSubsystem = visionSubsystem;
@@ -203,13 +204,13 @@ public class SystemTestCommand extends CommandBase {
             armSubsystem.setArmLiftSpeed(motorSpeed);
             break;
 
-//        case ARM_EXTEND:
-//            armSubsystem.setArmExtendSpeed(motorSpeed);
-//            break;
-//
-//        case PINCHER:
-//            armSubsystem.setPincherSpeed(motorSpeed);
-//            break;
+        // case ARM_EXTEND:
+        // armSubsystem.setArmExtendSpeed(motorSpeed);
+        // break;
+        //
+        // case PINCHER:
+        // armSubsystem.setPincherSpeed(motorSpeed);
+        // break;
 
         case CAMERA:
             // Use the motor speed to position the camera angle

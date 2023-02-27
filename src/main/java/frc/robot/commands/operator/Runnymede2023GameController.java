@@ -88,6 +88,10 @@ public class Runnymede2023GameController {
         return controller.getPOV() == 90;
     }
 
+    public double getRawAxis(int axisID) {
+        return controller.getRawAxis(axisID);
+    }
+
     public double leftX() {
         return controller.getLeftX();
     }
@@ -114,5 +118,13 @@ public class Runnymede2023GameController {
 
     public boolean isToggleTestMode() {
         return controller.getBackButton() && controller.getStartButton();
+    }
+
+    /**
+     * return raw runnymede controller.
+     * ONLY FOR USE IN TEST MODE.
+     */
+    public RunnymedeGameController getRawRunnymedeController() {
+        return controller;
     }
 }
