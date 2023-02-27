@@ -40,48 +40,62 @@ public class DefaultArmCommand extends CommandBase {
             armSubsystem.setPincherEncoder(0);
         }
 
-        // POV controls the arm up down extend/retract
-        int armMovement = driverController.getPOV();
+        /*
+         * POV controls the arm up down extend/retract
+         * in combination with the triggers.
+         *
+         * The POV selects which motor will move, and the
+         * Triggers move the motor.
+         *
+         * UP = extend/retract arm
+         * LEFT = open/close pincher
+         * DOWN = lift/lower arm
+         */
 
-        switch (armMovement) {
+        int    armMotorSelect = driverController.getPOV();
+        double motorSpeed     = 0;
 
-        case 0: // up (against gravity)
-            armSubsystem.setArmLiftSpeed(.1);
+        // If both the left and right triggers are pressed then
+        // do not move the motors.
+        if (driverController.getLeftTriggerAxis() > 0
+            && driverController.getRightTriggerAxis() > 0) {
+
+            motorSpeed = 0;
+        }
+        else if (driverController.getLeftTriggerAxis() > 0) {
+
+            motorSpeed = -driverController.getLeftTriggerAxis();
+        }
+        else if (driverController.getRightTriggerAxis() > 0) {
+
+            motorSpeed = driverController.getRightTriggerAxis();
+        }
+
+
+        switch (armMotorSelect) {
+
+        case 0:
+            armSubsystem.setArmLiftSpeed(0);
+            armSubsystem.setArmExtendSpeed(motorSpeed);
+            armSubsystem.setPincherSpeed(0);
             break;
 
-        case 90: // right
-            armSubsystem.setArmExtendSpeed(.1);
-            break;
-
-        case 180: // down (gravity is helping)
-            armSubsystem.setArmLiftSpeed(-.03);
+        case 180:
+            armSubsystem.setArmLiftSpeed(motorSpeed);
+            armSubsystem.setArmExtendSpeed(0);
+            armSubsystem.setPincherSpeed(0);
             break;
 
         case 270: // left
-            armSubsystem.setArmExtendSpeed(-.1);
+            armSubsystem.setArmLiftSpeed(0);
+            armSubsystem.setArmExtendSpeed(0);
+            armSubsystem.setPincherSpeed(motorSpeed);
             break;
 
         default:
             // no relevant button pressed
-            armSubsystem.setArmLiftSpeed(0); // NOTE: arm will gradually fall
+            armSubsystem.setArmLiftSpeed(0);
             armSubsystem.setArmExtendSpeed(0);
-            break;
-        }
-
-        // Pincher arm movement
-        // NOTE: we are out of buttons on the controller, so use the
-        // diagonal POV to open/close the pincher
-        switch (armMovement) {
-
-        case 45: // open pincher
-            armSubsystem.setPincherSpeed(.3);
-            break;
-
-        case 315: // close pincher
-            armSubsystem.setPincherSpeed(-.5);
-            break;
-
-        default:
             armSubsystem.setPincherSpeed(0);
             break;
         }
