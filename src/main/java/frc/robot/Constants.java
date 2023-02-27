@@ -93,7 +93,7 @@ public final class Constants {
             HIGH
         };
 
-        public static final int CAMERA_SERVO_PWM_PORT = 0;
+        public static final int CAMERA_ANGLE_MOTOR_PORT = 50;
     }
 
     public static final class ArmConstants {

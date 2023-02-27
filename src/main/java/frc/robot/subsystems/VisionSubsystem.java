@@ -1,11 +1,15 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.CameraView;
 
 public class VisionSubsystem extends SubsystemBase {
@@ -50,7 +54,19 @@ public class VisionSubsystem extends SubsystemBase {
 
     private VisionTargetType  currentVisionTargetType   = VisionTargetType.NONE;
 
-    private Servo             cameraServo               = new Servo(0);
+    /*
+     * Camera motor and encoder
+     */
+    private final CANSparkMax cameraMotor               = new CANSparkMax(VisionConstants.CAMERA_ANGLE_MOTOR_PORT,
+        MotorType.kBrushless);
+
+    private double            cameraMotorSpeed          = 0;
+
+    // Arm lift encoder
+    private RelativeEncoder   cameraEncoder             = cameraMotor.getEncoder();
+
+    private double            cameraEncoderOffset       = 0;
+
     private CameraView        cameraView                = CameraView.LOW;
 
     public VisionSubsystem() {
@@ -100,10 +116,10 @@ public class VisionSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Limelight Pipeline", pipeline.getInteger(-1L));
         SmartDashboard.putBoolean("Cone Targed Acquired", isConeTargetAcquired());
         SmartDashboard.putBoolean("Cube Targed Acquired", isCubeTargetAcquired());
+
         SmartDashboard.putString("Camera view", cameraView.toString());
-        if (cameraServo != null) {
-            SmartDashboard.putData("Camera Servo", cameraServo);
-        }
+        SmartDashboard.putNumber("Camera Motor Speed", getCameraMotorSpeed());
+        SmartDashboard.putNumber("Camera Encoder", getCameraEncoder());
     }
 
     /**
@@ -273,9 +289,44 @@ public class VisionSubsystem extends SubsystemBase {
         return cameraView;
     }
 
-    /** Set the camera servo to the specified position in the range -1.0 to 1.0 */
-    public void setCameraServoPosition(double servoPostion) {
-        cameraServo.set(servoPostion);
+    /**
+     * Set the camera motor speed
+     *
+     * @param speed
+     */
+    public void setCameraMotorSpeed(double speed) {
+
+        cameraMotorSpeed = speed;
+
+        cameraMotor.set(speed);
+    }
+
+    /**
+     * Get the camera motor speed
+     *
+     * @param speed
+     */
+    public double getCameraMotorSpeed() {
+
+        return cameraMotorSpeed;
+    }
+
+    /**
+     * Get the current camera encoder position
+     *
+     * @return double encoder position
+     */
+    public double getCameraEncoder() {
+        return cameraEncoder.getPosition() + cameraEncoderOffset;
+    }
+
+    /**
+     * Set the camera encoder to the supplied position
+     *
+     * @param cameraEncoderPosition
+     */
+    public void setCameraEncoderPosition(double cameraEncoderPosition) {
+        cameraEncoderOffset = -cameraEncoder.getPosition();
     }
 
     public void setCameraView(CameraView cameraView) {
@@ -284,17 +335,8 @@ public class VisionSubsystem extends SubsystemBase {
             return;
         }
 
-        // The Servo may or may not be installed
-        if (cameraServo != null) {
-            switch (cameraView) {
-            case LOW:
-                cameraServo.set(-1);
-                break;
-            case HIGH:
-                cameraServo.set(1);
-                break;
-            }
-        }
+        // FIXME: Should this be here?
+        // SetCameraView should be a command?
 
         this.cameraView = cameraView;
     }

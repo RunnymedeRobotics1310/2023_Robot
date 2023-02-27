@@ -26,6 +26,7 @@ import frc.robot.commands.drive.DriveOnHeadingCommand;
 import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.commands.operator.Runnymede2023GameController;
+import frc.robot.commands.vision.DefaultVisionCommand;
 import frc.robot.commands.vision.SwitchVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -72,6 +73,9 @@ public class RobotContainer {
 
         armSubsystem.setDefaultCommand(
             new DefaultArmCommand(driverController, armSubsystem));
+
+        visionSubsystem.setDefaultCommand(
+            new DefaultVisionCommand(driverController, visionSubsystem));
 
         // calibrate subsystems
         calibrateVision();

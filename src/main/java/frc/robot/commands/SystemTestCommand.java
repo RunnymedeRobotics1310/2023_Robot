@@ -203,17 +203,17 @@ public class SystemTestCommand extends CommandBase {
             armSubsystem.setArmLiftSpeed(motorSpeed);
             break;
 
-//        case ARM_EXTEND:
-//            armSubsystem.setArmExtendSpeed(motorSpeed);
-//            break;
-//
-//        case PINCHER:
-//            armSubsystem.setPincherSpeed(motorSpeed);
-//            break;
+        case ARM_EXTEND:
+            armSubsystem.setArmExtendSpeed(motorSpeed);
+            break;
+
+        case PINCHER:
+            armSubsystem.setPincherSpeed(motorSpeed);
+            break;
 
         case CAMERA:
             // Use the motor speed to position the camera angle
-            visionSubsystem.setCameraServoPosition(motorSpeed);
+            visionSubsystem.setCameraMotorSpeed(motorSpeed);
             break;
         }
     }
