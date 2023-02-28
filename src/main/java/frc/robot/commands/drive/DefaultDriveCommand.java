@@ -3,21 +3,21 @@ package frc.robot.commands.drive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants.DriveMode;
-import frc.robot.commands.operator.Runnymede2023GameController;
+import frc.robot.commands.operator.DriverController;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class DefaultDriveCommand extends CommandBase {
 
-    private final DriveSubsystem              driveSubsystem;
-    private final Runnymede2023GameController driverController;
-    private final DriveModeSelector           driveModeSelector;
+    private final DriveSubsystem    driveSubsystem;
+    private final DriverController  driverController;
+    private final DriveModeSelector driveModeSelector;
 
     /**
      * Creates a new ExampleCommand.
      *
      * @param driveSubsystem The subsystem used by this command.
      */
-    public DefaultDriveCommand(Runnymede2023GameController driverController, DriveSubsystem driveSubsystem,
+    public DefaultDriveCommand(DriverController driverController, DriveSubsystem driveSubsystem,
         DriveModeSelector driveModeSelector) {
 
         this.driverController  = driverController;
@@ -33,7 +33,7 @@ public class DefaultDriveCommand extends CommandBase {
     public void initialize() {
         System.out.println("DefaultDriveCommand started.");
         this.driverController.sayHello(); // FIXME: Kaelin remove this but see how you can talk to
-                                          // the custom controller.
+        // the custom controller.
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -113,17 +113,17 @@ public class DefaultDriveCommand extends CommandBase {
     private void setMotorSpeedsQuentin() {
 
         // forwards/backwards speed
-        double       speed   = driverController.getRawAxis(AXIS_LEFT_Y);
+        double speed = driverController.getRawAxis(AXIS_LEFT_Y);
         // turn speed
         final double rawTurn = driverController.getRawAxis(AXIS_RIGHT_X);
 
         SmartDashboard.putNumber("Speed", speed);
         SmartDashboard.putNumber("Turn", rawTurn);
 
-        double  turn      = rawTurn / 2;
-        boolean boost     = driverController.isBoost();
+        double  turn  = rawTurn / 2;
+        boolean boost = driverController.isBoost();
 
-        double  leftSpeed = 0, rightSpeed = 0;
+        double leftSpeed = 0, rightSpeed = 0;
 
         if (!boost) {
             speed = speed / 2;

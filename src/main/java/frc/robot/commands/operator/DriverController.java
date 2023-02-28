@@ -6,7 +6,7 @@ package frc.robot.commands.operator;
  * <p>
  * This class ... FIXME: Kaelin....
  */
-public class Runnymede2023GameController {
+public class DriverController {
 
     private final RunnymedeGameController controller;
 
@@ -17,7 +17,7 @@ public class Runnymede2023GameController {
      *
      * @param port on the driver station which the joystick is plugged into
      */
-    public Runnymede2023GameController(int port) {
+    public DriverController(int port) {
         controller = new RunnymedeGameController(port);
     }
 
@@ -29,7 +29,7 @@ public class Runnymede2023GameController {
      * than the specified value, then the axis will return zero. Setting the axisDeadbanding to zero turns off all deadbanding.
      * Values < 0 or > 0.4 are ignored, and the {@link #DEFAULT_AXIS_DEADBAND} value is used.
      */
-    public Runnymede2023GameController(int port, final double axisDeadband) {
+    public DriverController(int port, final double axisDeadband) {
         controller = new RunnymedeGameController(port, axisDeadband);
     }
 

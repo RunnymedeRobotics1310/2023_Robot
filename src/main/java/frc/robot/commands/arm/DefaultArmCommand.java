@@ -1,20 +1,20 @@
 package frc.robot.commands.arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.commands.operator.Runnymede2023GameController;
+import frc.robot.commands.operator.DriverController;
 import frc.robot.subsystems.ArmSubsystem;
 
 public class DefaultArmCommand extends CommandBase {
 
-    private final ArmSubsystem                armSubsystem;
-    private final Runnymede2023GameController driverController;
+    private final ArmSubsystem     armSubsystem;
+    private final DriverController driverController;
 
     /**
      * Creates a new ExampleCommand.
      *
      * @param ArmSubsystem The subsystem used by this command.
      */
-    public DefaultArmCommand(Runnymede2023GameController driverController, ArmSubsystem armSubsystem) {
+    public DefaultArmCommand(DriverController driverController, ArmSubsystem armSubsystem) {
 
         this.driverController = driverController;
         this.armSubsystem     = armSubsystem;
