@@ -2,16 +2,14 @@ package frc.robot.commands.operator;
 
 
 /**
- * The Runnymede 2023 Game Controller extends {@link RunnymedeGameController}
- * <p>
- * This class ... FIXME: Kaelin....
+ * The DriverController exposes all driver functions
  */
 public class DriverController {
 
     private final RunnymedeGameController controller;
 
     /**
-     * Construct a Runnymede2023GameController on the specified port
+     * Construct a DriverController on the specified port
      * <p>
      * Uses the {{@link #DEFAULT_AXIS_DEADBAND} as the joystick deadband
      *
@@ -22,11 +20,13 @@ public class DriverController {
     }
 
     /**
-     * Construct a Runnymede2023GameController on the specified port with the specified deadband
+     * Construct a DriverController on the specified port with the specified deadband
      *
      * @param port on the driver station which the joystick is plugged into
-     * @param axisDeadband (0 - 0.4) to use for all axis values on this controller. When the axis value from the hardware is less
-     * than the specified value, then the axis will return zero. Setting the axisDeadbanding to zero turns off all deadbanding.
+     * @param axisDeadband (0 - 0.4) to use for all axis values on this controller. When the axis
+     * value from the hardware is less
+     * than the specified value, then the axis will return zero. Setting the axisDeadbanding to zero
+     * turns off all deadbanding.
      * Values < 0 or > 0.4 are ignored, and the {@link #DEFAULT_AXIS_DEADBAND} value is used.
      */
     public DriverController(int port, final double axisDeadband) {
@@ -94,7 +94,7 @@ public class DriverController {
     }
 
     public boolean isCancel() {
-        return controller.getStartButton() && !controller.getBackButton();
+        return controller.getStartButton();
     }
 
     public boolean isVisionReset() {
@@ -150,7 +150,7 @@ public class DriverController {
     }
 
     /**
-     * return raw runnymede controller. ONLY FOR USE IN TEST MODE.
+     * return the raw underlying {@link RunnymedeGameController}. ONLY FOR USE IN TEST MODE.
      */
     public RunnymedeGameController getRawRunnymedeController() {
         return controller;

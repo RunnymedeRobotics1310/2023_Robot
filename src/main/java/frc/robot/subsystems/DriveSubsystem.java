@@ -93,10 +93,6 @@ public class DriveSubsystem extends SubsystemBase {
         rightPrimaryMotor.setInverted(DriveConstants.RIGHT_MOTOR_REVERSED);
         rightFollowerMotor.setInverted(DriveConstants.RIGHT_MOTOR_REVERSED);
 
-        // Set the polarity on the encoders
-        leftEncoder.setInverted(DriveConstants.LEFT_ENCODER_REVERSED);
-        rightEncoder.setInverted(DriveConstants.RIGHT_ENCODER_REVERSED);
-
         setIdleMode(IdleMode.kBrake);
         resetEncoders();
     }
@@ -179,7 +175,8 @@ public class DriveSubsystem extends SubsystemBase {
             heading += 360;
         }
 
-        return heading;
+        // round to two decimals
+        return Math.round(heading * 100) / 100d;
     }
 
     private double getRawGyroAngle(GyroAxis gyroAxis) {
@@ -188,9 +185,11 @@ public class DriveSubsystem extends SubsystemBase {
         case YAW:
             return navXGyro.getYaw();
         case PITCH:
-            return navXGyro.getPitch();
-        case ROLL:
+            // Pitch and roll are reversed
+            // in the vertical mounting of the rio
             return navXGyro.getRoll();
+        case ROLL:
+            return navXGyro.getPitch();
         default:
             return 0;
         }
@@ -204,7 +203,8 @@ public class DriveSubsystem extends SubsystemBase {
         // pitch was last set.
         gyroPitch += gyroPitchOffset;
 
-        return gyroPitch;
+        // Round to two decimals
+        return Math.round(gyroPitch * 100) / 100d;
     }
 
     /**
@@ -312,9 +312,9 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Gyro Heading", getHeading());
         SmartDashboard.putNumber("Gyro Pitch", getPitch());
 
-        SmartDashboard.putNumber("Gyro Raw Yaw", getRawGyroAngle(GyroAxis.YAW));
-        SmartDashboard.putNumber("Gyro Raw Pitch", getRawGyroAngle(GyroAxis.PITCH));
-        SmartDashboard.putNumber("Gyro Raw Roll", getRawGyroAngle(GyroAxis.ROLL));
+//        SmartDashboard.putNumber("Gyro Raw Yaw", getRawGyroAngle(GyroAxis.YAW));
+//        SmartDashboard.putNumber("Gyro Raw Pitch", getRawGyroAngle(GyroAxis.PITCH));
+//        SmartDashboard.putNumber("Gyro Raw Roll", getRawGyroAngle(GyroAxis.ROLL));
     }
 
     private void setIdleMode(IdleMode idleMode) {

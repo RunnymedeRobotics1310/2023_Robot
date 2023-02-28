@@ -46,7 +46,7 @@ public class ArmSubsystem extends SubsystemBase {
     /*
      * Pincher motor and encoder
      */
-    private final CANSparkMax      pincherMotor           = new CANSparkMax(ArmConstants.ARM_EXTEND_MOTOR_PORT, motorType);
+    private final CANSparkMax      pincherMotor           = new CANSparkMax(ArmConstants.PINCHER_MOTOR_PORT, motorType);
 
     private double                 pincherSpeed           = 0;
 
@@ -65,13 +65,13 @@ public class ArmSubsystem extends SubsystemBase {
      * The arm retracted detector is a hall effect limit switch that is normally open, plugged into
      * the arm extender SparkMAX reverse limit.
      */
-    private SparkMaxLimitSwitch    armRetractedDetector   = armExtendMotor.getReverseLimitSwitch(Type.kNormallyOpen);
+    private SparkMaxLimitSwitch    armRetractedDetector   = armExtendMotor.getReverseLimitSwitch(Type.kNormallyClosed);
 
     /**
      * The pincher open detector is a hall effect limit switch that is normally open, plugged into
      * the pincher SparkMAX reverse limit.
      */
-    private SparkMaxLimitSwitch    pincherOpenDetector    = pincherMotor.getReverseLimitSwitch(Type.kNormallyOpen);
+    private SparkMaxLimitSwitch    pincherOpenDetector    = pincherMotor.getReverseLimitSwitch(Type.kNormallyClosed);
 
     /**
      * The game piece detector is an infra-red sensor that is normally open, plugged into
@@ -92,9 +92,6 @@ public class ArmSubsystem extends SubsystemBase {
         armLiftMotor.setInverted(ArmConstants.ARM_LIFT_MOTOR_REVERSED);
         armLiftFollower.setInverted(ArmConstants.ARM_LIFT_MOTOR_REVERSED);
 
-        // Set the polarity on the encoder
-        armLiftEncoder.setInverted(ArmConstants.ARM_LIFT_ENCODER_REVERSED);
-
         setArmLiftIdleMode(IdleMode.kBrake);
 
         setArmLiftEncoder(0);
@@ -105,11 +102,10 @@ public class ArmSubsystem extends SubsystemBase {
         // Set the polarity on the motor
         armExtendMotor.setInverted(ArmConstants.ARM_EXTEND_MOTOR_REVERSED);
 
-        // Set the polarity on the encoder
-        armExtendEncoder.setInverted(ArmConstants.ARM_EXTEND_ENCODER_REVERSED);
-
         // Set the arm extender to always brake
         armExtendMotor.setIdleMode(IdleMode.kBrake);
+
+        armRetractedDetector.enableLimitSwitch(false);
 
         setArmExtendEncoder(0);
 
@@ -118,9 +114,6 @@ public class ArmSubsystem extends SubsystemBase {
          */
         // Set the polarity on the motor
         pincherMotor.setInverted(ArmConstants.PINCHER_MOTOR_REVERSED);
-
-        // Set the polarity on the encoder
-        pincherEncoder.setInverted(ArmConstants.PINCHER_ENCODER_REVERSED);
 
         // Set the arm extender to always brake
         pincherMotor.setIdleMode(IdleMode.kBrake);
