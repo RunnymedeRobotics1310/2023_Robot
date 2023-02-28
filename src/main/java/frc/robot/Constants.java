@@ -101,14 +101,25 @@ public final class Constants {
         public static final int     ARM_LIFT_MOTOR_PORT            = 30;
         public static final boolean ARM_LIFT_MOTOR_REVERSED        = false;
         public static final boolean ARM_LIFT_ENCODER_REVERSED      = false;
+        public static final int     ARM_LIFT_LIMIT                 = 0;
+        public static final int     ARM_LOWER_LIMIT                = 0;
+
 
         public static final int     ARM_EXTEND_MOTOR_PORT          = 35;
         public static final boolean ARM_EXTEND_MOTOR_REVERSED      = false;
         public static final boolean ARM_EXTEND_ENCODER_REVERSED    = false;
+        public static final int     ARM_EXTEND_LIMIT               = 0;
+        public static final int     ARM_RETRACT_LIMIT              = 0;
+
+
 
         public static final int     PINCHER_MOTOR_PORT             = 40;
         public static final boolean PINCHER_MOTOR_REVERSED         = false;
         public static final boolean PINCHER_ENCODER_REVERSED       = false;
+        public static final int     PINCHER_OPEN_LIMIT             = 0;
+        public static final int     PINCHER_CLOSE_LIMIT            = 0;
+
+
 
         public static final int     ARM_DOWN_LIMIT_SWITCH_DIO_PORT = 0;
 

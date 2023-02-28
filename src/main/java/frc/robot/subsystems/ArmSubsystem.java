@@ -50,7 +50,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     private double                 pincherSpeed           = 0;
 
-    // Arm lift encoder
+    // Pincher encoder
     private RelativeEncoder        pincherEncoder         = pincherMotor.getEncoder();
 
     private double                 pincherEncoderOffset   = 0;
@@ -330,26 +330,32 @@ public class ArmSubsystem extends SubsystemBase {
     private double checkArmLiftLimits(double inputSpeed) {
 
         boolean atLimit = false;
-
         /*
-         * Extending
+         * Lifting
          *
-         * If the arm encoder count is larger than the extend limit
-         * and the speed is positive (extending) then stop
+         * If the arm encoder count is larger than the lift limit
+         * and the speed is positive (lifting) then stop
          */
 
-        // FIXME: set the atLimit value based on the above comment ^^^
+        if ((armLiftEncoder.getPosition() > ArmConstants.ARM_LIFT_LIMIT) && (armLiftSpeed > 0)) {
+            atLimit = true;
+        }
 
         /*
-         * Retracting
+         * Lowering
          *
-         * If the retraction limit is detected, zero the encoder
+         * If the lowering limit is detected, zero the encoder
          *
-         * If the retraction limit is detected and the speed
-         * is negative (retracting), then stop
+         * If the lowering limit is detected and the speed
+         * is negative (lowering), then stop
          */
 
-        // FIXME: set the atLimit value based on the above comment ^^^
+        if (armDownDetector.get()) {
+            setArmLiftEncoder(0);
+        }
+        if ((armLiftEncoder.getPosition() < ArmConstants.ARM_LOWER_LIMIT) && (armLiftSpeed < 0)) {
+            atLimit = true;
+        }
 
         if (atLimit) {
             return 0;
@@ -377,7 +383,9 @@ public class ArmSubsystem extends SubsystemBase {
          * and the speed is positive (extending) then stop
          */
 
-        // FIXME: set the atLimit value based on the above comment ^^^
+        if ((armExtendEncoder.getPosition() > ArmConstants.ARM_EXTEND_LIMIT) && (armExtendSpeed > 0)) {
+            atLimit = true;
+        }
 
         /*
          * Retracting
@@ -388,7 +396,12 @@ public class ArmSubsystem extends SubsystemBase {
          * is negative (retracting), then stop
          */
 
-        // FIXME: set the atLimit value based on the above comment ^^^
+        if (armRetractedDetector.isPressed()) {
+            setArmExtendEncoder(0);
+        }
+        if ((armLiftEncoder.getPosition() < ArmConstants.ARM_RETRACT_LIMIT) && (armExtendSpeed < 0)) {
+            atLimit = true;
+        }
 
         if (atLimit) {
             return 0;
@@ -416,7 +429,9 @@ public class ArmSubsystem extends SubsystemBase {
          * and the speed is positive (closing) then stop
          */
 
-        // FIXME: set the atLimit value based on the above comment ^^^
+        if ((pincherEncoder.getPosition() < ArmConstants.PINCHER_CLOSE_LIMIT) && (pincherSpeed > 0)) {
+            atLimit = true;
+        }
 
         /*
          * Opening
@@ -427,7 +442,12 @@ public class ArmSubsystem extends SubsystemBase {
          * is negative (opening), then stop
          */
 
-        // FIXME: set the atLimit value based on the above comment ^^^
+        if (pincherOpenDetector.isPressed()) {
+            setPincherEncoder(0);
+        }
+        if ((pincherEncoder.getPosition() > ArmConstants.PINCHER_OPEN_LIMIT) && (armExtendSpeed < 0)) {
+            atLimit = true;
+        }
 
         if (atLimit) {
             return 0;
