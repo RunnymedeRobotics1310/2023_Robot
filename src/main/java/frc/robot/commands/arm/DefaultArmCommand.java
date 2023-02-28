@@ -34,71 +34,16 @@ public class DefaultArmCommand extends CommandBase {
     public void execute() {
 
         // zero the encoders if required
-        if (driverController.getBackButton()) {
+        if (driverController.isArmReset()) {
             armSubsystem.setArmLiftEncoder(0);
             armSubsystem.setArmExtendEncoder(0);
             armSubsystem.setPincherEncoder(0);
         }
 
-        /*
-         * POV controls the arm up down extend/retract
-         * in combination with the triggers.
-         *
-         * The POV selects which motor will move, and the
-         * Triggers move the motor.
-         *
-         * UP = extend/retract arm
-         * LEFT = open/close pincher
-         * DOWN = lift/lower arm
-         */
+        armSubsystem.setArmLiftSpeed(driverController.getArmLiftMotorSpeed());
+        armSubsystem.setArmExtendSpeed(driverController.getArmExtendMotorSpeed());
+        armSubsystem.setPincherSpeed(driverController.getPincerMotorSpeed());
 
-        int    armMotorSelect = driverController.getPOV();
-        double motorSpeed     = 0;
-
-        // If both the left and right triggers are pressed then
-        // do not move the motors.
-        if (driverController.getLeftTriggerAxis() > 0
-            && driverController.getRightTriggerAxis() > 0) {
-
-            motorSpeed = 0;
-        }
-        else if (driverController.getLeftTriggerAxis() > 0) {
-
-            motorSpeed = -driverController.getLeftTriggerAxis();
-        }
-        else if (driverController.getRightTriggerAxis() > 0) {
-
-            motorSpeed = driverController.getRightTriggerAxis();
-        }
-
-
-        switch (armMotorSelect) {
-
-        case 0:
-            armSubsystem.setArmLiftSpeed(0);
-            armSubsystem.setArmExtendSpeed(motorSpeed);
-            armSubsystem.setPincherSpeed(0);
-            break;
-
-        case 180:
-            armSubsystem.setArmLiftSpeed(motorSpeed);
-            armSubsystem.setArmExtendSpeed(0);
-            armSubsystem.setPincherSpeed(0);
-            break;
-
-        case 270: // left
-            armSubsystem.setArmLiftSpeed(0);
-            armSubsystem.setArmExtendSpeed(0);
-            armSubsystem.setPincherSpeed(motorSpeed);
-            break;
-
-        default:
-            // no relevant button pressed
-            armSubsystem.setArmLiftSpeed(0);
-            armSubsystem.setArmExtendSpeed(0);
-            armSubsystem.setPincherSpeed(0);
-            break;
-        }
     }
 
     // Returns true when the command should end.

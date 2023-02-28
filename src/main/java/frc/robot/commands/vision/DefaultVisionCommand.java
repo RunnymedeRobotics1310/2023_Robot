@@ -36,42 +36,11 @@ public class DefaultVisionCommand extends CommandBase {
     public void execute() {
 
         // zero the encoders if required
-        if (driverController.getBackButton()) {
+        if (driverController.isVisionReset()) {
             visionSubsystem.setCameraEncoderPosition(0);
         }
 
-        /*
-         * POV controls the Vision Camera angle.
-         *
-         * When POV right is selected the triggers move the camera
-         */
-
-        boolean visionMotorSelected = driverController.getPOV() == 90;
-        double  motorSpeed          = 0;
-
-        // If both the left and right triggers are pressed then
-        // do not move the motors.
-        if (driverController.getLeftTriggerAxis() > 0
-            && driverController.getRightTriggerAxis() > 0) {
-
-            motorSpeed = 0;
-        }
-        else if (driverController.getLeftTriggerAxis() > 0) {
-
-            motorSpeed = -driverController.getLeftTriggerAxis();
-        }
-        else if (driverController.getRightTriggerAxis() > 0) {
-
-            motorSpeed = driverController.getRightTriggerAxis();
-        }
-
-
-        if (visionMotorSelected) {
-            visionSubsystem.setCameraMotorSpeed(motorSpeed);
-        }
-        else {
-            visionSubsystem.setCameraMotorSpeed(0);
-        }
+        visionSubsystem.setCameraMotorSpeed(driverController.getCameraMotorSpeed());
     }
 
     // Returns true when the command should end.

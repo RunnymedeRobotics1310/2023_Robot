@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants.AutoAction;
 import frc.robot.Constants.AutoConstants.AutoLane;
@@ -19,10 +20,8 @@ import frc.robot.commands.CancelCommand;
 import frc.robot.commands.SystemTestCommand;
 import frc.robot.commands.arm.DefaultArmCommand;
 import frc.robot.commands.auto.AutonomousCommand;
-import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DefaultDriveCommand;
 import frc.robot.commands.drive.DriveModeSelector;
-import frc.robot.commands.drive.DriveOnHeadingCommand;
 import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.commands.operator.Runnymede2023GameController;
@@ -168,37 +167,52 @@ public class RobotContainer {
         // Cancel all commands on the XBox controller three lines (aka. start) button
         // NOTE: The SystemTestCommand uses the same button, so update the code in the
         // SystemTestCommand if this button changes
-        new Trigger(() -> driverController.getStartButton())
+        new Trigger(() -> driverController.isCancel())
             .onTrue(new CancelCommand(driveSubsystem));
 
         // Enter Test Mode (Start and Back pressed at the same time)
-        new Trigger(() -> (driverController.getStartButton() && driverController.getBackButton()))
+        new Trigger(() -> (driverController.isToggleTestMode()))
             .onTrue(new SystemTestCommand(driverController,
                 driveSubsystem, armSubsystem, visionSubsystem));
 
         // Reset the Gyro heading to zero on the menu (aka. back) button
-        new Trigger(() -> driverController.getBackButton())
+        new Trigger(() -> driverController.isGyroReset())
             .onTrue(new SetGyroHeadingCommand(0, driveSubsystem)
                 .andThen(new ResetGyroPitchCommand(driveSubsystem)));
 
-        // Example using the POV to Drive on Heading at .5 speed for 50cm.
-        new Trigger(() -> (driverController.getPOV() == 0))
-            .onTrue(new DriveOnHeadingCommand(0, .5, 400, driveSubsystem));
+        // dpad controlls
+        new Trigger(() -> (driverController.isAdjustHigher()))
+            .onTrue(new InstantCommand());
 
-        new Trigger(() -> (driverController.getPOV() == 90))
-            .onTrue(new DriveOnHeadingCommand(90, .5, 400, driveSubsystem));
+        new Trigger(() -> (driverController.isAdjustLower()))
+            .onTrue(new InstantCommand());
 
-        new Trigger(() -> (driverController.getPOV() == 180))
-            .onTrue(new DriveOnHeadingCommand(0, -.5, 400, driveSubsystem));
+        new Trigger(() -> (driverController.isSubstation()))
+            .onTrue(new InstantCommand());
 
-        new Trigger(() -> (driverController.getPOV() == 270))
-            .onTrue(new DriveOnHeadingCommand(270, .5, 400, driveSubsystem));
+        new Trigger(() -> (driverController.isUnnamed()))
+            .onTrue(new InstantCommand());
 
-        new Trigger(() -> (driverController.getLeftBumper()))
-            .onTrue(new SwitchVisionTargetCommand(visionSubsystem));
+        // scoring (a/b/y/x)
+        new Trigger(() -> (driverController.isHigh()))
+            .onTrue(new InstantCommand());
 
-        new Trigger(() -> (driverController.getAButton()))
-            .onTrue(new BalanceCommand(driveSubsystem));
+        new Trigger(() -> (driverController.isMid()))
+            .onTrue(new InstantCommand());
+
+        new Trigger(() -> (driverController.isLow()))
+            .onTrue(new InstantCommand());
+
+        new Trigger(() -> (driverController.isDrop()))
+            .onTrue(new InstantCommand());
+
+        // grab things
+        new Trigger(() -> (driverController.isPickUpCone()))
+            .onTrue(new InstantCommand());
+
+        new Trigger(() -> (driverController.isPickUpCube()))
+            .onTrue(new InstantCommand());
+
     }
 
     /**
