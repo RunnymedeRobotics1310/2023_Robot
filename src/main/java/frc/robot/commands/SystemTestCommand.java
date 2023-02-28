@@ -184,6 +184,8 @@ public class SystemTestCommand extends CommandBase {
             }
         }
 
+        SmartDashboard.putNumber("Test Motor Speed", motorSpeed);
+
         /*
          * If the X button is pressed, reset the motor speed to zero
          */

@@ -281,16 +281,16 @@ public class ArmSubsystem extends SubsystemBase {
          */
 
         SmartDashboard.putNumber("Lift Motor", armLiftSpeed);
-        SmartDashboard.putNumber("Lift Encoder", getArmLiftEncoder());
-        SmartDashboard.putNumber("Raw Lift Encoder", armLiftEncoder.getPosition());
+        SmartDashboard.putNumber("Lift Encoder", Math.round(getArmLiftEncoder() * 100) / 100);
+        SmartDashboard.putNumber("Raw Lift Encoder", Math.round(armLiftEncoder.getPosition() * 100) / 100);
 
         SmartDashboard.putNumber("Extend  Motor", armExtendSpeed);
-        SmartDashboard.putNumber("Extend Encoder", getArmExtendEncoder());
-        SmartDashboard.putNumber("Raw Extend Encoder", armExtendEncoder.getPosition());
+        SmartDashboard.putNumber("Extend Encoder", Math.round(getArmExtendEncoder() * 100) / 100);
+        SmartDashboard.putNumber("Raw Extend Encoder", Math.round(armExtendEncoder.getPosition() * 100) / 100);
 
         SmartDashboard.putNumber("Pincher  Motor", pincherSpeed);
-        SmartDashboard.putNumber("Pincher Encoder", getPincherEncoder());
-        SmartDashboard.putNumber("Raw Pincher Encoder", pincherEncoder.getPosition());
+        SmartDashboard.putNumber("Pincher Encoder", Math.round(getPincherEncoder() * 100) / 100);
+        SmartDashboard.putNumber("Raw Pincher Encoder", Math.round(pincherEncoder.getPosition() * 100) / 100);
 
         SmartDashboard.putBoolean("Arm Down", isArmDown());
         SmartDashboard.putBoolean("Arm Retracted", isArmRetracted());

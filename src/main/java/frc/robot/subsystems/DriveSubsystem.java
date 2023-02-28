@@ -300,21 +300,21 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Right Motor", rightSpeed);
         SmartDashboard.putNumber("Left  Motor", leftSpeed);
 
-        SmartDashboard.putNumber("Right Encoder", getRightEncoder());
-        SmartDashboard.putNumber("Left Encoder", getLeftEncoder());
-        SmartDashboard.putNumber("Avg Encoder", getAverageEncoderValue());
-        SmartDashboard.putNumber("Distance (cm)", getEncoderDistanceCm());
+        SmartDashboard.putNumber("Right Encoder", Math.round(getRightEncoder() * 100) / 100);
+        SmartDashboard.putNumber("Left Encoder", Math.round(getLeftEncoder() * 100) / 100);
+        SmartDashboard.putNumber("Avg Encoder", Math.round(getAverageEncoderValue() * 100) / 100);
+        SmartDashboard.putNumber("Distance (cm)", Math.round(getEncoderDistanceCm() * 10) / 10);
 
         SmartDashboard.putNumber("Ultrasonic Voltage", ultrasonicDistanceSensor.getVoltage());
-        SmartDashboard.putNumber("Ultrasonic Distance (cm)", getUltrasonicDistanceCm());
+        SmartDashboard.putNumber("Ultrasonic Distance (cm)", Math.round(getUltrasonicDistanceCm()));
 
         SmartDashboard.putData("Gyro", navXGyro);
         SmartDashboard.putNumber("Gyro Heading", getHeading());
         SmartDashboard.putNumber("Gyro Pitch", getPitch());
 
-//        SmartDashboard.putNumber("Gyro Raw Yaw", getRawGyroAngle(GyroAxis.YAW));
-//        SmartDashboard.putNumber("Gyro Raw Pitch", getRawGyroAngle(GyroAxis.PITCH));
-//        SmartDashboard.putNumber("Gyro Raw Roll", getRawGyroAngle(GyroAxis.ROLL));
+        // SmartDashboard.putNumber("Gyro Raw Yaw", getRawGyroAngle(GyroAxis.YAW));
+        // SmartDashboard.putNumber("Gyro Raw Pitch", getRawGyroAngle(GyroAxis.PITCH));
+        // SmartDashboard.putNumber("Gyro Raw Roll", getRawGyroAngle(GyroAxis.ROLL));
     }
 
     private void setIdleMode(IdleMode idleMode) {
