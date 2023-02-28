@@ -8,6 +8,14 @@ public class DriverController {
 
     private final RunnymedeGameController controller;
 
+    public enum Stick {
+        LEFT, RIGHT
+    };
+
+    public enum Axis {
+        X, Y
+    };
+
     /**
      * Construct a DriverController on the specified port
      * <p>
@@ -66,11 +74,11 @@ public class DriverController {
     }
 
     public boolean isPickUpCone() {
-        return !shift() && controller.getLeftTriggerAxis() > 0.1;
+        return !shift() && controller.getLeftTriggerAxis() > 0.3;
     }
 
     public boolean isPickUpCube() {
-        return !shift() && controller.getRightTriggerAxis() > 0.1;
+        return !shift() && controller.getRightTriggerAxis() > 0.3;
     }
 
     public boolean isSubstation() {
@@ -89,8 +97,30 @@ public class DriverController {
         return !shift() && controller.getPOV() == 90;
     }
 
-    public double getRawAxis(int axisID) {
-        return controller.getRawAxis(axisID);
+    public double getAxis(Stick stick, Axis axis) {
+
+        switch (stick) {
+
+        case LEFT:
+            switch (axis) {
+            case X:
+                return controller.getLeftX();
+            case Y:
+                return controller.getLeftY();
+            }
+            break;
+
+        case RIGHT:
+            switch (axis) {
+            case X:
+                return controller.getRightX();
+            case Y:
+                return controller.getRightY();
+            }
+            break;
+        }
+
+        return 0;
     }
 
     public boolean isCancel() {
