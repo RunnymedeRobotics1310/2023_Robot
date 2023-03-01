@@ -15,89 +15,80 @@ import frc.robot.Constants.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
 
-    public static enum Pose {
-        SCORE_HIGH,
-        SCORE_MID,
-        SUBSTATION_PICKUP,
-        SCORE_LOW,
-        COMPACT,
-        GROUND_PICKUP,
-        DRIVING_WITH_ITEM
+    public static enum PincherContents {
+
+        CUBE(5.0),
+        CONE(12);
+
+        private final double width;
+
+        private PincherContents(double width) {
+            this.width = width;
+        }
     }
 
-    public static enum HeldItemState {
-        NONE,
-        CONE,
-        CUBE
-    }
-
-    private Pose                   pose;
-    private HeldItemState          heldItemState;
-    private static final MotorType motorType              = MotorType.kBrushless;
+    private static final MotorType motorType = MotorType.kBrushless;
 
     /*
      * Arm lift motors and encoder
      */
-    private final CANSparkMax      armLiftMotor           = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT, motorType);
-    private final CANSparkMax      armLiftFollower        = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT + 1, motorType);
+    private final CANSparkMax armLiftMotor    = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT, motorType);
+    private final CANSparkMax armLiftFollower = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT + 1, motorType);
 
-    private IdleMode               armLiftIdleMode        = null;
-    private double                 armLiftSpeed           = 0;
+    private IdleMode armLiftIdleMode = null;
+    private double   armLiftSpeed    = 0;
 
     // Arm lift encoder
-    private RelativeEncoder        armLiftEncoder         = armLiftMotor.getEncoder();
+    private RelativeEncoder armLiftEncoder = armLiftMotor.getEncoder();
 
-    private double                 armLiftEncoderOffset   = 0;
+    private double armLiftEncoderOffset = 0;
 
     /*
      * Arm extend motor and encoder
      */
-    private final CANSparkMax      armExtendMotor         = new CANSparkMax(ArmConstants.ARM_EXTEND_MOTOR_PORT, motorType);
+    private final CANSparkMax armExtendMotor = new CANSparkMax(ArmConstants.ARM_EXTEND_MOTOR_PORT, motorType);
 
-    private double                 armExtendSpeed         = 0;
+    private double armExtendSpeed = 0;
 
     // Arm lift encoder
-    private RelativeEncoder        armExtendEncoder       = armExtendMotor.getEncoder();
+    private RelativeEncoder armExtendEncoder = armExtendMotor.getEncoder();
 
-    private double                 armExtendEncoderOffset = 0;
+    private double armExtendEncoderOffset = 0;
 
     /*
      * Pincher motor and encoder
      */
-    private final CANSparkMax      pincherMotor           = new CANSparkMax(ArmConstants.PINCHER_MOTOR_PORT, motorType);
+    private final CANSparkMax pincherMotor = new CANSparkMax(ArmConstants.PINCHER_MOTOR_PORT, motorType);
 
-    private double                 pincherSpeed           = 0;
+    private double pincherSpeed = 0;
 
     // Pincher encoder
-    private RelativeEncoder        pincherEncoder         = pincherMotor.getEncoder();
+    private RelativeEncoder pincherEncoder = pincherMotor.getEncoder();
 
-    private double                 pincherEncoderOffset   = 0;
+    private double pincherEncoderOffset = 0;
 
     /*
      * Limit Switches
      */
     /** The arm down detector is an infra-red limit switch plugged into the RoboRio */
-    private DigitalInput           armDownDetector        = new DigitalInput(ArmConstants.ARM_DOWN_LIMIT_SWITCH_DIO_PORT);
+    private DigitalInput armDownDetector = new DigitalInput(ArmConstants.ARM_DOWN_LIMIT_SWITCH_DIO_PORT);
 
     /**
-     * The arm retracted detector is a hall effect limit switch that is normally open, plugged into
-     * the arm extender SparkMAX
+     * The arm retracted detector is a hall effect limit switch that is normally open, plugged into the arm extender SparkMAX
      * reverse limit.
      */
-    private SparkMaxLimitSwitch    armRetractedDetector   = armExtendMotor.getReverseLimitSwitch(Type.kNormallyClosed);
+    private SparkMaxLimitSwitch armRetractedDetector = armExtendMotor.getReverseLimitSwitch(Type.kNormallyClosed);
 
     /**
-     * The pincher open detector is a hall effect limit switch that is normally open, plugged into
-     * the pincher SparkMAX reverse
+     * The pincher open detector is a hall effect limit switch that is normally open, plugged into the pincher SparkMAX reverse
      * limit.
      */
-    private SparkMaxLimitSwitch    pincherOpenDetector    = pincherMotor.getReverseLimitSwitch(Type.kNormallyClosed);
+    private SparkMaxLimitSwitch pincherOpenDetector = pincherMotor.getReverseLimitSwitch(Type.kNormallyClosed);
 
     /**
-     * The game piece detector is an infra-red sensor that is normally open, plugged into the
-     * pincher SparkMAX forward limit.
+     * The game piece detector is an infra-red sensor that is normally open, plugged into the pincher SparkMAX forward limit.
      */
-    private SparkMaxLimitSwitch    gamePieceDetector      = pincherMotor.getForwardLimitSwitch(Type.kNormallyOpen);
+    private SparkMaxLimitSwitch gamePieceDetector = pincherMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
     /** Creates a new ArmSubsystem */
     public ArmSubsystem() {
@@ -524,31 +515,16 @@ public class ArmSubsystem extends SubsystemBase {
         return 0;
     }
 
-    public void enterPose(Pose pose) {
-        // fixme: configure arm and pincher for every pose
-        // save pose
 
-        // FIXME: EnterPose should be a command (or part of a command)?
-        // maybe setPose(pose)
-    }
-
-    public Pose getPose() {
-        return pose;
-    }
-
-    public void grabCone() {
-        // fixme: close pincer on cone
-        // update held item state
-
-        // FIXME: the action of grabbing a cone should be in the command layer?
-    }
-
-    public void grabCube() {
-        // fixme: close pincer on cube
-        // update held item state
-    }
-
-    public HeldItemState getHeldItemState() {
-        return heldItemState;
+    public PincherContents getPincerContents() {
+        if (gamePieceDetector.isPressed()) {
+            if (pincherEncoder.getPosition() == PincherContents.CONE.width) {
+                return PincherContents.CONE;
+            }
+            if (pincherEncoder.getPosition() == PincherContents.CUBE.width) {
+                return PincherContents.CUBE;
+            }
+        }
+        return null;
     }
 }
