@@ -30,6 +30,7 @@ public class ReleaseCommand extends CommandBase {
 
         // FIXME: do everything
         // open claws
+        // run CompactCommand
 
         ;
 
