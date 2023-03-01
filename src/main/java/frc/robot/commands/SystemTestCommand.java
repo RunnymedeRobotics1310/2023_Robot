@@ -131,7 +131,7 @@ public class SystemTestCommand extends CommandBase {
          * The SystemTestCommand can use either the POV or the triggers to control
          * the motor speed. If the triggers are used, the POV is cleared.
          *
-         * Once the motor is selected, use the dpad up and down to
+         * Once the motor is selected, use the POV up and down to
          * adjust the motor speed.
          *
          * The speed is adjusted 50 times / second as the user holds the
@@ -182,6 +182,8 @@ public class SystemTestCommand extends CommandBase {
                     povMotorSpeed = -1.0;
                 }
             }
+
+            motorSpeed = povMotorSpeed;
         }
 
         SmartDashboard.putNumber("Test Motor Speed", motorSpeed);

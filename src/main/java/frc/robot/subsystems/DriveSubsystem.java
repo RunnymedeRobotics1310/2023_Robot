@@ -300,10 +300,10 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Right Motor", rightSpeed);
         SmartDashboard.putNumber("Left  Motor", leftSpeed);
 
-        SmartDashboard.putNumber("Right Encoder", Math.round(getRightEncoder() * 100) / 100);
-        SmartDashboard.putNumber("Left Encoder", Math.round(getLeftEncoder() * 100) / 100);
-        SmartDashboard.putNumber("Avg Encoder", Math.round(getAverageEncoderValue() * 100) / 100);
-        SmartDashboard.putNumber("Distance (cm)", Math.round(getEncoderDistanceCm() * 10) / 10);
+        SmartDashboard.putNumber("Right Encoder", Math.round(getRightEncoder() * 100) / 100d);
+        SmartDashboard.putNumber("Left Encoder", Math.round(getLeftEncoder() * 100) / 100d);
+        SmartDashboard.putNumber("Avg Encoder", Math.round(getAverageEncoderValue() * 100) / 100d);
+        SmartDashboard.putNumber("Distance (cm)", Math.round(getEncoderDistanceCm() * 10) / 10d);
 
         SmartDashboard.putNumber("Ultrasonic Voltage", ultrasonicDistanceSensor.getVoltage());
         SmartDashboard.putNumber("Ultrasonic Distance (cm)", Math.round(getUltrasonicDistanceCm()));
