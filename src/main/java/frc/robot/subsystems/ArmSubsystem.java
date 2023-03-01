@@ -15,69 +15,86 @@ import frc.robot.Constants.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
 
-    private static final MotorType motorType              = MotorType.kBrushless;
+    public static enum Pose {
+        SCORE_HIGH,
+        SCORE_MID,
+        SUBSTATION_PICKUP,
+        SCORE_LOW,
+        COMPACT,
+        GROUND_PICKUP,
+        DRIVING_WITH_ITEM
+    }
+
+    public static enum HeldItemState {
+        NONE,
+        CONE,
+        CUBE
+    }
+
+    private              Pose          pose;
+    private              HeldItemState heldItemState;
+    private static final MotorType     motorType = MotorType.kBrushless;
 
     /*
      * Arm lift motors and encoder
      */
-    private final CANSparkMax      armLiftMotor           = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT, motorType);
-    private final CANSparkMax      armLiftFollower        = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT + 1, motorType);
+    private final CANSparkMax armLiftMotor    = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT, motorType);
+    private final CANSparkMax armLiftFollower = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT + 1, motorType);
 
-    private IdleMode               armLiftIdleMode        = null;
-    private double                 armLiftSpeed           = 0;
+    private IdleMode armLiftIdleMode = null;
+    private double   armLiftSpeed    = 0;
 
     // Arm lift encoder
-    private RelativeEncoder        armLiftEncoder         = armLiftMotor.getEncoder();
+    private RelativeEncoder armLiftEncoder = armLiftMotor.getEncoder();
 
-    private double                 armLiftEncoderOffset   = 0;
+    private double armLiftEncoderOffset = 0;
 
     /*
      * Arm extend motor and encoder
      */
-    private final CANSparkMax      armExtendMotor         = new CANSparkMax(ArmConstants.ARM_EXTEND_MOTOR_PORT, motorType);
+    private final CANSparkMax armExtendMotor = new CANSparkMax(ArmConstants.ARM_EXTEND_MOTOR_PORT, motorType);
 
-    private double                 armExtendSpeed         = 0;
+    private double armExtendSpeed = 0;
 
     // Arm lift encoder
-    private RelativeEncoder        armExtendEncoder       = armExtendMotor.getEncoder();
+    private RelativeEncoder armExtendEncoder = armExtendMotor.getEncoder();
 
-    private double                 armExtendEncoderOffset = 0;
+    private double armExtendEncoderOffset = 0;
 
     /*
      * Pincher motor and encoder
      */
-    private final CANSparkMax      pincherMotor           = new CANSparkMax(ArmConstants.PINCHER_MOTOR_PORT, motorType);
+    private final CANSparkMax pincherMotor = new CANSparkMax(ArmConstants.PINCHER_MOTOR_PORT, motorType);
 
-    private double                 pincherSpeed           = 0;
+    private double pincherSpeed = 0;
 
-    // Arm lift encoder
-    private RelativeEncoder        pincherEncoder         = pincherMotor.getEncoder();
+    // Pincher encoder
+    private RelativeEncoder pincherEncoder = pincherMotor.getEncoder();
 
-    private double                 pincherEncoderOffset   = 0;
+    private double pincherEncoderOffset = 0;
 
     /*
      * Limit Switches
      */
     /** The arm down detector is an infra-red limit switch plugged into the RoboRio */
-    private DigitalInput           armDownDetector        = new DigitalInput(ArmConstants.ARM_DOWN_LIMIT_SWITCH_DIO_PORT);
+    private DigitalInput armDownDetector = new DigitalInput(ArmConstants.ARM_DOWN_LIMIT_SWITCH_DIO_PORT);
 
     /**
-     * The arm retracted detector is a hall effect limit switch that is normally open, plugged into
-     * the arm extender SparkMAX reverse limit.
+     * The arm retracted detector is a hall effect limit switch that is normally open, plugged into the arm extender SparkMAX
+     * reverse limit.
      */
-    private SparkMaxLimitSwitch    armRetractedDetector   = armExtendMotor.getReverseLimitSwitch(Type.kNormallyClosed);
+    private SparkMaxLimitSwitch armRetractedDetector = armExtendMotor.getReverseLimitSwitch(Type.kNormallyClosed);
 
     /**
-     * The pincher open detector is a hall effect limit switch that is normally open, plugged into
-     * the pincher SparkMAX reverse limit.
+     * The pincher open detector is a hall effect limit switch that is normally open, plugged into the pincher SparkMAX reverse
+     * limit.
      */
-    private SparkMaxLimitSwitch    pincherOpenDetector    = pincherMotor.getReverseLimitSwitch(Type.kNormallyClosed);
+    private SparkMaxLimitSwitch pincherOpenDetector = pincherMotor.getReverseLimitSwitch(Type.kNormallyClosed);
 
     /**
-     * The game piece detector is an infra-red sensor that is normally open, plugged into
-     * the pincher SparkMAX forward limit.
+     * The game piece detector is an infra-red sensor that is normally open, plugged into the pincher SparkMAX forward limit.
      */
-    private SparkMaxLimitSwitch    gamePieceDetector      = pincherMotor.getForwardLimitSwitch(Type.kNormallyOpen);
+    private SparkMaxLimitSwitch gamePieceDetector = pincherMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
     /** Creates a new ArmSubsystem */
     public ArmSubsystem() {
@@ -281,16 +298,16 @@ public class ArmSubsystem extends SubsystemBase {
          */
 
         SmartDashboard.putNumber("Lift Motor", armLiftSpeed);
-        SmartDashboard.putNumber("Lift Encoder", getArmLiftEncoder());
-        SmartDashboard.putNumber("Raw Lift Encoder", armLiftEncoder.getPosition());
+        SmartDashboard.putNumber("Lift Encoder", Math.round(getArmLiftEncoder() * 100) / 100);
+        SmartDashboard.putNumber("Raw Lift Encoder", Math.round(armLiftEncoder.getPosition() * 100) / 100);
 
         SmartDashboard.putNumber("Extend  Motor", armExtendSpeed);
-        SmartDashboard.putNumber("Extend Encoder", getArmExtendEncoder());
-        SmartDashboard.putNumber("Raw Extend Encoder", armExtendEncoder.getPosition());
+        SmartDashboard.putNumber("Extend Encoder", Math.round(getArmExtendEncoder() * 100) / 100);
+        SmartDashboard.putNumber("Raw Extend Encoder", Math.round(armExtendEncoder.getPosition() * 100) / 100);
 
         SmartDashboard.putNumber("Pincher  Motor", pincherSpeed);
-        SmartDashboard.putNumber("Pincher Encoder", getPincherEncoder());
-        SmartDashboard.putNumber("Raw Pincher Encoder", pincherEncoder.getPosition());
+        SmartDashboard.putNumber("Pincher Encoder", Math.round(getPincherEncoder() * 100) / 100);
+        SmartDashboard.putNumber("Raw Pincher Encoder", Math.round(pincherEncoder.getPosition() * 100) / 100);
 
         SmartDashboard.putBoolean("Arm Down", isArmDown());
         SmartDashboard.putBoolean("Arm Retracted", isArmRetracted());
@@ -313,36 +330,40 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     /**
-     * Check the arm lift limits and return the appropriate
-     * output speed based on the limits
+     * Check the arm lift limits and return the appropriate output speed based on the limits
      *
      * @param inputSpeed
-     * @return output speed for the arm lift based on the
-     * current lift position.
+     * @return output speed for the arm lift based on the current lift position.
      */
     private double checkArmLiftLimits(double inputSpeed) {
 
         boolean atLimit = false;
-
         /*
-         * Extending
+         * Lifting
          *
-         * If the arm encoder count is larger than the extend limit
-         * and the speed is positive (extending) then stop
+         * If the arm encoder count is larger than the lift limit
+         * and the speed is positive (lifting) then stop
          */
 
-        // FIXME: set the atLimit value based on the above comment ^^^
+        if ((armLiftEncoder.getPosition() > ArmConstants.ARM_LIFT_LIMIT) && (armLiftSpeed > 0)) {
+            atLimit = true;
+        }
 
         /*
-         * Retracting
+         * Lowering
          *
-         * If the retraction limit is detected, zero the encoder
+         * If the lowering limit is detected, zero the encoder
          *
-         * If the retraction limit is detected and the speed
-         * is negative (retracting), then stop
+         * If the lowering limit is detected and the speed
+         * is negative (lowering), then stop
          */
 
-        // FIXME: set the atLimit value based on the above comment ^^^
+        if (armDownDetector.get()) {
+            setArmLiftEncoder(0);
+        }
+        if ((armLiftEncoder.getPosition() < ArmConstants.ARM_LOWER_LIMIT) && (armLiftSpeed < 0)) {
+            atLimit = true;
+        }
 
         if (atLimit) {
             return 0;
@@ -352,12 +373,10 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     /**
-     * Check the arm extend limits and return the appropriate
-     * output speed based on the limits
+     * Check the arm extend limits and return the appropriate output speed based on the limits
      *
      * @param inputSpeed
-     * @return output speed for the arm extender based on the
-     * current extender position.
+     * @return output speed for the arm extender based on the current extender position.
      */
     private double checkArmExtendLimits(double inputSpeed) {
 
@@ -370,7 +389,9 @@ public class ArmSubsystem extends SubsystemBase {
          * and the speed is positive (extending) then stop
          */
 
-        // FIXME: set the atLimit value based on the above comment ^^^
+        if ((armExtendEncoder.getPosition() > ArmConstants.ARM_EXTEND_LIMIT) && (armExtendSpeed > 0)) {
+            atLimit = true;
+        }
 
         /*
          * Retracting
@@ -381,7 +402,12 @@ public class ArmSubsystem extends SubsystemBase {
          * is negative (retracting), then stop
          */
 
-        // FIXME: set the atLimit value based on the above comment ^^^
+        if (armRetractedDetector.isPressed()) {
+            setArmExtendEncoder(0);
+        }
+        if ((armLiftEncoder.getPosition() < ArmConstants.ARM_RETRACT_LIMIT) && (armExtendSpeed < 0)) {
+            atLimit = true;
+        }
 
         if (atLimit) {
             return 0;
@@ -391,12 +417,10 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     /**
-     * Check the pincher limits and return the appropriate
-     * output speed based on the limits
+     * Check the pincher limits and return the appropriate output speed based on the limits
      *
      * @param inputSpeed
-     * @return output speed for the pincher based on the
-     * current pincher position.
+     * @return output speed for the pincher based on the current pincher position.
      */
     private double checkPincherLimits(double inputSpeed) {
 
@@ -409,7 +433,9 @@ public class ArmSubsystem extends SubsystemBase {
          * and the speed is positive (closing) then stop
          */
 
-        // FIXME: set the atLimit value based on the above comment ^^^
+        if ((pincherEncoder.getPosition() < ArmConstants.PINCHER_CLOSE_LIMIT) && (pincherSpeed > 0)) {
+            atLimit = true;
+        }
 
         /*
          * Opening
@@ -420,12 +446,40 @@ public class ArmSubsystem extends SubsystemBase {
          * is negative (opening), then stop
          */
 
-        // FIXME: set the atLimit value based on the above comment ^^^
+        if (pincherOpenDetector.isPressed()) {
+            setPincherEncoder(0);
+        }
+        if ((pincherEncoder.getPosition() > ArmConstants.PINCHER_OPEN_LIMIT) && (armExtendSpeed < 0)) {
+            atLimit = true;
+        }
 
         if (atLimit) {
             return 0;
         }
 
         return inputSpeed;
+    }
+
+    public void enterPose(Pose pose) {
+        // fixme: configure arm and pincher for every pose
+        // save pose
+    }
+
+    public Pose getPose() {
+        return pose;
+    }
+
+    public void grabCone() {
+        // fixme: close pincer on cone
+        // update held item state
+    }
+
+    public void grabCube() {
+        // fixme: close pincer on cube
+        // update held item state
+    }
+
+    public HeldItemState getHeldItemState() {
+        return heldItemState;
     }
 }

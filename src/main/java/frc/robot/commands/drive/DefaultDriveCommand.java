@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants.DriveMode;
 import frc.robot.commands.operator.DriverController;
+import frc.robot.commands.operator.DriverController.Axis;
+import frc.robot.commands.operator.DriverController.Stick;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class DefaultDriveCommand extends CommandBase {
@@ -79,9 +81,11 @@ public class DefaultDriveCommand extends CommandBase {
     private void setMotorSpeedsArcade() {
 
         // Filter out low input values to reduce drivetrain drift
-        double leftY      = driverController.getRawAxis(1);
-        double leftX      = driverController.getRawAxis(0);
-        double leftSpeed  = leftY + leftX / (leftY == 0 ? 1 : 2); // less sensitive when moving
+        double leftY      = driverController.getAxis(Stick.LEFT, Axis.Y);
+        double leftX      = driverController.getAxis(Stick.LEFT, Axis.X);
+
+        double leftSpeed  = leftY + leftX / (leftY == 0 ? 1 : 2);        // less sensitive when
+                                                                         // moving
         double rightSpeed = leftY - leftX / (leftY == 0 ? 1 : 2);
 
         // Boost
@@ -95,8 +99,8 @@ public class DefaultDriveCommand extends CommandBase {
 
     private void setMotorSpeedsTank() {
 
-        double leftSpeed  = driverController.getRawAxis(1);
-        double rightSpeed = driverController.getRawAxis(5);
+        double leftSpeed  = driverController.getAxis(Stick.LEFT, Axis.Y);
+        double rightSpeed = driverController.getAxis(Stick.RIGHT, Axis.Y);
 
         // Boost
         if (driverController.isBoost()) {
@@ -107,23 +111,20 @@ public class DefaultDriveCommand extends CommandBase {
         }
     }
 
-    private static final int AXIS_LEFT_Y  = 1;
-    private static final int AXIS_RIGHT_X = 4;
-
     private void setMotorSpeedsQuentin() {
 
         // forwards/backwards speed
-        double speed = driverController.getRawAxis(AXIS_LEFT_Y);
+        double       speed   = driverController.getAxis(Stick.LEFT, Axis.Y);
         // turn speed
-        final double rawTurn = driverController.getRawAxis(AXIS_RIGHT_X);
+        final double rawTurn = driverController.getAxis(Stick.RIGHT, Axis.X);
 
         SmartDashboard.putNumber("Speed", speed);
         SmartDashboard.putNumber("Turn", rawTurn);
 
-        double  turn  = rawTurn / 2;
-        boolean boost = driverController.isBoost();
+        double  turn      = rawTurn / 2;
+        boolean boost     = driverController.isBoost();
 
-        double leftSpeed = 0, rightSpeed = 0;
+        double  leftSpeed = 0, rightSpeed = 0;
 
         if (!boost) {
             speed = speed / 2;

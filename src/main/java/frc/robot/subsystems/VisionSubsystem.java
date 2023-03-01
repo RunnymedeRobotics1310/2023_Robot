@@ -119,7 +119,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         SmartDashboard.putString("Camera view", cameraView.toString());
         SmartDashboard.putNumber("Camera Motor Speed", getCameraMotorSpeed());
-        SmartDashboard.putNumber("Camera Encoder", getCameraEncoder());
+        SmartDashboard.putNumber("Camera Encoder", Math.round(getCameraEncoder() * 100) / 100);
     }
 
     /**
