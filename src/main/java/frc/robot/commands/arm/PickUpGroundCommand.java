@@ -3,14 +3,14 @@ package frc.robot.commands.arm;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystem;
 
-public class PickUpSubstationCubeCommand extends CommandBase {
+public class PickUpGroundCommand extends CommandBase {
 
     private final ArmSubsystem armSubsystem;
 
     // fixme: do everything - see table
     // https://docs.google.com/document/d/1JzU-BzCXjGCwosouylmWGN83-x8lv-oPzklcXDqNN2U/edit#
 
-    public PickUpSubstationCubeCommand(ArmSubsystem armSubsystem) {
+    public PickUpGroundCommand(ArmSubsystem armSubsystem) {
 
         this.armSubsystem = armSubsystem;
 
@@ -21,7 +21,7 @@ public class PickUpSubstationCubeCommand extends CommandBase {
     @Override
     public void initialize() {
 
-        System.out.println("PickUpSubstationCubeCommand started");
+        System.out.println("PickUpGroundCommand started");
 
     }
 
@@ -29,7 +29,7 @@ public class PickUpSubstationCubeCommand extends CommandBase {
     public void execute() {
 
         // FIXME: do everything
-        // pose: substation pickup
+        // pose: ground pickup
         // hoover
         // grab if in sensor (update held item)
         // DriveWithPieceCommand
