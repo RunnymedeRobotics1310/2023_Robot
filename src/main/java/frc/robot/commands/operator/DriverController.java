@@ -160,7 +160,7 @@ public class DriverController {
 
     public double getArmLiftMotorSpeed() {
         if (shift()) {
-            return controller.getLeftY();
+            return controller.getLeftY() / 4;
         }
         return 0;
     }
