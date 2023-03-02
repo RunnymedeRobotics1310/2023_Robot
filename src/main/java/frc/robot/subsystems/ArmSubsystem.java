@@ -506,26 +506,19 @@ public class ArmSubsystem extends SubsystemBase {
 
     private double calcArmLiftHoldSpeed() {
 
-        // Arm is not extended
-        // Level = 0.06 motor speed, angle = 90 deg, encoder counts = 12.4
-        // Down = 0.04 (measured) , angle = 40 deg, encoder counts = 0;
+        double armDegrees       = getArmLiftEncoder() * ArmConstants.ARM_DEGREES_PER_ENCODER_COUNT + 40;
 
-        double degPerEncoderCount = 50 / 12.4;
+        double angleMultiplier  = Math.sin(armDegrees / 180 * Math.PI);
 
-        double armDegrees         = getArmLiftEncoder() * degPerEncoderCount + 40;
+        double extendMultiplier = 1 + (getArmExtendEncoder() / ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE * .7);
 
-        double angleMultiplier    = Math.sin(armDegrees / 180 * Math.PI);
-
-        double extendMultiplier   = 1 + (getArmExtendEncoder() / ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE * .7);
-
-        double baseCompensation   = 0.06;
+        double baseCompensation = 0.06;
 
         if (getHeldGamePiece() == GamePiece.CONE) {
             baseCompensation += 0.02;
         }
 
         return baseCompensation * angleMultiplier * extendMultiplier;
-
     }
 
 
