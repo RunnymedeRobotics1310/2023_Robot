@@ -37,7 +37,7 @@ public class OperatorInput {
         System.out.println("2023 game controller says hi!");
     }
 
-    private boolean dcShift() {
+    private boolean shift() {
         return driverController.getLeftBumper() && driverController.getRightBumper();
     }
 
@@ -104,7 +104,7 @@ public class OperatorInput {
     }
 
     public boolean isVisionReset() {
-        return dcShift() && driverController.getBackButton() && !driverController.getStartButton();
+        return shift() && driverController.getBackButton() && !driverController.getStartButton();
     }
 
     public boolean isGyroReset() {
@@ -112,11 +112,11 @@ public class OperatorInput {
     }
 
     public boolean isArmReset() {
-        return dcShift() && driverController.getBackButton() && !driverController.getStartButton();
+        return shift() && driverController.getBackButton() && !driverController.getStartButton();
     }
 
     public boolean isToggleTestMode() {
-        return !dcShift() && driverController.getBackButton() && driverController.getStartButton();
+        return !shift() && driverController.getBackButton() && driverController.getStartButton();
     }
 
     public double getCameraMotorSpeed() {
@@ -140,7 +140,7 @@ public class OperatorInput {
         return operatorController.getLeftX();
     }
 
-    public double getPincerMotorSpeed() {
+    public double getPincherMotorSpeed() {
         return operatorController.getRightY();
     }
 

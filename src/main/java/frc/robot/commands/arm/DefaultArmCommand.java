@@ -42,7 +42,7 @@ public class DefaultArmCommand extends CommandBase {
 
         armSubsystem.setArmLiftSpeed(driverController.getArmLiftMotorSpeed());
         armSubsystem.setArmExtendSpeed(driverController.getArmExtendMotorSpeed());
-        armSubsystem.setPincherSpeed(driverController.getPincerMotorSpeed());
+        armSubsystem.setPincherSpeed(driverController.getPincherMotorSpeed());
 
     }
 
