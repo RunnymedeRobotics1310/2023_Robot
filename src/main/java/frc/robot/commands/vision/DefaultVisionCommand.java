@@ -1,13 +1,13 @@
 package frc.robot.commands.vision;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.commands.operator.DriverController;
+import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.VisionSubsystem;
 
 public class DefaultVisionCommand extends CommandBase {
 
-    private final VisionSubsystem  visionSubsystem;
-    private final DriverController driverController;
+    private final VisionSubsystem visionSubsystem;
+    private final OperatorInput   driverController;
 
     /**
      * Default Vision Command.
@@ -15,7 +15,7 @@ public class DefaultVisionCommand extends CommandBase {
      * @param driverController
      * @param visionSubsystem
      */
-    public DefaultVisionCommand(DriverController driverController,
+    public DefaultVisionCommand(OperatorInput driverController,
         VisionSubsystem visionSubsystem) {
 
         this.driverController = driverController;
