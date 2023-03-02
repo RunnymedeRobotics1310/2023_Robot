@@ -89,6 +89,10 @@ public class SystemTestCommand extends CommandBase {
     @Override
     public void execute() {
 
+        if (driverController.isVisionReset()) {
+            visionSubsystem.setCameraEncoderPosition(0);
+        }
+
         /*
          * Use the bumpers to select the next / previous motor in the motor ring.
          *
