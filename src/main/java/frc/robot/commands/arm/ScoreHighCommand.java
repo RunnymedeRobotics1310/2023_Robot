@@ -1,6 +1,7 @@
 package frc.robot.commands.arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -47,10 +48,10 @@ public class ScoreHighCommand extends CommandBase {
 
         // ask arm if it thinks its holding a piece
         // set limelignt to april tags (cube) or tape (cone)
-        if (armSubsystem.getPincherEncoder() == /* ArmSubsystem.PincherContents.CUBE.width */ 0) {
+        if (armSubsystem.getHeldGamePiece() == GamePiece.CUBE) {
             visionSubsystem.setVisionTargetType(VisionTargetType.TAG);
         }
-        else if (armSubsystem.getPincherEncoder() == /* ArmSubsystem.PincherContents.CONE.width */ 0) {
+        else if (armSubsystem.getHeldGamePiece() == GamePiece.CONE) {
             visionSubsystem.setVisionTargetType(VisionTargetType.CONE_POST);
         }
         else {

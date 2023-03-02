@@ -505,7 +505,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
 
-    public Constants.GameConstants.GamePiece getPincerContents() {
+    public Constants.GameConstants.GamePiece getHeldGamePiece() {
         if (gamePieceDetector.isPressed()) {
             if (Math.abs(pincherEncoder.getPosition() - Constants.GameConstants.GamePiece.CONE.pincherEncoderCount) <= 5) {
                 return Constants.GameConstants.GamePiece.CONE;
