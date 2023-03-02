@@ -84,14 +84,14 @@ public class ArmSubsystem extends SubsystemBase {
      * the arm extender SparkMAX
      * reverse limit.
      */
-    private SparkMaxLimitSwitch    armRetractedDetector   = armExtendMotor.getReverseLimitSwitch(Type.kNormallyClosed);
+    private SparkMaxLimitSwitch    armRetractedDetector   = armExtendMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
     /**
      * The pincher open detector is a hall effect limit switch that is normally open, plugged into
      * the pincher SparkMAX reverse
      * limit.
      */
-    private SparkMaxLimitSwitch    pincherOpenDetector    = pincherMotor.getReverseLimitSwitch(Type.kNormallyClosed);
+    private SparkMaxLimitSwitch    pincherOpenDetector    = pincherMotor.getReverseLimitSwitch(Type.kNormallyOpen);
 
     /**
      * The game piece detector is an infra-red sensor that is normally open, plugged into the
