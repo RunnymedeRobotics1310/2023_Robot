@@ -11,38 +11,43 @@ public class DriveWithPieceCommand extends CommandBase {
     // https://docs.google.com/document/d/1JzU-BzCXjGCwosouylmWGN83-x8lv-oPzklcXDqNN2U/edit#
 
     public DriveWithPieceCommand(ArmSubsystem armSubsystem) {
-
         this.armSubsystem = armSubsystem;
-
         addRequirements(armSubsystem);
-
     }
 
     @Override
     public void initialize() {
-
         System.out.println("DriveWithPieceCommand started");
-
+        // fixme
+        // stop arms
+        // print current position etc.
     }
 
     @Override
     public void execute() {
-
         // FIXME: do everything
-        // pose: drive with item
-
-        ;
-
+        // if not holding a piece abort
+        // if holding a cone enter driving with cone pose
+        // if holding a cube enter driving with cube pose
     }
 
     @Override
     public boolean isFinished() {
         // FIXME: do everything
-        return true;
+        // if not holding a piece true
+        // otherwise keep running until interrupted
+        return false;
     }
 
     @Override
     public void end(boolean interrupted) {
         // FIXME: do everything
+        if (interrupted) {
+            // do nothing but log
+        }
+        else {
+            // still do nothing but log
+        }
+        // print state when ended
     }
 }
