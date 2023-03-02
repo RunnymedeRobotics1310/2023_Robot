@@ -11,21 +11,10 @@ import com.revrobotics.SparkMaxLimitSwitch.Type;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
-
-    public static enum PincherContents {
-
-        CUBE(5.0),
-        CONE(12);
-
-        private final double width;
-
-        private PincherContents(double width) {
-            this.width = width;
-        }
-    }
 
     private static final MotorType motorType = MotorType.kBrushless;
 
@@ -516,15 +505,15 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
 
-    public PincherContents getPincerContents() {
+    public Constants.GameConstants.GamePiece getPincerContents() {
         if (gamePieceDetector.isPressed()) {
-            if (pincherEncoder.getPosition() == PincherContents.CONE.width) {
-                return PincherContents.CONE;
+            if (Math.abs(pincherEncoder.getPosition() - Constants.GameConstants.GamePiece.CONE.pincherEncoderCount) <= 5) {
+                return Constants.GameConstants.GamePiece.CONE;
             }
-            if (pincherEncoder.getPosition() == PincherContents.CUBE.width) {
-                return PincherContents.CUBE;
+            if (Math.abs(pincherEncoder.getPosition() - Constants.GameConstants.GamePiece.CUBE.pincherEncoderCount) <= 5) {
+                return Constants.GameConstants.GamePiece.CUBE;
             }
         }
-        return null;
+        return Constants.GameConstants.GamePiece.NONE;
     }
 }
