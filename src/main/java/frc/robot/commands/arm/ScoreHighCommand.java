@@ -3,6 +3,7 @@ package frc.robot.commands.arm;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.VisionConstants.CameraView;
+import frc.robot.commands.drive.DriveToTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -59,6 +60,7 @@ public class ScoreHighCommand extends CommandBase {
         }
 
         // drive to target
+        new DriveToTargetCommand(null, 0, driveSubsystem, visionSubsystem)
 
         // pose: score high
         // raise arm
