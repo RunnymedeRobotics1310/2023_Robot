@@ -135,6 +135,8 @@ public class ArmSubsystem extends SubsystemBase {
         // Set the polarity on the motor
         pincherMotor.setInverted(ArmConstants.PINCHER_MOTOR_REVERSED);
 
+        gamePieceDetector.enableLimitSwitch(false);
+
         // Set the arm extender to always brake
         pincherMotor.setIdleMode(IdleMode.kBrake);
 
