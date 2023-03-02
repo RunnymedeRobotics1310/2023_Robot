@@ -2,19 +2,19 @@ package frc.robot.commands.arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.GameConstants.GamePiece;
-import frc.robot.commands.operator.DriverController;
+import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.ArmSubsystem;
 
 public class PickUpGroundCommand extends CommandBase {
 
-    private final ArmSubsystem     armSubsystem;
-    private final DriverController driverController;
-    private final double           GROUND_PICKUP_ARM_HEIGHT = 2;
+    private final ArmSubsystem  armSubsystem;
+    private final OperatorInput driverController;
+    private final double        GROUND_PICKUP_ARM_HEIGHT = 2;
 
     // fixme: do everything - see table
     // https://docs.google.com/document/d/1JzU-BzCXjGCwosouylmWGN83-x8lv-oPzklcXDqNN2U/edit#
 
-    public PickUpGroundCommand(DriverController driverController, ArmSubsystem armSubsystem) {
+    public PickUpGroundCommand(OperatorInput driverController, ArmSubsystem armSubsystem) {
 
         this.armSubsystem     = armSubsystem;
         this.driverController = driverController;

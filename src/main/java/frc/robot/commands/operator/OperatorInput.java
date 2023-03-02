@@ -4,17 +4,21 @@ package frc.robot.commands.operator;
 /**
  * The DriverController exposes all driver functions
  */
-public class DriverController {
+public class OperatorInput {
 
     private final RunnymedeGameController controller;
 
     public enum Stick {
         LEFT, RIGHT
-    };
+    }
+
+    ;
 
     public enum Axis {
         X, Y
-    };
+    }
+
+    ;
 
     /**
      * Construct a DriverController on the specified port
@@ -23,7 +27,7 @@ public class DriverController {
      *
      * @param port on the driver station which the joystick is plugged into
      */
-    public DriverController(int port) {
+    public OperatorInput(int port) {
         controller = new RunnymedeGameController(port);
     }
 
@@ -31,13 +35,11 @@ public class DriverController {
      * Construct a DriverController on the specified port with the specified deadband
      *
      * @param port on the driver station which the joystick is plugged into
-     * @param axisDeadband (0 - 0.4) to use for all axis values on this controller. When the axis
-     * value from the hardware is less
-     * than the specified value, then the axis will return zero. Setting the axisDeadbanding to zero
-     * turns off all deadbanding.
+     * @param axisDeadband (0 - 0.4) to use for all axis values on this controller. When the axis value from the hardware is less
+     * than the specified value, then the axis will return zero. Setting the axisDeadbanding to zero turns off all deadbanding.
      * Values < 0 or > 0.4 are ignored, and the {@link #DEFAULT_AXIS_DEADBAND} value is used.
      */
-    public DriverController(int port, final double axisDeadband) {
+    public OperatorInput(int port, final double axisDeadband) {
         controller = new RunnymedeGameController(port, axisDeadband);
     }
 
@@ -160,7 +162,7 @@ public class DriverController {
 
     public double getArmLiftMotorSpeed() {
         if (shift()) {
-            return controller.getLeftY();
+            return controller.getLeftY() / 4;
         }
         return 0;
     }

@@ -24,7 +24,7 @@ import frc.robot.commands.drive.DefaultDriveCommand;
 import frc.robot.commands.drive.DriveModeSelector;
 import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
-import frc.robot.commands.operator.DriverController;
+import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.vision.DefaultVisionCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -55,7 +55,7 @@ public class RobotContainer {
     private final DriveModeSelector driveModeSelector = new DriveModeSelector();
 
     // The driver's controller
-    private final DriverController driverController = new DriverController(
+    private final OperatorInput driverController = new OperatorInput(
         OiConstants.DRIVER_CONTROLLER_PORT);
 
     /**
