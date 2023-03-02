@@ -56,7 +56,7 @@ public class RobotContainer {
 
     // The driver's controller
     private final OperatorInput driverController = new OperatorInput(
-        OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.AUX_CONTROLLER_PORT);
+        OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -173,20 +173,7 @@ public class RobotContainer {
         new Trigger(() -> driverController.isGyroReset())
             .onTrue(new SetGyroHeadingCommand(0, driveSubsystem)
                 .andThen(new ResetGyroPitchCommand(driveSubsystem)));
-
-        // dpad controlls
-        new Trigger(() -> (driverController.isAdjustHigher()))
-            .onTrue(new InstantCommand());
-
-        new Trigger(() -> (driverController.isAdjustLower()))
-            .onTrue(new InstantCommand());
-
-        new Trigger(() -> (driverController.isSubstation()))
-            .onTrue(new InstantCommand());
-
-        new Trigger(() -> (driverController.isUnnamed()))
-            .onTrue(new InstantCommand());
-
+        
         // scoring (a/b/y/x)
         new Trigger(() -> (driverController.isHigh()))
             .onTrue(new InstantCommand());

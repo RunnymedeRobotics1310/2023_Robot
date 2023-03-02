@@ -48,7 +48,7 @@ public class SystemTestCommand extends CommandBase {
         ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem) {
 
         this.driverController = driverController;
-        this.controller       = driverController.getRawRunnymedeController();
+        this.controller       = driverController.getRawDriverController();
         this.driveSubsystem   = driveSubsystem;
         this.armSubsystem     = armSubsystem;
         this.visionSubsystem  = visionSubsystem;

@@ -81,8 +81,8 @@ public class DefaultDriveCommand extends CommandBase {
     private void setMotorSpeedsArcade() {
 
         // Filter out low input values to reduce drivetrain drift
-        double leftY = driverController.getAxis(Stick.LEFT, Axis.Y);
-        double leftX = driverController.getAxis(Stick.LEFT, Axis.X);
+        double leftY = driverController.getDriverControllerAxis(Stick.LEFT, Axis.Y);
+        double leftX = driverController.getDriverControllerAxis(Stick.LEFT, Axis.X);
 
         double leftSpeed = leftY + leftX / (leftY == 0 ? 1 : 2);        // less sensitive when
         // moving
@@ -99,8 +99,8 @@ public class DefaultDriveCommand extends CommandBase {
 
     private void setMotorSpeedsTank() {
 
-        double leftSpeed  = driverController.getAxis(Stick.LEFT, Axis.Y);
-        double rightSpeed = driverController.getAxis(Stick.RIGHT, Axis.Y);
+        double leftSpeed  = driverController.getDriverControllerAxis(Stick.LEFT, Axis.Y);
+        double rightSpeed = driverController.getDriverControllerAxis(Stick.RIGHT, Axis.Y);
 
         // Boost
         if (driverController.isBoost()) {
@@ -114,9 +114,9 @@ public class DefaultDriveCommand extends CommandBase {
     private void setMotorSpeedsQuentin() {
 
         // forwards/backwards speed
-        double speed = driverController.getAxis(Stick.LEFT, Axis.Y);
+        double speed = driverController.getDriverControllerAxis(Stick.LEFT, Axis.Y);
         // turn speed
-        final double rawTurn = driverController.getAxis(Stick.RIGHT, Axis.X);
+        final double rawTurn = driverController.getDriverControllerAxis(Stick.RIGHT, Axis.X);
 
         SmartDashboard.putNumber("Speed", speed);
         SmartDashboard.putNumber("Turn", rawTurn);

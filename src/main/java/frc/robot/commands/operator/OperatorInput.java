@@ -6,8 +6,8 @@ package frc.robot.commands.operator;
  */
 public class OperatorInput {
 
-    private final RunnymedeGameController controller;
-    private final RunnymedeGameController auxController;
+    private final RunnymedeGameController driverController;
+    private final RunnymedeGameController operatorController;
 
     public enum Stick {
         LEFT, RIGHT
@@ -22,14 +22,14 @@ public class OperatorInput {
     ;
 
     /**
-     * Construct an OperatorInput class that is fed by a DriverController and an AuxiliaryController.
+     * Construct an OperatorInput class that is fed by a DriverController and an OperatorController.
      *
      * @param driverControllerPort on the driver station which the driver joystick is plugged into
-     * @param auxControllerPort on the driver station which the aux joystick is plugged into
+     * @param operatorControllerPort on the driver station which the aux joystick is plugged into
      */
-    public OperatorInput(int driverControllerPort, int auxControllerPort) {
-        controller    = new RunnymedeGameController(driverControllerPort);
-        auxController = new RunnymedeGameController(auxControllerPort);
+    public OperatorInput(int driverControllerPort, int operatorControllerPort) {
+        driverController   = new RunnymedeGameController(driverControllerPort);
+        operatorController = new RunnymedeGameController(operatorControllerPort);
     }
 
 
@@ -37,77 +37,61 @@ public class OperatorInput {
         System.out.println("2023 game controller says hi!");
     }
 
-    private boolean shift() {
-        return controller.getLeftBumper() && controller.getRightBumper();
+    private boolean dcShift() {
+        return driverController.getLeftBumper() && driverController.getRightBumper();
     }
 
     public boolean isBoost() {
-        return !shift() && controller.getLeftBumper();
+        return driverController.getLeftBumper();
     }
 
     public boolean isSlowDown() {
-        return !shift() && controller.getRightBumper();
+        return driverController.getRightBumper();
     }
 
     public boolean isHigh() {
-        return !shift() && controller.getYButton();
+        return driverController.getYButton();
     }
 
     public boolean isMid() {
-        return !shift() && controller.getBButton();
+        return driverController.getBButton();
     }
 
     public boolean isLow() {
-        return !shift() && controller.getAButton();
+        return driverController.getAButton();
     }
 
     public boolean isDrop() {
-        return !shift() && controller.getXButton();
+        return driverController.getXButton();
     }
 
     public boolean isPickUpCone() {
-        return !shift() && controller.getLeftTriggerAxis() > 0.3;
+        return driverController.getLeftTriggerAxis() > 0.3;
     }
 
     public boolean isPickUpCube() {
-        return !shift() && controller.getRightTriggerAxis() > 0.3;
+        return driverController.getRightTriggerAxis() > 0.3;
     }
 
-    public boolean isSubstation() {
-        return !shift() && controller.getPOV() == 270;
-    }
-
-    public boolean isAdjustHigher() {
-        return !shift() && controller.getPOV() == 0;
-    }
-
-    public boolean isAdjustLower() {
-        return !shift() && controller.getPOV() == 180;
-    }
-
-    public boolean isUnnamed() {
-        return !shift() && controller.getPOV() == 90;
-    }
-
-    public double getAxis(Stick stick, Axis axis) {
+    public double getDriverControllerAxis(Stick stick, Axis axis) {
 
         switch (stick) {
 
         case LEFT:
             switch (axis) {
             case X:
-                return controller.getLeftX();
+                return driverController.getLeftX();
             case Y:
-                return controller.getLeftY();
+                return driverController.getLeftY();
             }
             break;
 
         case RIGHT:
             switch (axis) {
             case X:
-                return controller.getRightX();
+                return driverController.getRightX();
             case Y:
-                return controller.getRightY();
+                return driverController.getRightY();
             }
             break;
         }
@@ -116,65 +100,54 @@ public class OperatorInput {
     }
 
     public boolean isCancel() {
-        return controller.getStartButton();
+        return driverController.getStartButton();
     }
 
     public boolean isVisionReset() {
-        return shift() && controller.getBackButton() && !controller.getStartButton();
+        return dcShift() && driverController.getBackButton() && !driverController.getStartButton();
     }
 
     public boolean isGyroReset() {
-        return controller.getBackButton() && !controller.getStartButton();
+        return driverController.getBackButton() && !driverController.getStartButton();
     }
 
     public boolean isArmReset() {
-        return shift() && controller.getBackButton() && !controller.getStartButton();
+        return dcShift() && driverController.getBackButton() && !driverController.getStartButton();
     }
 
     public boolean isToggleTestMode() {
-        return !shift() && controller.getBackButton() && controller.getStartButton();
+        return !dcShift() && driverController.getBackButton() && driverController.getStartButton();
     }
 
     public double getCameraMotorSpeed() {
-        if (shift()) {
-            if (controller.getLeftTriggerAxis() > 0 && controller.getRightTriggerAxis() > 0) {
-                return 0;
-            }
-            if (controller.getLeftTriggerAxis() > 0) {
-                return -controller.getLeftTriggerAxis();
-            }
-            if (controller.getRightTriggerAxis() > 0) {
-                return controller.getRightTriggerAxis();
-            }
+        if (operatorController.getLeftTriggerAxis() > 0 && operatorController.getRightTriggerAxis() > 0) {
+            return 0;
+        }
+        if (operatorController.getLeftTriggerAxis() > 0) {
+            return -operatorController.getLeftTriggerAxis();
+        }
+        if (operatorController.getRightTriggerAxis() > 0) {
+            return operatorController.getRightTriggerAxis();
         }
         return 0;
     }
 
     public double getArmLiftMotorSpeed() {
-        if (shift()) {
-            return controller.getLeftY() / 4;
-        }
-        return 0;
+        return operatorController.getLeftY() / 4;
     }
 
     public double getArmExtendMotorSpeed() {
-        if (shift()) {
-            return controller.getLeftX();
-        }
-        return 0;
+        return operatorController.getLeftX();
     }
 
     public double getPincerMotorSpeed() {
-        if (shift()) {
-            return controller.getRightY();
-        }
-        return 0;
+        return operatorController.getRightY();
     }
 
     /**
      * return the raw underlying {@link RunnymedeGameController}. ONLY FOR USE IN TEST MODE.
      */
-    public RunnymedeGameController getRawRunnymedeController() {
-        return controller;
+    public RunnymedeGameController getRawDriverController() {
+        return driverController;
     }
 }
