@@ -56,7 +56,7 @@ public class RobotContainer {
 
     // The driver's controller
     private final OperatorInput driverController = new OperatorInput(
-        OiConstants.DRIVER_CONTROLLER_PORT);
+        OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.AUX_CONTROLLER_PORT);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.

@@ -7,6 +7,7 @@ package frc.robot.commands.operator;
 public class OperatorInput {
 
     private final RunnymedeGameController controller;
+    private final RunnymedeGameController auxController;
 
     public enum Stick {
         LEFT, RIGHT
@@ -21,27 +22,16 @@ public class OperatorInput {
     ;
 
     /**
-     * Construct a DriverController on the specified port
-     * <p>
-     * Uses the {{@link #DEFAULT_AXIS_DEADBAND} as the joystick deadband
+     * Construct an OperatorInput class that is fed by a DriverController and an AuxiliaryController.
      *
-     * @param port on the driver station which the joystick is plugged into
+     * @param driverControllerPort on the driver station which the driver joystick is plugged into
+     * @param auxControllerPort on the driver station which the aux joystick is plugged into
      */
-    public OperatorInput(int port) {
-        controller = new RunnymedeGameController(port);
+    public OperatorInput(int driverControllerPort, int auxControllerPort) {
+        controller    = new RunnymedeGameController(driverControllerPort);
+        auxController = new RunnymedeGameController(auxControllerPort);
     }
 
-    /**
-     * Construct a DriverController on the specified port with the specified deadband
-     *
-     * @param port on the driver station which the joystick is plugged into
-     * @param axisDeadband (0 - 0.4) to use for all axis values on this controller. When the axis value from the hardware is less
-     * than the specified value, then the axis will return zero. Setting the axisDeadbanding to zero turns off all deadbanding.
-     * Values < 0 or > 0.4 are ignored, and the {@link #DEFAULT_AXIS_DEADBAND} value is used.
-     */
-    public OperatorInput(int port, final double axisDeadband) {
-        controller = new RunnymedeGameController(port, axisDeadband);
-    }
 
     public void sayHello() {
         System.out.println("2023 game controller says hi!");

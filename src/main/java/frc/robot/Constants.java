@@ -15,12 +15,12 @@ package frc.robot;
 public final class Constants {
 
     // Global constants
-    public static final double DEFAULT_COMMAND_TIMEOUT_SECONDS = 5;  
+    public static final double DEFAULT_COMMAND_TIMEOUT_SECONDS = 5;
 
     public static final class GameConstants {
 
-        public static enum GamePiece { 
-            CUBE(5), CONE(10),  NONE(0); 
+        public static enum GamePiece {
+            CUBE(5), CONE(10), NONE(0);
 
             public final double pincherEncoderCount;
 
@@ -80,6 +80,8 @@ public final class Constants {
     public static final class OiConstants {
 
         public static final int DRIVER_CONTROLLER_PORT = 0;
+        public static final int AUX_CONTROLLER_PORT    = 1;
+
     }
 
     public static final class VisionConstants {
@@ -100,23 +102,23 @@ public final class Constants {
 
     public static final class ArmConstants {
 
-      public static final int     ARM_LIFT_MOTOR_PORT               = 30;
-      public static final boolean ARM_LIFT_MOTOR_REVERSED           = false;
+        public static final int     ARM_LIFT_MOTOR_PORT     = 30;
+        public static final boolean ARM_LIFT_MOTOR_REVERSED = false;
 
-      public static final double  ARM_LIFT_LIMIT_ENCODER_VALUE      = 16;
-      public static final int     ARM_DOWN_LIMIT_SWITCH_DIO_PORT    = 0;
-
-
-      public static final int     ARM_EXTEND_MOTOR_PORT             = 35;
-      public static final boolean ARM_EXTEND_MOTOR_REVERSED         = true;
-
-      public static final double  ARM_EXTEND_LIMIT_ENCODER_VALUE    = 56.0;
+        public static final double ARM_LIFT_LIMIT_ENCODER_VALUE   = 16;
+        public static final int    ARM_DOWN_LIMIT_SWITCH_DIO_PORT = 0;
 
 
-      public static final int     PINCHER_MOTOR_PORT                = 40;
-      public static final boolean PINCHER_MOTOR_REVERSED            = true;
+        public static final int     ARM_EXTEND_MOTOR_PORT     = 35;
+        public static final boolean ARM_EXTEND_MOTOR_REVERSED = true;
 
-      public static final double  PINCHER_CLOSE_LIMIT_ENCODER_VALUE = 126;
+        public static final double ARM_EXTEND_LIMIT_ENCODER_VALUE = 56.0;
+
+
+        public static final int     PINCHER_MOTOR_PORT     = 40;
+        public static final boolean PINCHER_MOTOR_REVERSED = true;
+
+        public static final double PINCHER_CLOSE_LIMIT_ENCODER_VALUE = 126;
 
         // lifter constants
         public static final double TOP_CUBE_HEIGHT    = 30;
