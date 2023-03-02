@@ -518,10 +518,10 @@ public class ArmSubsystem extends SubsystemBase {
 
         double extendMultiplier   = 1 + (getArmExtendEncoder() / ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE * .7);
 
-        double baseCompensation   = 0.6;
+        double baseCompensation   = 0.06;
 
         if (getHeldGamePiece() == GamePiece.CONE) {
-            baseCompensation += 0.2;
+            baseCompensation += 0.02;
         }
 
         return baseCompensation * angleMultiplier * extendMultiplier;
