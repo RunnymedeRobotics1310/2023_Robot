@@ -27,6 +27,9 @@ public class DriveWithPieceCommand extends CommandBase {
     public void execute() {
         // FIXME: do everything
         // if not holding a piece abort
+        if (armSubsystem.isGamePieceDetected()) {
+            return;
+        }
         // if holding a cone enter driving with cone pose
         // if holding a cube enter driving with cube pose
     }
@@ -35,6 +38,9 @@ public class DriveWithPieceCommand extends CommandBase {
     public boolean isFinished() {
         // FIXME: do everything
         // if not holding a piece true
+        if (!armSubsystem.isGamePieceDetected()) {
+            return true;
+        }
         // otherwise keep running until interrupted
         return false;
     }
