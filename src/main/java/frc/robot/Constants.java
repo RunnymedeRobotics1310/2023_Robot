@@ -22,6 +22,8 @@ public final class Constants {
     public static final class GameConstants {
 
         public static enum GamePiece {
+
+            // TODO: set these values
             CUBE(5), CONE(10), NONE(0);
 
             public final double pincherEncoderCount;
@@ -101,59 +103,62 @@ public final class Constants {
         public static final int CAMERA_ANGLE_MOTOR_PORT = 50;
     }
 
+    public static class ArmPosition {
+
+        public final double angle, extension;
+
+        ArmPosition(double angle, double extension) {
+            this.angle     = angle;
+            this.extension = extension;
+        }
+    }
+
     public static final class ArmConstants {
 
-        public static final int     ARM_LIFT_MOTOR_PORT               = 30;
-        public static final boolean ARM_LIFT_MOTOR_REVERSED           = false;
-        public static final double  ARM_LIFT_MOTOR_TOLERANCE          = 2;
+        public static final int         ARM_LIFT_MOTOR_PORT               = 30;
+        public static final boolean     ARM_LIFT_MOTOR_REVERSED           = false;
+        public static final double      ARM_LIFT_MOTOR_TOLERANCE          = 2;
 
-        public static final double  ARM_LIFT_LIMIT_ENCODER_VALUE      = 16;
-        public static final int     ARM_DOWN_LIMIT_SWITCH_DIO_PORT    = 0;
+        public static final double      ARM_LIFT_LIMIT_ENCODER_VALUE      = 16;
+        public static final int         ARM_DOWN_LIMIT_SWITCH_DIO_PORT    = 0;
+
+        public static final double      MAX_LIFT_SPEED                    = 1;
 
         /** Down position is 23 degrees, and there are 12.5 encoder counts to horizontal, 90 deg */
-        public static final double  ARM_DEGREES_PER_ENCODER_COUNT     = (90 - 23) / 12.5;
+        public static final double      ARM_DEGREES_PER_ENCODER_COUNT     = (90 - 23) / 12.5;
 
-        public static final double  CLEAR_FRAME_LIFT_ENCODER_LOCATION = 3;               // TODO:
-                                                                                         // get real
-                                                                                         // value
+        public static final double      CLEAR_FRAME_LIFT_ENCODER_LOCATION = 3;                        // TODO:
+                                                                                                      // get
+                                                                                                      // real
+                                                                                                      // value
 
-        public static final int     ARM_EXTEND_MOTOR_PORT             = 35;
-        public static final boolean ARM_EXTEND_MOTOR_REVERSED         = true;
-        public static final double  ARM_EXTEND_MOTOR_TOLERANCE        = 2;
+        public static final int         ARM_EXTEND_MOTOR_PORT             = 35;
+        public static final boolean     ARM_EXTEND_MOTOR_REVERSED         = true;
+        public static final double      ARM_EXTEND_MOTOR_TOLERANCE        = 2;
 
-        public static final double  ARM_EXTEND_LIMIT_ENCODER_VALUE    = 56.0;
-
-
-        public static final int     PINCHER_MOTOR_PORT                = 40;
-        public static final boolean PINCHER_MOTOR_REVERSED            = true;
-        public static final double  PINCHER_MOTOR_TOLERANCE           = 2;
-
-        public static final double  PINCHER_CLOSE_LIMIT_ENCODER_VALUE = 126;
-
-        // lifter constants
-        public static final double  TOP_CUBE_HEIGHT                   = 30;
-        public static final double  MIDDLE_CUBE_HEIGHT                = 20;
-        public static final double  BOTTOM_CUBE_HEIGHT                = 10;
-
-        public static final double  TOP_CONE_HEIGHT                   = 30;
-        public static final double  MIDDLE_CONE_HEIGHT                = 20;
-        public static final double  BOTTOM_CONE_HEIGHT                = 10;
-
-        // extension constants
-        public static final double  TOP_CUBE_EXTEND                   = 30;
-        public static final double  MIDDLE_CUBE_EXTEND                = 20;
-        public static final double  BOTTOM_CUBE_EXTEND                = 10;
-
-        public static final double  TOP_CONE_EXTEND                   = 30;
-        public static final double  MIDDLE_CONE_EXTEND                = 20;
-        public static final double  BOTTOM_CONE_EXTEND                = 10;
-
-        public static final double  MAX_EXTEND_SPEED                  = 1;
-
-        public static final double  GROUND_PICKUP_HEIGHT              = 2;
-        public static final double  GROUND_PICKUP_EXTEND              = 2;
-        public static final double  GROUND_PICKUP_PINCHER_WIDTH       = 0;
+        public static final double      MAX_EXTEND_SPEED                  = 1;
+        public static final double      ARM_EXTEND_LIMIT_ENCODER_VALUE    = 56.0;
 
 
+        public static final int         PINCHER_MOTOR_PORT                = 40;
+        public static final boolean     PINCHER_MOTOR_REVERSED            = true;
+        public static final double      PINCHER_MOTOR_TOLERANCE           = 2;
+
+        public static final double      MAX_PINCHER_SPEED                 = 1;
+        public static final double      PINCHER_CLOSE_LIMIT_ENCODER_VALUE = 126;
+
+        // Scoring constants
+        public static final ArmPosition SCORE_HIGH_CONE_POSITION          = new ArmPosition(100, 100);
+        public static final ArmPosition SCORE_HIGH_CUBE_POSITION          = new ArmPosition(100, 100);
+
+        public static final ArmPosition SCORE_MIDDLE_CONE_POSITION        = new ArmPosition(100, 100);
+        public static final ArmPosition SCORE_MIDDLE_CUBE_POSITION        = new ArmPosition(100, 100);
+
+        public static final ArmPosition SCORE_LOW_CONE_POSITION           = new ArmPosition(100, 100);
+        public static final ArmPosition SCORE_LOW_CUBE_POSITION           = new ArmPosition(100, 100);
+
+        // Pickup constants
+        public static final ArmPosition GROUND_PICKUP_POSITION            = new ArmPosition(100, 100);
+        public static final ArmPosition SUBSTATION_PICKUP_POSITION        = new ArmPosition(100, 100);
     }
 }

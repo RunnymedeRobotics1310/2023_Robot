@@ -3,6 +3,7 @@ package frc.robot.commands.arm;
 import static frc.robot.Constants.ArmConstants.ARM_EXTEND_MOTOR_TOLERANCE;
 import static frc.robot.Constants.ArmConstants.ARM_LIFT_MOTOR_TOLERANCE;
 import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_LIFT_ENCODER_LOCATION;
+import static frc.robot.Constants.ArmConstants.MAX_PINCHER_SPEED;
 import static frc.robot.Constants.ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE;
 import static frc.robot.Constants.ArmConstants.PINCHER_MOTOR_TOLERANCE;
 
@@ -88,6 +89,25 @@ abstract class BaseArmCommand extends CommandBase {
             armSubsystem.setPincherSpeed(0);
             return true;
         }
+    }
+
+    /**
+     * Move the motor to a specified encoder count
+     *
+     * @param targetCount the count to get to
+     * @param speed the absolute value of the speed at which you should move
+     * @return true if at the desired location, false if still moving to that point
+     */
+    protected final boolean openPincher() {
+
+        armSubsystem.setPincherSpeed(-MAX_PINCHER_SPEED);
+
+        if (armSubsystem.isPincherOpen()) {
+            armSubsystem.setPincherSpeed(0);
+            return true;
+        }
+
+        return false;
     }
 
     private enum CompactState {

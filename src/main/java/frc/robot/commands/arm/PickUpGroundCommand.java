@@ -1,9 +1,7 @@
 package frc.robot.commands.arm;
 
 import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_LIFT_ENCODER_LOCATION;
-import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_EXTEND;
-import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_HEIGHT;
-import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_PINCHER_WIDTH;
+import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_POSITION;
 
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.commands.operator.OperatorInput;
@@ -92,9 +90,9 @@ public class PickUpGroundCommand extends BaseArmCommand {
         }
 
         case ARM_MOVING: {
-            boolean liftDone  = moveArmLiftToEncoderCount(GROUND_PICKUP_HEIGHT, .15);
-            boolean extDone   = moveArmExtendToEncoderCount(GROUND_PICKUP_EXTEND, .5);
-            boolean pinchDone = movePincherToEncoderCount(GROUND_PICKUP_PINCHER_WIDTH, .5);
+            boolean liftDone  = moveArmLiftToEncoderCount(GROUND_PICKUP_POSITION.angle, .15);
+            boolean extDone   = moveArmExtendToEncoderCount(GROUND_PICKUP_POSITION.extension, .5);
+            boolean pinchDone = openPincher();
             if (liftDone && extDone && pinchDone) {
                 state = State.ARM_IN_POSITION;
             }
