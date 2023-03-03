@@ -7,7 +7,6 @@ import static frc.robot.Constants.ArmConstants.*;
 
 abstract class BaseArmCommand extends CommandBase {
 
-
     private final ArmSubsystem armSubsystem;
 
     protected BaseArmCommand(ArmSubsystem armSubsystem) {
@@ -86,7 +85,6 @@ abstract class BaseArmCommand extends CommandBase {
             return true;
         }
     }
-
 
     private enum CompactState {
         PREPARING, RETRACTING, LOWERING, COMPACT_POSE;

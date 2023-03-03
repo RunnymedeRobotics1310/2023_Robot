@@ -30,7 +30,6 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
     }
 
-
     private enum State {
 
         MOVING_TO_COMPACT_POSE,
@@ -53,7 +52,6 @@ public class PickUpGroundCommand extends BaseArmCommand {
     @Override
     public void initialize() {
         printStatus("initialize");
-        // dump arm data
         if (isCompactPose()) {
             state = State.COMPACT_POSE;
             stopArmMotors();
@@ -65,7 +63,6 @@ public class PickUpGroundCommand extends BaseArmCommand {
             state = State.MOVING_TO_COMPACT_POSE;
         }
     }
-
 
     @Override
     public void execute() {
@@ -114,7 +111,6 @@ public class PickUpGroundCommand extends BaseArmCommand {
             break;
         }
         }
-
     }
 
     @Override
