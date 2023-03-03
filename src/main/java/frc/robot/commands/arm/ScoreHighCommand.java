@@ -66,10 +66,11 @@ public class ScoreHighCommand extends CommandBase {
         }
 
         // Cube arm extend
-        // FIXME: Quentin, please add to the arm subsystem a method .isAtExtendPosition(double
-        // position) and you can follow the lift angle pattern above for the extension.
+        // FIXME: Quentin, please add a method to the arm subsystem
+        // .isAtExtendPosition(double position)
+        // and you can follow the lift angle pattern above for the extension.
 
-        // TODO: determine if there are timing considerations
+        // TODO: determine if there are timing considerations?
         // Does the arm have to be lifted _before_ the extension can happen?
     }
 
