@@ -3,8 +3,8 @@ package frc.robot.commands.arm;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ArmPosition;
-import frc.robot.Constants.GameConstants;
 import frc.robot.Constants.GameConstants.GamePiece;
+import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.subsystems.ArmSubsystem;
 
 public class ScoreHighCommand extends CommandBase {
@@ -49,11 +49,11 @@ public class ScoreHighCommand extends CommandBase {
         // FIXME:
         // Quentin: There are some new constants for the arm, and a helper method to get the scoring
         // position for all of the scoring spots
-        // The scoring position has an angle and extension. The isAtLiftAngle should be in the
+        // The scoring position has an angle and extension. The isAtLiftAngle is in the
         // subsystem which can tell you if the current arm position equals the passed in position.
         // FIXME: We should do this for the extension as well.
 
-        ArmPosition scoringPosition = ArmConstants.getScoringPosition(gamePiece, GameConstants.ScoringRow.TOP);
+        ArmPosition scoringPosition = ArmConstants.getScoringPosition(gamePiece, ScoringRow.TOP);
 
         if (armSubsystem.isArmAtLiftAngle(scoringPosition.angle)) {
             armSubsystem.setArmLiftSpeed(0);
