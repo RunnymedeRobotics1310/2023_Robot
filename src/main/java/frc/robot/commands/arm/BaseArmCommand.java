@@ -13,8 +13,8 @@ abstract class BaseArmCommand extends CommandBase {
     protected BaseArmCommand(ArmSubsystem armSubsystem) {
         this.armSubsystem = armSubsystem;
     }
-    
-    protected final void printState() {
+
+    protected final void printArmState() {
         System.out.println("BaseArmCommand: armSubsystem.getHeldGamePiece: " + armSubsystem.getHeldGamePiece());
         System.out.println("BaseArmCommand: Arm height: " + armSubsystem.getArmLiftEncoder());
         System.out.println("BaseArmCommand: Arm extent: " + armSubsystem.getArmExtendEncoder());

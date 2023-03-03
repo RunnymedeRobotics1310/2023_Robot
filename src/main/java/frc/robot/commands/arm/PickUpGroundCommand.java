@@ -41,7 +41,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
     private void printStatus(String msg) {
         System.out.println("PickupGroundCommand: " + msg);
         System.out.println("PickupGroundCommand: State: " + state);
-        printState();
+        printArmState();
     }
 
     @Override
