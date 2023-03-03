@@ -31,13 +31,14 @@ abstract class BaseArmCommand extends CommandBase {
      * Start moving the motor to a specified encoder count
      *
      * @param targetCount the count to get to
-     * @param speed the speed at which you should be moving
+     * @param speed the absolute value of the speed at which you should be moving
      * @return true if moving, false if not
      */
     protected final boolean moveArmLiftToEncoderCount(double targetCount, double speed) {
-        double gap = armSubsystem.getArmLiftEncoder() - targetCount;
+        double absSpd = Math.abs(speed);
+        double gap    = armSubsystem.getArmLiftEncoder() - targetCount;
         if (Math.abs(gap) > ARM_LIFT_MOTOR_TOLERANCE) {
-            armSubsystem.setArmLiftSpeed(gap > 0 ? -speed : speed);
+            armSubsystem.setArmLiftSpeed(gap > 0 ? -absSpd : absSpd);
             return true;
         }
         else {
@@ -50,13 +51,14 @@ abstract class BaseArmCommand extends CommandBase {
      * Start moving the motor to a specified encoder count
      *
      * @param targetCount the count to get to
-     * @param speed the speed at which you should be moving
+     * @param speed the absolute value of the speed at which you should be moving
      * @return true if moving, false if not
      */
     protected final boolean moveArmExtendToEncoderCount(double targetCount, double speed) {
-        double gap = armSubsystem.getArmExtendEncoder() - targetCount;
+        double absSpd = Math.abs(speed);
+        double gap    = armSubsystem.getArmExtendEncoder() - targetCount;
         if (Math.abs(gap) > PINCHER_MOTOR_TOLERANCE) {
-            armSubsystem.setArmExtendSpeed(gap > 0 ? -speed : speed);
+            armSubsystem.setArmExtendSpeed(gap > 0 ? -absSpd : absSpd);
             return true;
         }
         else {
@@ -69,13 +71,14 @@ abstract class BaseArmCommand extends CommandBase {
      * Start moving the motor to a specified encoder count
      *
      * @param targetCount the count to get to
-     * @param speed the speed at which you should be moving
+     * @param speed the absolute value of the speed at which you should be moving
      * @return true if moving, false if not
      */
     protected final boolean movePincherToEncoderCount(double targetCount, double speed) {
-        double gap = armSubsystem.getPincherEncoder() - targetCount;
+        double absSpd = Math.abs(speed);
+        double gap    = armSubsystem.getPincherEncoder() - targetCount;
         if (Math.abs(gap) > PINCHER_MOTOR_TOLERANCE) {
-            armSubsystem.setPincherSpeed(gap > 0 ? -speed : speed);
+            armSubsystem.setPincherSpeed(gap > 0 ? -absSpd : absSpd);
             return true;
         }
         else {
