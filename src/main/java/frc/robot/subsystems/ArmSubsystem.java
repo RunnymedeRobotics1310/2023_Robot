@@ -246,7 +246,7 @@ public class ArmSubsystem extends SubsystemBase {
 
         double outputArmSpeed = armLiftSpeed;
 
-        if (!isArmAtUpperLimit()) {
+        if (!isArmAtUpperLimit() && !isArmDown()) {
             outputArmSpeed += calcArmLiftHoldSpeed();
         }
 
@@ -506,11 +506,11 @@ public class ArmSubsystem extends SubsystemBase {
 
     private double calcArmLiftHoldSpeed() {
 
-        double armDegrees       = getArmLiftEncoder() * ArmConstants.ARM_DEGREES_PER_ENCODER_COUNT + 40;
+        double armDegrees       = getArmLiftEncoder() * ArmConstants.ARM_DEGREES_PER_ENCODER_COUNT + 23;
 
         double angleMultiplier  = Math.sin(armDegrees / 180 * Math.PI);
 
-        double extendMultiplier = 1 + (getArmExtendEncoder() / ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE * .7);
+        double extendMultiplier = 1 + (getArmExtendEncoder() / ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE * .6);
 
         double baseCompensation = 0.06;
 
