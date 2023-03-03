@@ -1,9 +1,14 @@
 package frc.robot.commands.arm;
 
+import static frc.robot.Constants.ArmConstants.ARM_EXTEND_MOTOR_TOLERANCE;
+import static frc.robot.Constants.ArmConstants.ARM_LIFT_MOTOR_TOLERANCE;
+import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_LIFT_ENCODER_LOCATION;
+import static frc.robot.Constants.ArmConstants.MAX_PINCHER_SPEED;
+import static frc.robot.Constants.ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE;
+import static frc.robot.Constants.ArmConstants.PINCHER_MOTOR_TOLERANCE;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystem;
-
-import static frc.robot.Constants.ArmConstants.*;
 
 abstract class BaseArmCommand extends CommandBase {
 
@@ -56,7 +61,7 @@ abstract class BaseArmCommand extends CommandBase {
     protected final boolean moveArmExtendToEncoderCount(double targetCount, double speed) {
         double absSpd = Math.abs(speed);
         double gap    = armSubsystem.getArmExtendEncoder() - targetCount;
-        if (Math.abs(gap) > PINCHER_MOTOR_TOLERANCE) {
+        if (Math.abs(gap) > ARM_EXTEND_MOTOR_TOLERANCE) {
             armSubsystem.setArmExtendSpeed(gap > 0 ? -absSpd : absSpd);
             return false;
         }
@@ -86,6 +91,23 @@ abstract class BaseArmCommand extends CommandBase {
         }
     }
 
+    /**
+     * Move the motor to a specified encoder count
+     *
+     * @return true if at the desired location, false if still moving to that point
+     */
+    protected final boolean openPincher() {
+
+        armSubsystem.setPincherSpeed(-MAX_PINCHER_SPEED);
+
+        if (armSubsystem.isPincherOpen()) {
+            armSubsystem.setPincherSpeed(0);
+            return true;
+        }
+
+        return false;
+    }
+
     private enum CompactState {
         PREPARING, RETRACTING, LOWERING, COMPACT_POSE;
     }
@@ -97,12 +119,14 @@ abstract class BaseArmCommand extends CommandBase {
     }
 
     /**
-     * Safely move the arm from whatever position it is in to the compact pose, which has the arm down, retracted, and with
+     * Safely move the arm from whatever position it is in to the compact pose, which has the arm
+     * down, retracted, and with
      * pinchers closed.
      *
      * @return true if in the compact pose, false if still moving there
      */
     protected final boolean moveToCompactPose() {
+
         // Figure out initial state
         if (compactState == null) {
             System.out.println("moveToCompactPose starting");
@@ -121,6 +145,7 @@ abstract class BaseArmCommand extends CommandBase {
 
         // get into the compact pose
         switch (compactState) {
+
         case PREPARING: {
             if (!armSubsystem.isPincherAtCloseLimit()) {
                 armSubsystem.setPincherSpeed(.5);
@@ -131,6 +156,7 @@ abstract class BaseArmCommand extends CommandBase {
             }
             break;
         }
+
         case RETRACTING: {
             boolean pinchDone  = movePincherToEncoderCount(PINCHER_CLOSE_LIMIT_ENCODER_VALUE, .5);
             boolean extendDone = moveArmExtendToEncoderCount(0, .3);
@@ -139,6 +165,7 @@ abstract class BaseArmCommand extends CommandBase {
             }
             break;
         }
+
         case LOWERING: {
             boolean liftDone = moveArmLiftToEncoderCount(0, .1);
             if (liftDone) {
@@ -146,9 +173,11 @@ abstract class BaseArmCommand extends CommandBase {
             }
             break;
         }
+
         case COMPACT_POSE: {
             System.out.println("Compact pose achieved");
             stopArmMotors();
+            compactState = null; // ready to go again
             return true;
         }
         }
