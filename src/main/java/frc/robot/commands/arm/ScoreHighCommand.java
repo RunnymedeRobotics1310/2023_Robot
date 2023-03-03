@@ -33,8 +33,6 @@ public class ScoreHighCommand extends CommandBase {
 
     @Override
     public void execute() {
-
-        double tolerance = -2;
         // Q is working on this
 
         // ensure that we have a piece
@@ -43,48 +41,58 @@ public class ScoreHighCommand extends CommandBase {
             return;
         }
         if (armSubsystem.getHeldGamePiece() == GamePiece.CUBE) {
-            // Cube hight & extend
-            if (armSubsystem.getArmLiftEncoder() - ArmConstants.TOP_CUBE_HEIGHT <= tolerance) {
+            // Cube hight
+            if (armSubsystem.getArmLiftEncoder() - ArmConstants.TOP_CUBE_HEIGHT <= ArmConstants.ARM_LIFT_MOTOR_TOLERANCE) {
                 armSubsystem.setArmLiftSpeed(.25);
             }
-            else if (armSubsystem.getArmLiftEncoder() - ArmConstants.TOP_CUBE_HEIGHT >= tolerance) {
+            else if (armSubsystem.getArmLiftEncoder() - ArmConstants.TOP_CUBE_HEIGHT >= ArmConstants.ARM_LIFT_MOTOR_TOLERANCE) {
                 armSubsystem.setArmLiftSpeed(-.25);
             }
             else {
                 armSubsystem.setArmLiftSpeed(0);
             }
-
-            if (armSubsystem.getArmLiftEncoder() - ArmConstants.TOP_CUBE_EXTEND <= tolerance) {
+            // Cube extend
+            if (armSubsystem.getArmLiftEncoder() - ArmConstants.TOP_CUBE_EXTEND <= ArmConstants.ARM_EXTEND_MOTOR_TOLERANCE) {
                 armSubsystem.setArmLiftSpeed(.25);
             }
-            else if (armSubsystem.getArmLiftEncoder() - ArmConstants.TOP_CUBE_EXTEND >= tolerance) {
+            else if (armSubsystem.getArmLiftEncoder() - ArmConstants.TOP_CUBE_EXTEND >= ArmConstants.ARM_EXTEND_MOTOR_TOLERANCE) {
                 armSubsystem.setArmLiftSpeed(-.25);
             }
             else {
                 armSubsystem.setArmLiftSpeed(0);
+            }
+            // Are we there yet?
+            if (armSubsystem.getArmLiftEncoder() == ArmConstants.TOP_CUBE_HEIGHT
+                && armSubsystem.getArmExtendEncoder() == ArmConstants.TOP_CONE_EXTEND) {
+                return;
             }
 
         }
         else if (armSubsystem.getHeldGamePiece() == GamePiece.CONE) {
-            // Cone height & extend
-            if (armSubsystem.getArmLiftEncoder() - ArmConstants.TOP_CONE_HEIGHT <= tolerance) {
+            // Cone height
+            if (armSubsystem.getArmLiftEncoder() - ArmConstants.TOP_CONE_HEIGHT <= ArmConstants.ARM_LIFT_MOTOR_TOLERANCE) {
                 armSubsystem.setArmLiftSpeed(.25);
             }
-            else if (armSubsystem.getArmLiftEncoder() - ArmConstants.TOP_CONE_HEIGHT >= tolerance) {
+            else if (armSubsystem.getArmLiftEncoder() - ArmConstants.TOP_CONE_HEIGHT >= ArmConstants.ARM_LIFT_MOTOR_TOLERANCE) {
                 armSubsystem.setArmLiftSpeed(-.25);
             }
             else {
                 armSubsystem.setArmLiftSpeed(0);
             }
-
-            if (armSubsystem.getArmLiftEncoder() - ArmConstants.TOP_CONE_EXTEND <= tolerance) {
+            // Cone extend
+            if (armSubsystem.getArmLiftEncoder() - ArmConstants.TOP_CONE_EXTEND <= ArmConstants.ARM_EXTEND_MOTOR_TOLERANCE) {
                 armSubsystem.setArmLiftSpeed(.25);
             }
-            else if (armSubsystem.getArmLiftEncoder() - ArmConstants.TOP_CONE_EXTEND >= tolerance) {
+            else if (armSubsystem.getArmLiftEncoder() - ArmConstants.TOP_CONE_EXTEND >= ArmConstants.ARM_EXTEND_MOTOR_TOLERANCE) {
                 armSubsystem.setArmLiftSpeed(-.25);
             }
             else {
                 armSubsystem.setArmLiftSpeed(0);
+            }
+            // Are we there yet?
+            if (armSubsystem.getArmLiftEncoder() == ArmConstants.TOP_CONE_HEIGHT
+                && armSubsystem.getArmExtendEncoder() == ArmConstants.TOP_CONE_EXTEND) {
+                return;
             }
 
         }
