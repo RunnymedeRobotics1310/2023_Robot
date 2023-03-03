@@ -523,6 +523,7 @@ public class ArmSubsystem extends SubsystemBase {
 
 
     public Constants.GameConstants.GamePiece getHeldGamePiece() {
+        // TODO: Determine the valid ranges for cone and cube.
         if (gamePieceDetector.isPressed()) {
             if (Math.abs(pincherEncoder.getPosition() - Constants.GameConstants.GamePiece.CONE.pincherEncoderCount) <= 5) {
                 return Constants.GameConstants.GamePiece.CONE;

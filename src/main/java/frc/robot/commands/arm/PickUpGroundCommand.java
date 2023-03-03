@@ -1,10 +1,13 @@
 package frc.robot.commands.arm;
 
+import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_LIFT_ENCODER_LOCATION;
+import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_EXTEND;
+import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_HEIGHT;
+import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_PINCHER_WIDTH;
+
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.ArmSubsystem;
-
-import static frc.robot.Constants.ArmConstants.*;
 
 public class PickUpGroundCommand extends BaseArmCommand {
 
@@ -14,7 +17,8 @@ public class PickUpGroundCommand extends BaseArmCommand {
     // https://docs.google.com/document/d/1JzU-BzCXjGCwosouylmWGN83-x8lv-oPzklcXDqNN2U/edit#
 
     /**
-     * Pick up a piece from the ground. This command will remain active until a piece is grasped or it is interrupted or
+     * Pick up a piece from the ground. This command will remain active until a piece is grasped or
+     * it is interrupted or
      * cancelled.
      *
      * @param operatorInput the controllers
@@ -66,9 +70,10 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
     @Override
     public void execute() {
-        printStatus("execute");
+        printStatus("execute"); // FIXME: This print will flood the logs.
 
         switch (state) {
+
         case MOVING_TO_COMPACT_POSE: {
             boolean done = moveToCompactPose();
             if (done) {
@@ -76,6 +81,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
             }
             break;
         }
+
         case COMPACT_POSE: {
             // sets arm position to ground pickup
             boolean liftDone = moveArmLiftToEncoderCount(CLEAR_FRAME_LIFT_ENCODER_LOCATION, .15);
@@ -84,6 +90,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
             }
             break;
         }
+
         case ARM_MOVING: {
             boolean liftDone  = moveArmLiftToEncoderCount(GROUND_PICKUP_HEIGHT, .15);
             boolean extDone   = moveArmExtendToEncoderCount(GROUND_PICKUP_EXTEND, .5);
@@ -93,13 +100,16 @@ public class PickUpGroundCommand extends BaseArmCommand {
             }
             break;
         }
+
         case ARM_IN_POSITION: {
             if (armSubsystem.isGamePieceDetected()) {
                 state = State.PIECE_DETECTED;
             }
             break;
         }
-        case PIECE_DETECTED: {
+
+        case PIECE_DETECTED:
+        case PINCHERS_MOVING: {
             if (operatorInput.isPickUpCube()) {
                 boolean pinchDone = movePincherToEncoderCount(GamePiece.CUBE.pincherEncoderCount, .5);
                 state = pinchDone ? State.PIECE_GRABBED : State.PINCHERS_MOVING;
@@ -108,14 +118,19 @@ public class PickUpGroundCommand extends BaseArmCommand {
                 boolean pinchDone = movePincherToEncoderCount(GamePiece.CONE.pincherEncoderCount, .5);
                 state = pinchDone ? State.PIECE_GRABBED : State.PINCHERS_MOVING;
             }
+
+            // FIXME: What happens when neither trigger is pressed?
             break;
         }
+
+        default:
+            System.out.println("PickupGroundCommand: Unknown state encountered " + state);
         }
     }
 
     @Override
     public boolean isFinished() {
-        printStatus("finished");
+        printStatus("finished"); // FIXME: This print will flood the logs.
         return state == State.PIECE_GRABBED && armSubsystem.getHeldGamePiece() != GamePiece.NONE;
     }
 
