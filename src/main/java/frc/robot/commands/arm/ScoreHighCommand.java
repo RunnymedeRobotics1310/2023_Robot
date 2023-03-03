@@ -2,7 +2,9 @@ package frc.robot.commands.arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.ArmPosition;
 import frc.robot.Constants.GameConstants.GamePiece;
+import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.subsystems.ArmSubsystem;
 
 public class ScoreHighCommand extends CommandBase {
@@ -36,75 +38,40 @@ public class ScoreHighCommand extends CommandBase {
         // Q is working on this
 
         // ensure that we have a piece
-        if (armSubsystem.getHeldGamePiece() == GamePiece.NONE) {
+        GamePiece gamePiece = armSubsystem.getHeldGamePiece();
+
+        if (gamePiece == GamePiece.NONE) {
             System.out.print("Can not score high, no piece is held.");
+            // FIXME: This is an infinite loop?
             return;
         }
-        if (armSubsystem.getHeldGamePiece() == GamePiece.CUBE) {
-            // Cube hight
-            if (armSubsystem.getArmLiftEncoder() - ArmConstants.SCORE_HIGH_CUBE_POSITION.angle
-                <= ArmConstants.ARM_LIFT_MOTOR_TOLERANCE) {
-                armSubsystem.setArmLiftSpeed(.25);
-            }
-            else if (armSubsystem.getArmLiftEncoder() - ArmConstants.SCORE_HIGH_CUBE_POSITION.angle
-                >= ArmConstants.ARM_LIFT_MOTOR_TOLERANCE) {
-                armSubsystem.setArmLiftSpeed(-.25);
-            }
-            else {
-                armSubsystem.setArmLiftSpeed(0);
-            }
-            // Cube extend
-            if (armSubsystem.getArmLiftEncoder() - ArmConstants.SCORE_HIGH_CUBE_POSITION.extension
-                <= ArmConstants.ARM_EXTEND_MOTOR_TOLERANCE) {
-                armSubsystem.setArmLiftSpeed(.25);
-            }
-            else if (armSubsystem.getArmLiftEncoder() - ArmConstants.SCORE_HIGH_CUBE_POSITION.extension
-                >= ArmConstants.ARM_EXTEND_MOTOR_TOLERANCE) {
-                armSubsystem.setArmLiftSpeed(-.25);
-            }
-            else {
-                armSubsystem.setArmLiftSpeed(0);
-            }
-            // Are we there yet?
-            if (armSubsystem.getArmLiftEncoder() == ArmConstants.SCORE_HIGH_CUBE_POSITION.angle
-                && armSubsystem.getArmExtendEncoder() == ArmConstants.SCORE_HIGH_CUBE_POSITION.extension) {
-                return;
-            }
 
+        // FIXME:
+        // Quentin: There are some new constants for the arm, and a helper method to get the scoring
+        // position for all of the scoring spots
+        // The scoring position has an angle and extension. The isAtLiftAngle is in the
+        // subsystem which can tell you if the current arm position equals the passed in position.
+        // FIXME: We should do this for the extension as well.
+
+        ArmPosition scoringPosition = ArmConstants.getScoringPosition(gamePiece, ScoringRow.TOP);
+
+        if (armSubsystem.isArmAtLiftAngle(scoringPosition.angle)) {
+            armSubsystem.setArmLiftSpeed(0);
         }
-        else if (armSubsystem.getHeldGamePiece() == GamePiece.CONE) {
-            // Cone height
-            if (armSubsystem.getArmLiftEncoder() - ArmConstants.SCORE_HIGH_CONE_POSITION.angle
-                <= ArmConstants.ARM_LIFT_MOTOR_TOLERANCE) {
-                armSubsystem.setArmLiftSpeed(.25);
-            }
-            else if (armSubsystem.getArmLiftEncoder() - ArmConstants.SCORE_HIGH_CONE_POSITION.angle
-                >= ArmConstants.ARM_LIFT_MOTOR_TOLERANCE) {
-                armSubsystem.setArmLiftSpeed(-.25);
-            }
-            else {
-                armSubsystem.setArmLiftSpeed(0);
-            }
-            // Cone extend
-            if (armSubsystem.getArmLiftEncoder() - ArmConstants.SCORE_HIGH_CONE_POSITION.extension
-                <= ArmConstants.ARM_EXTEND_MOTOR_TOLERANCE) {
-                armSubsystem.setArmLiftSpeed(.25);
-            }
-            else if (armSubsystem.getArmLiftEncoder() - ArmConstants.SCORE_HIGH_CONE_POSITION.extension
-                >= ArmConstants.ARM_EXTEND_MOTOR_TOLERANCE) {
-                armSubsystem.setArmLiftSpeed(-.25);
-            }
-            else {
-                armSubsystem.setArmLiftSpeed(0);
-            }
-            // Are we there yet?
-            if (armSubsystem.getArmLiftEncoder() == ArmConstants.SCORE_HIGH_CONE_POSITION.angle
-                && armSubsystem.getArmExtendEncoder() == ArmConstants.SCORE_HIGH_CONE_POSITION.extension) {
-                return;
-            }
-
+        else if (armSubsystem.getArmLiftAngle() < scoringPosition.angle) {
+            armSubsystem.setArmLiftSpeed(.25);
+        }
+        else {
+            armSubsystem.setArmLiftSpeed(-.25);
         }
 
+        // Cube arm extend
+        // FIXME: Quentin, please add a method to the arm subsystem
+        // .isAtExtendPosition(double position)
+        // and you can follow the lift angle pattern above for the extension.
+
+        // TODO: determine if there are timing considerations?
+        // Does the arm have to be lifted _before_ the extension can happen?
     }
 
     @Override

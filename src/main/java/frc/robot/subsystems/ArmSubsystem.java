@@ -137,6 +137,19 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     /**
+     * Gets the lift arm angle in degrees where 0 = vertical and 90 deg = parallel to the floor.
+     *
+     * @return the lift angle in degrees (rounded to 2 decimal places)
+     */
+    public double getArmLiftAngle() {
+        return Math.round(
+            ((armLiftEncoder.getPosition() * ArmConstants.ARM_DEGREES_PER_ENCODER_COUNT)
+                + ArmConstants.ARM_DOWN_ANGLE_DEGREES) * 100)
+            / 100d;
+
+    }
+
+    /**
      * Gets the extend motor encoder.
      *
      * @return the extend motor encoder position
@@ -154,6 +167,19 @@ public class ArmSubsystem extends SubsystemBase {
         return pincherEncoder.getPosition() + pincherEncoderOffset;
     }
 
+    public Constants.GameConstants.GamePiece getHeldGamePiece() {
+        // TODO: Determine the valid ranges for cone and cube.
+        if (gamePieceDetector.isPressed()) {
+            if (Math.abs(pincherEncoder.getPosition() - GamePiece.CONE.pincherEncoderCount) <= 5) {
+                return GamePiece.CONE;
+            }
+            if (Math.abs(pincherEncoder.getPosition() - GamePiece.CUBE.pincherEncoderCount) <= 5) {
+                return GamePiece.CUBE;
+            }
+        }
+        return GamePiece.NONE;
+    }
+
     /** Determine if the arm is fully down */
     public boolean isArmDown() {
 
@@ -163,6 +189,20 @@ public class ArmSubsystem extends SubsystemBase {
         // no object is detected, and pulled-to-low (0) when an
         // when an object is detected and the switch is closed.
         return !armDownDetector.get();
+    }
+
+    /**
+     * Determine if the arm is at the supplied angle in degrees, within the arm lift angle tolerance
+     *
+     * @param angle to compare
+     * @return {@code true} if at the angle, {@code false} otherwise
+     */
+    public boolean isArmAtLiftAngle(double angle) {
+
+        if (Math.abs(angle - getArmLiftAngle()) <= ArmConstants.ARM_LIFT_ANGLE_TOLERANCE_DEGREES) {
+            return true;
+        }
+        return false;
     }
 
     /** Determine if the arm is at the upper encoder limit */
@@ -329,6 +369,8 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Lift Motor", armLiftSpeed);
         SmartDashboard.putNumber("Lift Encoder", Math.round(getArmLiftEncoder() * 100) / 100d);
         SmartDashboard.putNumber("Raw Lift Encoder", Math.round(armLiftEncoder.getPosition() * 100) / 100d);
+        SmartDashboard.putNumber("Arm Lift Angle", getArmLiftAngle());
+
 
         SmartDashboard.putNumber("Extend  Motor", armExtendSpeed);
         SmartDashboard.putNumber("Extend Encoder", Math.round(getArmExtendEncoder() * 100) / 100d);
@@ -506,9 +548,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     private double calcArmLiftHoldSpeed() {
 
-        double armDegrees       = getArmLiftEncoder() * ArmConstants.ARM_DEGREES_PER_ENCODER_COUNT + 23;
-
-        double angleMultiplier  = Math.sin(armDegrees / 180 * Math.PI);
+        double angleMultiplier  = Math.sin(Math.toRadians(getArmLiftAngle()));
 
         double extendMultiplier = 1 + (getArmExtendEncoder() / ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE * .6);
 
@@ -519,19 +559,5 @@ public class ArmSubsystem extends SubsystemBase {
         }
 
         return baseCompensation * angleMultiplier * extendMultiplier;
-    }
-
-
-    public Constants.GameConstants.GamePiece getHeldGamePiece() {
-        // TODO: Determine the valid ranges for cone and cube.
-        if (gamePieceDetector.isPressed()) {
-            if (Math.abs(pincherEncoder.getPosition() - Constants.GameConstants.GamePiece.CONE.pincherEncoderCount) <= 5) {
-                return Constants.GameConstants.GamePiece.CONE;
-            }
-            if (Math.abs(pincherEncoder.getPosition() - Constants.GameConstants.GamePiece.CUBE.pincherEncoderCount) <= 5) {
-                return Constants.GameConstants.GamePiece.CUBE;
-            }
-        }
-        return Constants.GameConstants.GamePiece.NONE;
     }
 }

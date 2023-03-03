@@ -3,6 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import frc.robot.Constants.GameConstants.GamePiece;
+import frc.robot.Constants.GameConstants.ScoringRow;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose.
@@ -118,19 +121,23 @@ public final class Constants {
         public static final int         ARM_LIFT_MOTOR_PORT               = 30;
         public static final boolean     ARM_LIFT_MOTOR_REVERSED           = false;
         public static final double      ARM_LIFT_MOTOR_TOLERANCE          = 2;
+        public static final double      ARM_LIFT_ANGLE_TOLERANCE_DEGREES  = 3;
 
         public static final double      ARM_LIFT_LIMIT_ENCODER_VALUE      = 16;
         public static final int         ARM_DOWN_LIMIT_SWITCH_DIO_PORT    = 0;
 
         public static final double      MAX_LIFT_SPEED                    = 1;
 
-        /** Down position is 23 degrees, and there are 12.5 encoder counts to horizontal, 90 deg */
-        public static final double      ARM_DEGREES_PER_ENCODER_COUNT     = (90 - 23) / 12.5;
+        /** Hard stop angle where 0 = straight down, and 90 = parallel to floor */
+        public static final double      ARM_DOWN_ANGLE_DEGREES            = 23;
 
-        public static final double      CLEAR_FRAME_LIFT_ENCODER_LOCATION = 3;                        // TODO:
-                                                                                                      // get
-                                                                                                      // real
-                                                                                                      // value
+        /** Down position is 23 degrees, and there are 12.5 encoder counts to horizontal, 90 deg */
+        public static final double      ARM_DEGREES_PER_ENCODER_COUNT     = (90 - ARM_DOWN_ANGLE_DEGREES) / 12.5;
+
+        public static final double      CLEAR_FRAME_LIFT_ENCODER_LOCATION = 3;                                   // TODO:
+                                                                                                                 // get
+                                                                                                                 // real
+                                                                                                                 // value
 
         public static final int         ARM_EXTEND_MOTOR_PORT             = 35;
         public static final boolean     ARM_EXTEND_MOTOR_REVERSED         = true;
@@ -148,17 +155,53 @@ public final class Constants {
         public static final double      PINCHER_CLOSE_LIMIT_ENCODER_VALUE = 126;
 
         // Scoring constants
-        public static final ArmPosition SCORE_HIGH_CONE_POSITION          = new ArmPosition(100, 100);
-        public static final ArmPosition SCORE_HIGH_CUBE_POSITION          = new ArmPosition(100, 100);
+        public static final ArmPosition SCORE_TOP_CONE_POSITION           = new ArmPosition(100, 50);
+        public static final ArmPosition SCORE_TOP_CUBE_POSITION           = new ArmPosition(100, 50);
 
-        public static final ArmPosition SCORE_MIDDLE_CONE_POSITION        = new ArmPosition(100, 100);
-        public static final ArmPosition SCORE_MIDDLE_CUBE_POSITION        = new ArmPosition(100, 100);
+        public static final ArmPosition SCORE_MIDDLE_CONE_POSITION        = new ArmPosition(75, 25);
+        public static final ArmPosition SCORE_MIDDLE_CUBE_POSITION        = new ArmPosition(75, 25);
 
-        public static final ArmPosition SCORE_LOW_CONE_POSITION           = new ArmPosition(100, 100);
-        public static final ArmPosition SCORE_LOW_CUBE_POSITION           = new ArmPosition(100, 100);
+        public static final ArmPosition SCORE_BOTTOM_CONE_POSITION        = new ArmPosition(40, 10);
+        public static final ArmPosition SCORE_BOTTOM_CUBE_POSITION        = new ArmPosition(40, 10);
 
         // Pickup constants
-        public static final ArmPosition GROUND_PICKUP_POSITION            = new ArmPosition(100, 100);
-        public static final ArmPosition SUBSTATION_PICKUP_POSITION        = new ArmPosition(100, 100);
+        public static final ArmPosition GROUND_PICKUP_POSITION            = new ArmPosition(30, 10);
+        public static final ArmPosition SUBSTATION_PICKUP_POSITION        = new ArmPosition(30, 10);
+
+        // Helper routine to get a scoring position
+        public static ArmPosition getScoringPosition(GamePiece gamePiece, ScoringRow scoringRow) {
+
+            if (gamePiece == GamePiece.CONE) {
+
+                switch (scoringRow) {
+                case TOP:
+                    return SCORE_TOP_CONE_POSITION;
+                case MIDDLE:
+                    return SCORE_MIDDLE_CONE_POSITION;
+                case BOTTOM:
+                    return SCORE_BOTTOM_CONE_POSITION;
+                }
+
+            }
+            else if (gamePiece == GamePiece.CUBE) {
+
+                switch (scoringRow) {
+                case TOP:
+                    return SCORE_TOP_CUBE_POSITION;
+                case MIDDLE:
+                    return SCORE_MIDDLE_CUBE_POSITION;
+                case BOTTOM:
+                    return SCORE_BOTTOM_CUBE_POSITION;
+                }
+
+            }
+
+            // If we got here there is an error
+            System.out.println("No known scoring position for game piece " + gamePiece
+                + " scoring row " + scoringRow);
+
+            // Return the default scoring position of bottom cube
+            return SCORE_BOTTOM_CUBE_POSITION;
+        }
     }
 }

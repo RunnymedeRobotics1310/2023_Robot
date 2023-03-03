@@ -88,7 +88,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
         case COMPACT_POSE: {
             // sets arm position to ground pickup
-            boolean liftDone = moveArmLiftToEncoderCount(CLEAR_FRAME_LIFT_ENCODER_LOCATION, .15);
+            boolean liftDone = moveArmLiftToAngle(CLEAR_FRAME_LIFT_ENCODER_LOCATION, .15);
             if (liftDone) {
                 state = State.ARM_MOVING;
             }
@@ -97,7 +97,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
         case ARM_MOVING: {
             // if ground pickup location is too low, override it with the location that will ensure that we clear the frame.
-            boolean liftDone = moveArmLiftToEncoderCount(
+            boolean liftDone = moveArmLiftToAngle(
                 Double.max(CLEAR_FRAME_LIFT_ENCODER_LOCATION, GROUND_PICKUP_POSITION.angle), .15);
             boolean extDone   = moveArmExtendToEncoderCount(GROUND_PICKUP_POSITION.extension, .5);
             boolean pinchDone = openPincher();
