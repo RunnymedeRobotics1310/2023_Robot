@@ -102,21 +102,24 @@ public final class Constants {
 
     public static final class ArmConstants {
 
-        public static final int     ARM_LIFT_MOTOR_PORT     = 30;
-        public static final boolean ARM_LIFT_MOTOR_REVERSED = false;
+        public static final int     ARM_LIFT_MOTOR_PORT      = 30;
+        public static final boolean ARM_LIFT_MOTOR_REVERSED  = false;
+        public static final double  ARM_LIFT_MOTOR_TOLERANCE = 2;
 
         public static final double ARM_LIFT_LIMIT_ENCODER_VALUE   = 16;
         public static final int    ARM_DOWN_LIMIT_SWITCH_DIO_PORT = 0;
 
 
-        public static final int     ARM_EXTEND_MOTOR_PORT     = 35;
-        public static final boolean ARM_EXTEND_MOTOR_REVERSED = true;
+        public static final int     ARM_EXTEND_MOTOR_PORT      = 35;
+        public static final boolean ARM_EXTEND_MOTOR_REVERSED  = true;
+        public static final double  ARM_EXTEND_MOTOR_TOLERANCE = 2;
 
         public static final double ARM_EXTEND_LIMIT_ENCODER_VALUE = 56.0;
 
 
-        public static final int     PINCHER_MOTOR_PORT     = 40;
-        public static final boolean PINCHER_MOTOR_REVERSED = true;
+        public static final int     PINCHER_MOTOR_PORT      = 40;
+        public static final boolean PINCHER_MOTOR_REVERSED  = true;
+        public static final double  PINCHER_MOTOR_TOLERANCE = 2;
 
         public static final double PINCHER_CLOSE_LIMIT_ENCODER_VALUE = 126;
 
@@ -139,6 +142,11 @@ public final class Constants {
         public static final double BOTTOM_CONE_EXTEND = 10;
 
         public static final double MAX_EXTEND_SPEED = 1;
+
+        public static final double GROUND_PICKUP_HEIGHT        = 2;
+        public static final double GROUND_PICKUP_EXTEND        = 2;
+        public static final double GROUND_PICKUP_PINCHER_WIDTH = 0;
+
 
     }
 }
