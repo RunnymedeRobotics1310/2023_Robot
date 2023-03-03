@@ -1,7 +1,6 @@
 package frc.robot.commands.arm;
 
 import static frc.robot.Constants.ArmConstants.ARM_EXTEND_MOTOR_TOLERANCE;
-import static frc.robot.Constants.ArmConstants.ARM_LIFT_MOTOR_TOLERANCE;
 import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_LIFT_ENCODER_LOCATION;
 import static frc.robot.Constants.ArmConstants.MAX_PINCHER_SPEED;
 import static frc.robot.Constants.ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE;
@@ -34,21 +33,23 @@ abstract class BaseArmCommand extends CommandBase {
     /**
      * Move the motor to a specified encoder count
      *
-     * @param targetCount the count to get to
+     * @param targetAngle the angle in degrees
      * @param speed the absolute value of the speed at which you should move
      * @return true if at the desired location, false if still moving to that point
      */
-    protected final boolean moveArmLiftToEncoderCount(double targetCount, double speed) {
-        double absSpd = Math.abs(speed);
-        double gap    = armSubsystem.getArmLiftEncoder() - targetCount;
-        if (Math.abs(gap) > ARM_LIFT_MOTOR_TOLERANCE) {
-            armSubsystem.setArmLiftSpeed(gap > 0 ? -absSpd : absSpd);
-            return false;
-        }
-        else {
+    protected final boolean moveArmLiftToAngle(double targetAngle, double speed) {
+
+        if (armSubsystem.isArmAtLiftAngle(targetAngle)) {
             armSubsystem.setArmLiftSpeed(0);
             return true;
         }
+
+        double absSpd = Math.abs(speed);
+        double gap    = armSubsystem.getArmLiftAngle() - targetAngle;
+
+        armSubsystem.setArmLiftSpeed(gap > 0 ? -absSpd : absSpd);
+
+        return false;
     }
 
     /**
@@ -148,7 +149,7 @@ abstract class BaseArmCommand extends CommandBase {
             if (!armSubsystem.isPincherAtCloseLimit()) {
                 armSubsystem.setPincherSpeed(.5);
             }
-            boolean done = moveArmLiftToEncoderCount(CLEAR_FRAME_LIFT_ENCODER_LOCATION, .3);
+            boolean done = moveArmLiftToAngle(CLEAR_FRAME_LIFT_ENCODER_LOCATION, .3);
             compactState = done ? CompactState.RETRACTING : CompactState.PREPARING;
             break;
         }
@@ -161,7 +162,7 @@ abstract class BaseArmCommand extends CommandBase {
         }
 
         case LOWERING: {
-            boolean done = moveArmLiftToEncoderCount(0, .1);
+            boolean done = moveArmLiftToAngle(0, .1);
             compactState = done ? CompactState.COMPACT_POSE : CompactState.LOWERING;
             break;
         }
