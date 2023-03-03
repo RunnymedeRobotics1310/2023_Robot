@@ -137,6 +137,15 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     /**
+     * Gets the lift motor encoder. (top lift motor)
+     *
+     * @return the lift motor encoder position
+     */
+    public double getArmLiftAngle() {
+        return (armLiftEncoder.getPosition() * ArmConstants.ARM_DEGREES_PER_ENCODER_COUNT) + ArmConstants.ARM_DOWN_ANGLE_DEGREES;
+    }
+
+    /**
      * Gets the extend motor encoder.
      *
      * @return the extend motor encoder position
@@ -506,9 +515,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     private double calcArmLiftHoldSpeed() {
 
-        double armDegrees       = getArmLiftEncoder() * ArmConstants.ARM_DEGREES_PER_ENCODER_COUNT + 23;
-
-        double angleMultiplier  = Math.sin(armDegrees / 180 * Math.PI);
+        double angleMultiplier  = Math.sin(Math.toRadians(getArmLiftAngle()));
 
         double extendMultiplier = 1 + (getArmExtendEncoder() / ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE * .6);
 
@@ -533,5 +540,13 @@ public class ArmSubsystem extends SubsystemBase {
             }
         }
         return Constants.GameConstants.GamePiece.NONE;
+    }
+
+    public boolean isAtLiftAngle(double angle) {
+
+        if (Math.abs(angle - getArmLiftAngle()) <= ArmConstants.ARM_LIFT_MOTOR_TOLERANCE) {
+            return true;
+        }
+        return false;
     }
 }
