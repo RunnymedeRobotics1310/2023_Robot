@@ -55,7 +55,7 @@ public class ScoreHighCommand extends CommandBase {
 
         ArmPosition scoringPosition = ArmConstants.getScoringPosition(gamePiece, GameConstants.ScoringRow.TOP);
 
-        if (armSubsystem.isAtLiftAngle(scoringPosition.angle)) {
+        if (armSubsystem.isArmAtLiftAngle(scoringPosition.angle)) {
             armSubsystem.setArmLiftSpeed(0);
         }
         else if (armSubsystem.getArmLiftAngle() < scoringPosition.angle) {

@@ -121,6 +121,7 @@ public final class Constants {
         public static final int         ARM_LIFT_MOTOR_PORT               = 30;
         public static final boolean     ARM_LIFT_MOTOR_REVERSED           = false;
         public static final double      ARM_LIFT_MOTOR_TOLERANCE          = 2;
+        public static final double      ARM_LIFT_ANGLE_TOLERANCE_DEGREES  = 3;
 
         public static final double      ARM_LIFT_LIMIT_ENCODER_VALUE      = 16;
         public static final int         ARM_DOWN_LIMIT_SWITCH_DIO_PORT    = 0;
@@ -154,18 +155,18 @@ public final class Constants {
         public static final double      PINCHER_CLOSE_LIMIT_ENCODER_VALUE = 126;
 
         // Scoring constants
-        public static final ArmPosition SCORE_TOP_CONE_POSITION           = new ArmPosition(100, 100);
-        public static final ArmPosition SCORE_TOP_CUBE_POSITION           = new ArmPosition(100, 100);
+        public static final ArmPosition SCORE_TOP_CONE_POSITION           = new ArmPosition(100, 50);
+        public static final ArmPosition SCORE_TOP_CUBE_POSITION           = new ArmPosition(100, 50);
 
-        public static final ArmPosition SCORE_MIDDLE_CONE_POSITION        = new ArmPosition(100, 100);
-        public static final ArmPosition SCORE_MIDDLE_CUBE_POSITION        = new ArmPosition(100, 100);
+        public static final ArmPosition SCORE_MIDDLE_CONE_POSITION        = new ArmPosition(75, 25);
+        public static final ArmPosition SCORE_MIDDLE_CUBE_POSITION        = new ArmPosition(75, 25);
 
-        public static final ArmPosition SCORE_BOTTOM_CONE_POSITION        = new ArmPosition(100, 100);
-        public static final ArmPosition SCORE_BOTTOM_CUBE_POSITION        = new ArmPosition(100, 100);
+        public static final ArmPosition SCORE_BOTTOM_CONE_POSITION        = new ArmPosition(40, 10);
+        public static final ArmPosition SCORE_BOTTOM_CUBE_POSITION        = new ArmPosition(40, 10);
 
         // Pickup constants
-        public static final ArmPosition GROUND_PICKUP_POSITION            = new ArmPosition(100, 100);
-        public static final ArmPosition SUBSTATION_PICKUP_POSITION        = new ArmPosition(100, 100);
+        public static final ArmPosition GROUND_PICKUP_POSITION            = new ArmPosition(30, 10);
+        public static final ArmPosition SUBSTATION_PICKUP_POSITION        = new ArmPosition(30, 10);
 
         // Helper routine to get a scoring position
         public static ArmPosition getScoringPosition(GamePiece gamePiece, ScoringRow scoringRow) {
