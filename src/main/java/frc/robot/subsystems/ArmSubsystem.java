@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.GameConstants.GamePiece;
 
 public class ArmSubsystem extends SubsystemBase {
 
@@ -245,12 +246,14 @@ public class ArmSubsystem extends SubsystemBase {
 
         double outputArmSpeed = armLiftSpeed;
 
-        if (!isArmAtUpperLimit() && !isArmDown()) {
+        if (!isArmAtUpperLimit()) {
             outputArmSpeed += calcArmLiftHoldSpeed();
         }
 
         armLiftMotor.set(outputArmSpeed);
         armLiftFollower.set(outputArmSpeed);
+
+        SmartDashboard.putNumber("Arm Lift output", outputArmSpeed);
     }
 
     public void setArmLiftTestSpeed(double armLiftMotorSpeed, double armLiftFollowerSpeed) {
@@ -503,17 +506,19 @@ public class ArmSubsystem extends SubsystemBase {
 
     private double calcArmLiftHoldSpeed() {
 
-        // Arm is not extended
-        // Level = 0.06 motor speed, angle = 90 deg, encoder counts = 12.4
-        // Down = 0.04 (measured) , angle = 40 deg, encoder counts = 0;
+        double armDegrees       = getArmLiftEncoder() * ArmConstants.ARM_DEGREES_PER_ENCODER_COUNT + 40;
 
-        double degPerEncoderCount = 50 / 12.4;
+        double angleMultiplier  = Math.sin(armDegrees / 180 * Math.PI);
 
-        double armDegrees         = getArmLiftEncoder() * degPerEncoderCount + 40;
+        double extendMultiplier = 1 + (getArmExtendEncoder() / ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE * .7);
 
-        double angleMultiplier    = Math.cos(armDegrees / 180 * Math.PI);
+        double baseCompensation = 0.06;
 
-        return .6 * angleMultiplier;
+        if (getHeldGamePiece() == GamePiece.CONE) {
+            baseCompensation += 0.02;
+        }
+
+        return baseCompensation * angleMultiplier * extendMultiplier;
     }
 
 
