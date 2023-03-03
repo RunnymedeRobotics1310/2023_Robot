@@ -1,14 +1,13 @@
 package frc.robot.commands.arm;
 
-import
-    edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.ArmSubsystem;
 
 import static frc.robot.Constants.ArmConstants.*;
 
-public class PickUpGroundCommand extends CommandBase {
+// FIXME: THIS IS IN PROGRESS BUT COMPILING. NOT READY TO RUN YET
+public class PickUpGroundCommand extends BaseArmCommand {
 
     private final ArmSubsystem  armSubsystem;
     private final OperatorInput operatorInput;
@@ -23,6 +22,7 @@ public class PickUpGroundCommand extends CommandBase {
      * @param armSubsystem the arm subsystem
      */
     public PickUpGroundCommand(OperatorInput operatorInput, ArmSubsystem armSubsystem) {
+        super(armSubsystem);
 
         this.armSubsystem  = armSubsystem;
         this.operatorInput = operatorInput;
@@ -40,22 +40,22 @@ public class PickUpGroundCommand extends CommandBase {
 
     private void printStatus(String msg) {
         System.out.println("PickupGroundCommand: " + msg);
-        System.out.println("PickupGroundCommand: Arm height: " + armSubsystem.getArmLiftEncoder());
-        System.out.println("PickupGroundCommand: Arm extent: " + armSubsystem.getArmExtendEncoder());
-        System.out.println("PickupGroundCommand: Pincher: " + armSubsystem.getPincherEncoder());
         System.out.println("PickupGroundCommand: State: " + state);
+        printState();
     }
 
     @Override
     public void initialize() {
         printStatus("initialize");
         // dump arm data
-        if (armSubsystem.isArmRetracted()) {
+        if (armSubsystem.isArmRetracted() && armSubsystem.isPincherAtCloseLimit() && armSubsystem.isArmDown()) {
             state = State.COMPAT_POSE;
-            armSubsystem.setArmExtendSpeed(0);
+            stopArmMotors();
         }
         else {
-            armSubsystem.setArmExtendSpeed(-0.1);
+            armSubsystem.setPincherSpeed(.25);
+            armSubsystem.setArmExtendSpeed(0);
+            armSubsystem.setArmLiftSpeed(0);
             state = State.ARM_RETRACTING;
         }
     }
@@ -68,6 +68,19 @@ public class PickUpGroundCommand extends CommandBase {
 
         switch (state) {
         case ARM_RETRACTING: {
+            if (armSubsystem.isArmRetracted() && armSubsystem.isPincherAtCloseLimit() && armSubsystem.isArmDown()) {
+                state = State.COMPAT_POSE;
+                stopArmMotors();
+            }
+            else {
+                armSubsystem.setPincherSpeed(.25);
+                armSubsystem.setArmExtendSpeed(0);
+                armSubsystem.setArmLiftSpeed(0);
+                state = State.ARM_RETRACTING;
+            }
+
+
+
             if (armSubsystem.isArmRetracted()) {
                 state = State.COMPAT_POSE;
                 armSubsystem.setArmExtendSpeed(0);
@@ -78,45 +91,14 @@ public class PickUpGroundCommand extends CommandBase {
             }
         }
         case COMPAT_POSE: {
-            boolean moving = false;
             // sets arm position to ground pickup
-            if ((armSubsystem.getArmLiftEncoder() - GROUND_PICKUP_HEIGHT) > ARM_LIFT_MOTOR_TOLERANCE) {
-                armSubsystem.setArmLiftSpeed(.25);
-                moving = true;
-            }
-            else if ((armSubsystem.getArmLiftEncoder() - GROUND_PICKUP_HEIGHT) < ARM_LIFT_MOTOR_TOLERANCE) {
-                armSubsystem.setArmLiftSpeed(-1);
-                moving = true;
-            }
-            else {
-                armSubsystem.setArmLiftSpeed(0);
-            }
+            boolean moving = moveArmLiftToEncoderCount(GROUND_PICKUP_HEIGHT, .25);
 
             // don't extend arm or open pinchers if we haven't extended raised the arm above the frame
-
             if (armSubsystem.getArmLiftEncoder() >= CLEAR_FRAME_LIFT_ENCODER_LOCATION) {
 
-                // set extension
-                if ((armSubsystem.getArmExtendEncoder() - GROUND_PICKUP_EXTEND) > ARM_EXTEND_MOTOR_TOLERANCE) {
-                    armSubsystem.setArmExtendSpeed(.25);
-                    moving = true;
-                }
-                else if ((armSubsystem.getArmLiftEncoder() - GROUND_PICKUP_EXTEND) < ARM_EXTEND_MOTOR_TOLERANCE) {
-                    armSubsystem.setArmExtendSpeed(-.25);
-                    moving = true;
-                }
-                else {
-                    armSubsystem.setArmExtendSpeed(0);
-                }
-
-                // set pinchers
-                if (!armSubsystem.isPincherOpen()) {
-                    armSubsystem.setPincherSpeed(-.25);
-                    moving = true;
-                }
-                else {
-                    armSubsystem.setPincherSpeed(0);
-                }
+                moving = moving || moveArmExtendToEncoderCount(CLEAR_FRAME_LIFT_ENCODER_LOCATION, .25);
+                moving = moving || movePincherToEncoderCount(0, -.25);
             }
 
             state = moving ? State.ARM_MOVING : State.ARM_IN_POSITION;
@@ -127,14 +109,12 @@ public class PickUpGroundCommand extends CommandBase {
             }
         }
         case PIECE_DETECTED: {
-            if (operatorInput.isPickUpCube()
-                && (armSubsystem.getPincherEncoder() - GamePiece.CUBE.pincherEncoderCount) < PINCHER_MOTOR_TOLERANCE) {
-                armSubsystem.setPincherSpeed(.25);
+            if (operatorInput.isPickUpCube()) {
+                movePincherToEncoderCount(GamePiece.CUBE.pincherEncoderCount, .25);
                 state = State.PINCHERS_MOVING;
             }
-            else if (operatorInput.isPickUpCone()
-                && (armSubsystem.getPincherEncoder() - GamePiece.CONE.pincherEncoderCount) < PINCHER_MOTOR_TOLERANCE) {
-                armSubsystem.setPincherSpeed(.25);
+            else if (operatorInput.isPickUpCone()) {
+                movePincherToEncoderCount(GamePiece.CONE.pincherEncoderCount, .25);
                 state = State.PINCHERS_MOVING;
             }
             else {
@@ -150,14 +130,12 @@ public class PickUpGroundCommand extends CommandBase {
     @Override
     public boolean isFinished() {
         printStatus("finished");
-        return state == State.PIECE_GRABBED;
+        return state == State.PIECE_GRABBED && armSubsystem.getHeldGamePiece() != GamePiece.NONE;
     }
 
     @Override
     public void end(boolean interrupted) {
         printStatus("interrupted: " + interrupted);
-        armSubsystem.setArmLiftSpeed(0);
-        armSubsystem.setArmExtendSpeed(0);
-        armSubsystem.setPincherSpeed(0);
+        stopArmMotors();
     }
 }
