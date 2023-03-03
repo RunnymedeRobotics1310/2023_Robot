@@ -34,10 +34,8 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
     private enum State {
 
-        ARM_PREPARING_FOR_RETRACTION, // make sure arm is high enough to clear bumper
-        ARM_RETRACTING, // pull the arm in and close the pincher
-        ARM_LOWERING_TO_COMPACT, // lower arm to compact post
-        COMPAT_POSE, // raise arm to safe height
+        MOVING_TO_COMPACT_POSE,
+        COMPACT_POSE, // raise arm to safe height
         ARM_MOVING, // extend arm, open pincher and raise arm
         ARM_IN_POSITION, // arm is in the proper position for hoovering
         PIECE_DETECTED, // piece has been found
@@ -45,7 +43,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
         PIECE_GRABBED // all done!
     }
 
-    private State state = State.ARM_PREPARING_FOR_RETRACTION;
+    private State state = State.MOVING_TO_COMPACT_POSE;
 
     private void printStatus(String msg) {
         System.out.println("PickupGroundCommand: " + msg);
@@ -57,69 +55,46 @@ public class PickUpGroundCommand extends BaseArmCommand {
     public void initialize() {
         printStatus("initialize");
         // dump arm data
-        if (armSubsystem.isArmRetracted() && armSubsystem.isPincherAtCloseLimit() && armSubsystem.isArmDown()) {
-            state = State.COMPAT_POSE;
+        if (isCompactPose()) {
+            state = State.COMPACT_POSE;
             stopArmMotors();
         }
         else {
             armSubsystem.setPincherSpeed(.25);
             armSubsystem.setArmExtendSpeed(0);
             armSubsystem.setArmLiftSpeed(0);
-            state = State.ARM_PREPARING_FOR_RETRACTION;
+            state = State.MOVING_TO_COMPACT_POSE;
         }
     }
 
-    private final double CLEAR_FRAME_LIFT_ENCODER_LOCATION = 3; // todo: fixme - get real value
 
     @Override
     public void execute() {
         printStatus("execute");
 
         switch (state) {
-        case ARM_PREPARING_FOR_RETRACTION: {
-            if (armSubsystem.isArmRetracted() && armSubsystem.isPincherAtCloseLimit() && armSubsystem.isArmDown()) {
-                stopArmMotors();
-                state = State.COMPAT_POSE;
-            }
-            else {
-                boolean moving = moveArmLiftToEncoderCount(CLEAR_FRAME_LIFT_ENCODER_LOCATION, .25);
-                state = moving ? State.ARM_PREPARING_FOR_RETRACTION : State.ARM_RETRACTING;
+        case MOVING_TO_COMPACT_POSE: {
+            boolean done = moveToCompactPose();
+            if (done) {
+                state = State.COMPACT_POSE;
             }
             break;
         }
-        case ARM_RETRACTING: {
-            armSubsystem.setPincherSpeed(.25);
-            armSubsystem.setArmLiftSpeed(0);
-            if (armSubsystem.isArmRetracted()) {
-                armSubsystem.setArmExtendSpeed(0);
-                state = State.ARM_LOWERING_TO_COMPACT;
-            }
-            else {
-                armSubsystem.setArmExtendEncoder(-.25);
-            }
-            break;
-        }
-        case ARM_LOWERING_TO_COMPACT: {
-            if (armSubsystem.isArmDown()) {
-                stopArmMotors();
-                state = State.COMPAT_POSE;
-            }
-            else {
-                moveArmLiftToEncoderCount(0, .25);
-            }
-            break;
-        }
-        case COMPAT_POSE: {
+        case COMPACT_POSE: {
             // sets arm position to ground pickup
-            boolean moving = moveArmLiftToEncoderCount(CLEAR_FRAME_LIFT_ENCODER_LOCATION, .25);
-            state = moving ? State.COMPAT_POSE : State.ARM_MOVING;
+            boolean liftDone = moveArmLiftToEncoderCount(CLEAR_FRAME_LIFT_ENCODER_LOCATION, .15);
+            if (liftDone) {
+                state = State.ARM_MOVING;
+            }
             break;
         }
         case ARM_MOVING: {
-            boolean moving = moveArmLiftToEncoderCount(GROUND_PICKUP_HEIGHT, .25);
-            moving = moving || moveArmExtendToEncoderCount(CLEAR_FRAME_LIFT_ENCODER_LOCATION, .25);
-            moving = moving || movePincherToEncoderCount(0, -.25);
-            state  = moving ? State.ARM_MOVING : State.ARM_IN_POSITION;
+            boolean liftDone  = moveArmLiftToEncoderCount(GROUND_PICKUP_HEIGHT, .15);
+            boolean extDone   = moveArmExtendToEncoderCount(GROUND_PICKUP_EXTEND, .5);
+            boolean pinchDone = movePincherToEncoderCount(GROUND_PICKUP_PINCHER_WIDTH, .5);
+            if (liftDone && extDone && pinchDone) {
+                state = State.ARM_IN_POSITION;
+            }
             break;
         }
         case ARM_IN_POSITION: {
@@ -130,16 +105,12 @@ public class PickUpGroundCommand extends BaseArmCommand {
         }
         case PIECE_DETECTED: {
             if (operatorInput.isPickUpCube()) {
-                movePincherToEncoderCount(GamePiece.CUBE.pincherEncoderCount, .25);
-                state = State.PINCHERS_MOVING;
+                boolean pinchDone = movePincherToEncoderCount(GamePiece.CUBE.pincherEncoderCount, .5);
+                state = pinchDone ? State.PIECE_GRABBED : State.PINCHERS_MOVING;
             }
             else if (operatorInput.isPickUpCone()) {
-                movePincherToEncoderCount(GamePiece.CONE.pincherEncoderCount, .25);
-                state = State.PINCHERS_MOVING;
-            }
-            else {
-                armSubsystem.setPincherSpeed(0);
-                state = State.PIECE_GRABBED;
+                boolean pinchDone = movePincherToEncoderCount(GamePiece.CONE.pincherEncoderCount, .5);
+                state = pinchDone ? State.PIECE_GRABBED : State.PINCHERS_MOVING;
             }
             break;
         }
