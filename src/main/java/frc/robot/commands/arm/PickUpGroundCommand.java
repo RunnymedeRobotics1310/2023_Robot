@@ -6,7 +6,6 @@ import frc.robot.subsystems.ArmSubsystem;
 
 import static frc.robot.Constants.ArmConstants.*;
 
-// FIXME: THIS IS IN PROGRESS BUT COMPILING. NOT READY TO RUN YET
 public class PickUpGroundCommand extends BaseArmCommand {
 
     private final ArmSubsystem  armSubsystem;
