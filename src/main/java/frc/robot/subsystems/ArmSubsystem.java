@@ -139,11 +139,14 @@ public class ArmSubsystem extends SubsystemBase {
     /**
      * Gets the lift arm angle in degrees where 0 = vertical and 90 deg = parallel to the floor.
      *
-     * @return the lift angle in degrees
+     * @return the lift angle in degrees (rounded to 2 decimal places)
      */
     public double getArmLiftAngle() {
-        return (armLiftEncoder.getPosition() * ArmConstants.ARM_DEGREES_PER_ENCODER_COUNT)
-            + ArmConstants.ARM_DOWN_ANGLE_DEGREES;
+        return Math.round(
+            ((armLiftEncoder.getPosition() * ArmConstants.ARM_DEGREES_PER_ENCODER_COUNT)
+                + ArmConstants.ARM_DOWN_ANGLE_DEGREES) * 100)
+            / 100d;
+
     }
 
     /**
@@ -366,6 +369,8 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Lift Motor", armLiftSpeed);
         SmartDashboard.putNumber("Lift Encoder", Math.round(getArmLiftEncoder() * 100) / 100d);
         SmartDashboard.putNumber("Raw Lift Encoder", Math.round(armLiftEncoder.getPosition() * 100) / 100d);
+        SmartDashboard.putNumber("Arm Lift Angle", getArmLiftAngle());
+
 
         SmartDashboard.putNumber("Extend  Motor", armExtendSpeed);
         SmartDashboard.putNumber("Extend Encoder", Math.round(getArmExtendEncoder() * 100) / 100d);
