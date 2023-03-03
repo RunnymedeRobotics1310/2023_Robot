@@ -60,6 +60,8 @@ public class PickUpGroundCommand extends CommandBase {
         }
     }
 
+    private final double CLEAR_FRAME_LIFT_ENCODER_LOCATION = 3; // todo: fixme - get real value
+
     @Override
     public void execute() {
         printStatus("execute");
@@ -90,27 +92,31 @@ public class PickUpGroundCommand extends CommandBase {
                 armSubsystem.setArmLiftSpeed(0);
             }
 
+            // don't extend arm or open pinchers if we haven't extended raised the arm above the frame
 
-            // set extension
-            if ((armSubsystem.getArmExtendEncoder() - GROUND_PICKUP_EXTEND) > ARM_EXTEND_MOTOR_TOLERANCE) {
-                armSubsystem.setArmExtendSpeed(.25);
-                moving = true;
-            }
-            else if ((armSubsystem.getArmLiftEncoder() - GROUND_PICKUP_EXTEND) < ARM_EXTEND_MOTOR_TOLERANCE) {
-                armSubsystem.setArmExtendSpeed(-.25);
-                moving = true;
-            }
-            else {
-                armSubsystem.setArmExtendSpeed(0);
-            }
+            if (armSubsystem.getArmLiftEncoder() >= CLEAR_FRAME_LIFT_ENCODER_LOCATION) {
 
-            // set pinchers
-            if (!armSubsystem.isPincherOpen()) {
-                armSubsystem.setPincherSpeed(-.25);
-                moving = true;
-            }
-            else {
-                armSubsystem.setPincherSpeed(0);
+                // set extension
+                if ((armSubsystem.getArmExtendEncoder() - GROUND_PICKUP_EXTEND) > ARM_EXTEND_MOTOR_TOLERANCE) {
+                    armSubsystem.setArmExtendSpeed(.25);
+                    moving = true;
+                }
+                else if ((armSubsystem.getArmLiftEncoder() - GROUND_PICKUP_EXTEND) < ARM_EXTEND_MOTOR_TOLERANCE) {
+                    armSubsystem.setArmExtendSpeed(-.25);
+                    moving = true;
+                }
+                else {
+                    armSubsystem.setArmExtendSpeed(0);
+                }
+
+                // set pinchers
+                if (!armSubsystem.isPincherOpen()) {
+                    armSubsystem.setPincherSpeed(-.25);
+                    moving = true;
+                }
+                else {
+                    armSubsystem.setPincherSpeed(0);
+                }
             }
 
             state = moving ? State.ARM_MOVING : State.ARM_IN_POSITION;
