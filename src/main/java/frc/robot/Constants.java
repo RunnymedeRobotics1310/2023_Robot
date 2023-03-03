@@ -82,7 +82,7 @@ public final class Constants {
 
     public static final class OiConstants {
 
-        public static final int DRIVER_CONTROLLER_PORT = 0;
+        public static final int DRIVER_CONTROLLER_PORT   = 0;
         public static final int OPERATOR_CONTROLLER_PORT = 1;
     }
 
@@ -109,7 +109,8 @@ public final class Constants {
 
         public static final double  ARM_LIFT_LIMIT_ENCODER_VALUE      = 16;
         public static final int     ARM_DOWN_LIMIT_SWITCH_DIO_PORT    = 0;
-        public static final double  ARM_DEGREES_PER_ENCODER_COUNT     = 50 / 12.4;
+        /** Down position is 23 degrees, and the encoder counts to horizontal (90 deg) is 12.5 */
+        public static final double  ARM_DEGREES_PER_ENCODER_COUNT     = (90 - 23) / 12.5;
 
 
 
