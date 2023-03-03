@@ -1,7 +1,6 @@
 package frc.robot.commands.arm;
 
-import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_LIFT_ENCODER_LOCATION;
-import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_POSITION;
+import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.GameConstants.GamePiece.*;
 
 import frc.robot.Constants.GameConstants.GamePiece;
@@ -58,11 +57,26 @@ public class PickUpGroundCommand extends BaseArmCommand {
         printArmState();
     }
 
+    private boolean isGroundPickupPose() {
+        if (!armSubsystem.isArmAtLiftAngle(GROUND_PICKUP_POSITION.angle))
+            return false;
+        double ext = armSubsystem.getArmExtendEncoder();
+        if (Math.abs(ext - GROUND_PICKUP_POSITION.extension) > ARM_EXTEND_MOTOR_TOLERANCE)
+            return false;
+        if (!armSubsystem.isPincherOpen())
+            return false;
+        return true;
+    }
+
     @Override
     public void initialize() {
         printStatus("initialize");
         if (isCompactPose()) {
             state = State.COMPACT_POSE;
+            stopArmMotors();
+        }
+        else if (isGroundPickupPose()) {
+            state = State.ARM_IN_POSITION;
             stopArmMotors();
         }
         else {
