@@ -3,15 +3,15 @@ package frc.robot.commands.drive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants.DriveMode;
-import frc.robot.commands.operator.DriverController;
-import frc.robot.commands.operator.DriverController.Axis;
-import frc.robot.commands.operator.DriverController.Stick;
+import frc.robot.commands.operator.OperatorInput;
+import frc.robot.commands.operator.OperatorInput.Axis;
+import frc.robot.commands.operator.OperatorInput.Stick;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class DefaultDriveCommand extends CommandBase {
 
     private final DriveSubsystem    driveSubsystem;
-    private final DriverController  driverController;
+    private final OperatorInput     driverController;
     private final DriveModeSelector driveModeSelector;
 
     /**
@@ -19,7 +19,7 @@ public class DefaultDriveCommand extends CommandBase {
      *
      * @param driveSubsystem The subsystem used by this command.
      */
-    public DefaultDriveCommand(DriverController driverController, DriveSubsystem driveSubsystem,
+    public DefaultDriveCommand(OperatorInput driverController, DriveSubsystem driveSubsystem,
         DriveModeSelector driveModeSelector) {
 
         this.driverController  = driverController;
@@ -81,11 +81,11 @@ public class DefaultDriveCommand extends CommandBase {
     private void setMotorSpeedsArcade() {
 
         // Filter out low input values to reduce drivetrain drift
-        double leftY      = driverController.getAxis(Stick.LEFT, Axis.Y);
-        double leftX      = driverController.getAxis(Stick.LEFT, Axis.X);
+        double leftY = driverController.getDriverControllerAxis(Stick.LEFT, Axis.Y);
+        double leftX = driverController.getDriverControllerAxis(Stick.LEFT, Axis.X);
 
-        double leftSpeed  = leftY + leftX / (leftY == 0 ? 1 : 2);        // less sensitive when
-                                                                         // moving
+        double leftSpeed = leftY + leftX / (leftY == 0 ? 1 : 2);        // less sensitive when
+        // moving
         double rightSpeed = leftY - leftX / (leftY == 0 ? 1 : 2);
 
         // Boost
@@ -99,8 +99,8 @@ public class DefaultDriveCommand extends CommandBase {
 
     private void setMotorSpeedsTank() {
 
-        double leftSpeed  = driverController.getAxis(Stick.LEFT, Axis.Y);
-        double rightSpeed = driverController.getAxis(Stick.RIGHT, Axis.Y);
+        double leftSpeed  = driverController.getDriverControllerAxis(Stick.LEFT, Axis.Y);
+        double rightSpeed = driverController.getDriverControllerAxis(Stick.RIGHT, Axis.Y);
 
         // Boost
         if (driverController.isBoost()) {
@@ -114,17 +114,17 @@ public class DefaultDriveCommand extends CommandBase {
     private void setMotorSpeedsQuentin() {
 
         // forwards/backwards speed
-        double       speed   = driverController.getAxis(Stick.LEFT, Axis.Y);
+        double speed = driverController.getDriverControllerAxis(Stick.LEFT, Axis.Y);
         // turn speed
-        final double rawTurn = driverController.getAxis(Stick.RIGHT, Axis.X);
+        final double rawTurn = driverController.getDriverControllerAxis(Stick.RIGHT, Axis.X);
 
         SmartDashboard.putNumber("Speed", speed);
         SmartDashboard.putNumber("Turn", rawTurn);
 
-        double  turn      = rawTurn / 2;
-        boolean boost     = driverController.isBoost();
+        double  turn  = rawTurn / 2;
+        boolean boost = driverController.isBoost();
 
-        double  leftSpeed = 0, rightSpeed = 0;
+        double leftSpeed = 0, rightSpeed = 0;
 
         if (!boost) {
             speed = speed / 2;

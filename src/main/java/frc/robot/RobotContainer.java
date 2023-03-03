@@ -24,7 +24,7 @@ import frc.robot.commands.drive.DefaultDriveCommand;
 import frc.robot.commands.drive.DriveModeSelector;
 import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
-import frc.robot.commands.operator.DriverController;
+import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.vision.DefaultVisionCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -55,8 +55,8 @@ public class RobotContainer {
     private final DriveModeSelector driveModeSelector = new DriveModeSelector();
 
     // The driver's controller
-    private final DriverController driverController = new DriverController(
-        OiConstants.DRIVER_CONTROLLER_PORT);
+    private final OperatorInput driverController = new OperatorInput(
+        OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -173,20 +173,7 @@ public class RobotContainer {
         new Trigger(() -> driverController.isGyroReset())
             .onTrue(new SetGyroHeadingCommand(0, driveSubsystem)
                 .andThen(new ResetGyroPitchCommand(driveSubsystem)));
-
-        // dpad controlls
-        new Trigger(() -> (driverController.isAdjustHigher()))
-            .onTrue(new InstantCommand());
-
-        new Trigger(() -> (driverController.isAdjustLower()))
-            .onTrue(new InstantCommand());
-
-        new Trigger(() -> (driverController.isSubstation()))
-            .onTrue(new InstantCommand());
-
-        new Trigger(() -> (driverController.isUnnamed()))
-            .onTrue(new InstantCommand());
-
+        
         // scoring (a/b/y/x)
         new Trigger(() -> (driverController.isHigh()))
             .onTrue(new InstantCommand());

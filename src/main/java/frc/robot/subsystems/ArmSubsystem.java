@@ -13,71 +13,75 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.GameConstants.GamePiece;
 
 public class ArmSubsystem extends SubsystemBase {
 
-    private static final MotorType motorType = MotorType.kBrushless;
+    private static final MotorType motorType              = MotorType.kBrushless;
 
     /*
      * Arm lift motors and encoder
      */
-    private final CANSparkMax armLiftMotor    = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT, motorType);
-    private final CANSparkMax armLiftFollower = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT + 1, motorType);
+    private final CANSparkMax      armLiftMotor           = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT, motorType);
+    private final CANSparkMax      armLiftFollower        = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT + 1, motorType);
 
-    private IdleMode armLiftIdleMode = null;
-    private double   armLiftSpeed    = 0;
+    private IdleMode               armLiftIdleMode        = null;
+    private double                 armLiftSpeed           = 0;
 
     // Arm lift encoder
-    private RelativeEncoder armLiftEncoder = armLiftMotor.getEncoder();
+    private RelativeEncoder        armLiftEncoder         = armLiftMotor.getEncoder();
 
-    private double armLiftEncoderOffset = 0;
+    private double                 armLiftEncoderOffset   = 0;
 
     /*
      * Arm extend motor and encoder
      */
-    private final CANSparkMax armExtendMotor = new CANSparkMax(ArmConstants.ARM_EXTEND_MOTOR_PORT, motorType);
+    private final CANSparkMax      armExtendMotor         = new CANSparkMax(ArmConstants.ARM_EXTEND_MOTOR_PORT, motorType);
 
-    private double armExtendSpeed = 0;
+    private double                 armExtendSpeed         = 0;
 
     // Arm lift encoder
-    private RelativeEncoder armExtendEncoder = armExtendMotor.getEncoder();
+    private RelativeEncoder        armExtendEncoder       = armExtendMotor.getEncoder();
 
-    private double armExtendEncoderOffset = 0;
+    private double                 armExtendEncoderOffset = 0;
 
     /*
      * Pincher motor and encoder
      */
-    private final CANSparkMax pincherMotor = new CANSparkMax(ArmConstants.PINCHER_MOTOR_PORT, motorType);
+    private final CANSparkMax      pincherMotor           = new CANSparkMax(ArmConstants.PINCHER_MOTOR_PORT, motorType);
 
-    private double pincherSpeed = 0;
+    private double                 pincherSpeed           = 0;
 
     // Pincher encoder
-    private RelativeEncoder pincherEncoder = pincherMotor.getEncoder();
+    private RelativeEncoder        pincherEncoder         = pincherMotor.getEncoder();
 
-    private double pincherEncoderOffset = 0;
+    private double                 pincherEncoderOffset   = 0;
 
     /*
      * Limit Switches
      */
     /** The arm down detector is an infra-red limit switch plugged into the RoboRio */
-    private DigitalInput armDownDetector = new DigitalInput(ArmConstants.ARM_DOWN_LIMIT_SWITCH_DIO_PORT);
+    private DigitalInput           armDownDetector        = new DigitalInput(ArmConstants.ARM_DOWN_LIMIT_SWITCH_DIO_PORT);
 
     /**
-     * The arm retracted detector is a hall effect limit switch that is normally open, plugged into the arm extender SparkMAX
+     * The arm retracted detector is a hall effect limit switch that is normally open, plugged into
+     * the arm extender SparkMAX
      * reverse limit.
      */
-    private SparkMaxLimitSwitch armRetractedDetector = armExtendMotor.getReverseLimitSwitch(Type.kNormallyClosed);
+    private SparkMaxLimitSwitch    armRetractedDetector   = armExtendMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
     /**
-     * The pincher open detector is a hall effect limit switch that is normally open, plugged into the pincher SparkMAX reverse
+     * The pincher open detector is a hall effect limit switch that is normally open, plugged into
+     * the pincher SparkMAX reverse
      * limit.
      */
-    private SparkMaxLimitSwitch pincherOpenDetector = pincherMotor.getReverseLimitSwitch(Type.kNormallyClosed);
+    private SparkMaxLimitSwitch    pincherOpenDetector    = pincherMotor.getReverseLimitSwitch(Type.kNormallyOpen);
 
     /**
-     * The game piece detector is an infra-red sensor that is normally open, plugged into the pincher SparkMAX forward limit.
+     * The game piece detector is an infra-red sensor that is normally open, plugged into the
+     * pincher SparkMAX forward limit.
      */
-    private SparkMaxLimitSwitch gamePieceDetector = pincherMotor.getForwardLimitSwitch(Type.kNormallyOpen);
+    private SparkMaxLimitSwitch    gamePieceDetector      = pincherMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
     /** Creates a new ArmSubsystem */
     public ArmSubsystem() {
@@ -114,6 +118,8 @@ public class ArmSubsystem extends SubsystemBase {
          */
         // Set the polarity on the motor
         pincherMotor.setInverted(ArmConstants.PINCHER_MOTOR_REVERSED);
+
+        gamePieceDetector.enableLimitSwitch(false);
 
         // Set the arm extender to always brake
         pincherMotor.setIdleMode(IdleMode.kBrake);
@@ -246,6 +252,8 @@ public class ArmSubsystem extends SubsystemBase {
 
         armLiftMotor.set(outputArmSpeed);
         armLiftFollower.set(outputArmSpeed);
+
+        SmartDashboard.putNumber("Arm Lift output", outputArmSpeed);
     }
 
     public void setArmLiftTestSpeed(double armLiftMotorSpeed, double armLiftFollowerSpeed) {
@@ -498,10 +506,19 @@ public class ArmSubsystem extends SubsystemBase {
 
     private double calcArmLiftHoldSpeed() {
 
-        // FIXME: return the amount of current required to hold the arm
-        // still based on the current armLiftEncoder, armExtendEncoder and gamePiece
+        double armDegrees       = getArmLiftEncoder() * ArmConstants.ARM_DEGREES_PER_ENCODER_COUNT + 23;
 
-        return 0;
+        double angleMultiplier  = Math.sin(armDegrees / 180 * Math.PI);
+
+        double extendMultiplier = 1 + (getArmExtendEncoder() / ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE * .6);
+
+        double baseCompensation = 0.06;
+
+        if (getHeldGamePiece() == GamePiece.CONE) {
+            baseCompensation += 0.02;
+        }
+
+        return baseCompensation * angleMultiplier * extendMultiplier;
     }
 
 

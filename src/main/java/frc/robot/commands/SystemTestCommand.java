@@ -2,15 +2,14 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.commands.operator.DriverController;
+import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.operator.RunnymedeGameController;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 /**
- * This command is used to safely stop the robot in its current position, and to cancel any running
- * commands
+ * This command is used to safely stop the robot in its current position, and to cancel any running commands
  */
 public class SystemTestCommand extends CommandBase {
 
@@ -22,33 +21,34 @@ public class SystemTestCommand extends CommandBase {
         ARM_EXTEND,
         PINCHER,
         CAMERA
-    };
+    }
 
-    private final DriverController        driverController;
+    ;
+
+    private final OperatorInput           driverController;
     private final RunnymedeGameController controller;
     private final DriveSubsystem          driveSubsystem;
     private final ArmSubsystem            armSubsystem;
     private final VisionSubsystem         visionSubsystem;
 
-    private long                          startTime           = 0;
-    private Motor                         selectedMotor       = Motor.NONE;
-    private double                        povMotorSpeed       = 0;
+    private long   startTime     = 0;
+    private Motor  selectedMotor = Motor.NONE;
+    private double povMotorSpeed = 0;
 
-    private boolean                       previousLeftBumper  = false;
-    private boolean                       previousRightBumper = false;
+    private boolean previousLeftBumper  = false;
+    private boolean previousRightBumper = false;
 
     /**
      * System Test Command
      *
-     * All subsystems must be passed to this command, and each subsystem should have a stop command
-     * that safely stops the robot
+     * All subsystems must be passed to this command, and each subsystem should have a stop command that safely stops the robot
      * from moving.
      */
-    public SystemTestCommand(DriverController driverController, DriveSubsystem driveSubsystem,
+    public SystemTestCommand(OperatorInput driverController, DriveSubsystem driveSubsystem,
         ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem) {
 
         this.driverController = driverController;
-        this.controller       = driverController.getRawRunnymedeController();
+        this.controller       = driverController.getRawDriverController();
         this.driveSubsystem   = driveSubsystem;
         this.armSubsystem     = armSubsystem;
         this.visionSubsystem  = visionSubsystem;
@@ -88,6 +88,10 @@ public class SystemTestCommand extends CommandBase {
 
     @Override
     public void execute() {
+
+        if (driverController.isVisionReset()) {
+            visionSubsystem.setCameraEncoderPosition(0);
+        }
 
         /*
          * Use the bumpers to select the next / previous motor in the motor ring.
@@ -144,7 +148,7 @@ public class SystemTestCommand extends CommandBase {
         double leftTrigger  = controller.getLeftTriggerAxis();
         double rightTrigger = controller.getRightTriggerAxis();
 
-        double motorSpeed   = 0;
+        double motorSpeed = 0;
 
         if (leftTrigger > 0 && rightTrigger > 0) {
 

@@ -1,20 +1,20 @@
 package frc.robot.commands.arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.commands.operator.DriverController;
+import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.ArmSubsystem;
 
 public class DefaultArmCommand extends CommandBase {
 
-    private final ArmSubsystem     armSubsystem;
-    private final DriverController driverController;
+    private final ArmSubsystem  armSubsystem;
+    private final OperatorInput driverController;
 
     /**
      * Creates a new ExampleCommand.
      *
      * @param ArmSubsystem The subsystem used by this command.
      */
-    public DefaultArmCommand(DriverController driverController, ArmSubsystem armSubsystem) {
+    public DefaultArmCommand(OperatorInput driverController, ArmSubsystem armSubsystem) {
 
         this.driverController = driverController;
         this.armSubsystem     = armSubsystem;
@@ -42,7 +42,7 @@ public class DefaultArmCommand extends CommandBase {
 
         armSubsystem.setArmLiftSpeed(driverController.getArmLiftMotorSpeed());
         armSubsystem.setArmExtendSpeed(driverController.getArmExtendMotorSpeed());
-        armSubsystem.setPincherSpeed(driverController.getPincerMotorSpeed());
+        armSubsystem.setPincherSpeed(driverController.getPincherMotorSpeed());
 
     }
 
