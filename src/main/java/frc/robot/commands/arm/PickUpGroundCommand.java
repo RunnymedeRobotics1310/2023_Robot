@@ -70,8 +70,8 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
         switch (state) {
         case MOVING_TO_COMPACT_POSE: {
-            boolean done = moveToCompactPose();
-            if (done) {
+            boolean compactDone = moveToCompactPose();
+            if (compactDone) {
                 state = State.COMPACT_POSE;
             }
             break;
@@ -115,13 +115,13 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
     @Override
     public boolean isFinished() {
-        printStatus("finished");
+        printStatus("in isFinished");
         return state == State.PIECE_GRABBED && armSubsystem.getHeldGamePiece() != GamePiece.NONE;
     }
 
     @Override
     public void end(boolean interrupted) {
-        printStatus("interrupted: " + interrupted);
+        printStatus("end. Interrupted? " + interrupted);
         stopArmMotors();
     }
 }

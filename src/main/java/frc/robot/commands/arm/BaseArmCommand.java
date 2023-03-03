@@ -29,8 +29,8 @@ abstract class BaseArmCommand extends CommandBase {
     /**
      * Move the motor to a specified encoder count
      *
-     * @param targetCount the count to get to
-     * @param speed the absolute value of the speed at which you should move
+     * @param targetCount The count to get to
+     * @param speed Speed that the motor should move to the target. Direction (sign) will be ignored and computed automatically.
      * @return true if at the desired location, false if still moving to that point
      */
     protected final boolean moveArmLiftToEncoderCount(double targetCount, double speed) {
@@ -49,8 +49,8 @@ abstract class BaseArmCommand extends CommandBase {
     /**
      * Move the motor to a specified encoder count
      *
-     * @param targetCount the count to get to
-     * @param speed the absolute value of the speed at which you should move
+     * @param targetCount The count to get to
+     * @param speed Speed that the motor should move to the target. Direction (sign) will be ignored and computed automatically.
      * @return true if at the desired location, false if still moving to that point
      */
     protected final boolean moveArmExtendToEncoderCount(double targetCount, double speed) {
@@ -69,8 +69,8 @@ abstract class BaseArmCommand extends CommandBase {
     /**
      * Move the motor to a specified encoder count
      *
-     * @param targetCount the count to get to
-     * @param speed the absolute value of the speed at which you should move
+     * @param targetCount The count to get to
+     * @param speed Speed that the motor should move to the target. Direction (sign) will be ignored and computed automatically.
      * @return true if at the desired location, false if still moving to that point
      */
     protected final boolean movePincherToEncoderCount(double targetCount, double speed) {
@@ -105,6 +105,7 @@ abstract class BaseArmCommand extends CommandBase {
     protected final boolean moveToCompactPose() {
         // Figure out initial state
         if (compactState == null) {
+            System.out.println("moveToCompactPose starting");
             stopArmMotors();
             if (isCompactPose()) {
                 compactState = CompactState.COMPACT_POSE;
@@ -114,6 +115,9 @@ abstract class BaseArmCommand extends CommandBase {
                 compactState = tooLow ? CompactState.PREPARING : CompactState.RETRACTING;
             }
         }
+        else {
+            System.out.println("moveToCompactPose. Compact Pose State: " + compactState);
+        }
 
         // get into the compact pose
         switch (compactState) {
@@ -121,23 +125,30 @@ abstract class BaseArmCommand extends CommandBase {
             if (!armSubsystem.isPincherAtCloseLimit()) {
                 armSubsystem.setPincherSpeed(.5);
             }
-            boolean done = moveArmLiftToEncoderCount(CLEAR_FRAME_LIFT_ENCODER_LOCATION, .3);
-            compactState = done ? CompactState.RETRACTING : CompactState.PREPARING;
+            boolean liftDone = moveArmLiftToEncoderCount(CLEAR_FRAME_LIFT_ENCODER_LOCATION, .3);
+            if (liftDone) {
+                compactState = CompactState.RETRACTING;
+            }
             break;
         }
         case RETRACTING: {
-            boolean done = movePincherToEncoderCount(PINCHER_CLOSE_LIMIT_ENCODER_VALUE, .5);
-            done         = moveArmExtendToEncoderCount(0, .3) && done;
-            compactState = done ? CompactState.LOWERING : CompactState.RETRACTING;
+            boolean pinchDone  = movePincherToEncoderCount(PINCHER_CLOSE_LIMIT_ENCODER_VALUE, .5);
+            boolean extendDone = moveArmExtendToEncoderCount(0, .3);
+            if (pinchDone && extendDone) {
+                compactState = CompactState.LOWERING;
+            }
             break;
         }
         case LOWERING: {
-            boolean done = moveArmLiftToEncoderCount(0, .1);
-            compactState = done ? CompactState.COMPACT_POSE : CompactState.LOWERING;
+            boolean liftDone = moveArmLiftToEncoderCount(0, .1);
+            if (liftDone) {
+                compactState = CompactState.COMPACT_POSE;
+            }
             break;
         }
         case COMPACT_POSE: {
-            // done!
+            System.out.println("Compact pose achieved");
+            stopArmMotors();
             return true;
         }
         }
