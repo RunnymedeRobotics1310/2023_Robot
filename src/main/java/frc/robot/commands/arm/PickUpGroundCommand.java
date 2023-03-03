@@ -2,6 +2,7 @@ package frc.robot.commands.arm;
 
 import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_LIFT_ENCODER_LOCATION;
 import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_POSITION;
+import static frc.robot.Constants.GameConstants.GamePiece.*;
 
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.commands.operator.OperatorInput;
@@ -11,6 +12,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
     private final ArmSubsystem  armSubsystem;
     private final OperatorInput operatorInput;
+    private       GamePiece     pickupTarget;
 
     // https://docs.google.com/document/d/1JzU-BzCXjGCwosouylmWGN83-x8lv-oPzklcXDqNN2U/edit#
 
@@ -18,14 +20,18 @@ public class PickUpGroundCommand extends BaseArmCommand {
      * Pick up a piece from the ground. This command will remain active until a piece is grasped or it is interrupted or
      * cancelled.
      *
-     * @param operatorInput the controllers
      * @param armSubsystem the arm subsystem
+     * @param operatorInput optional operator input object which allows the operator to change the selected game piece after the
+     * command has started. If not specified, the initialPickupTarget will remain the active pickup target for the duration of the
+     * command.
+     * @param initialPickupTarget the type of game piece to be picked up - unless later overridden by the operator
      */
-    public PickUpGroundCommand(OperatorInput operatorInput, ArmSubsystem armSubsystem) {
+    public PickUpGroundCommand(ArmSubsystem armSubsystem, OperatorInput operatorInput, GamePiece initialPickupTarget) {
         super(armSubsystem);
 
         this.armSubsystem  = armSubsystem;
         this.operatorInput = operatorInput;
+        this.pickupTarget  = initialPickupTarget;
 
         addRequirements(armSubsystem);
 
@@ -39,13 +45,15 @@ public class PickUpGroundCommand extends BaseArmCommand {
         ARM_IN_POSITION, // arm is in the proper position for hoovering
         PIECE_DETECTED, // piece has been found
         PINCHERS_MOVING, // close pinchers
-        PIECE_GRABBED // all done!
+        PIECE_GRABBED, // all done!
+        CANCELLED // aborted
     }
 
     private State state = State.MOVING_TO_COMPACT_POSE;
 
     private void printStatus(String msg) {
         System.out.println("PickupGroundCommand: " + msg);
+        System.out.println("PickupGroundCommand: Target: " + pickupTarget);
         System.out.println("PickupGroundCommand: State: " + state);
         printArmState();
     }
@@ -88,7 +96,9 @@ public class PickUpGroundCommand extends BaseArmCommand {
         }
 
         case ARM_MOVING: {
-            boolean liftDone  = moveArmLiftToEncoderCount(GROUND_PICKUP_POSITION.angle, .15);
+            // if ground pickup location is too low, override it with the location that will ensure that we clear the frame.
+            boolean liftDone = moveArmLiftToEncoderCount(
+                Double.max(CLEAR_FRAME_LIFT_ENCODER_LOCATION, GROUND_PICKUP_POSITION.angle), .15);
             boolean extDone   = moveArmExtendToEncoderCount(GROUND_PICKUP_POSITION.extension, .5);
             boolean pinchDone = openPincher();
             if (liftDone && extDone && pinchDone) {
@@ -106,16 +116,34 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
         case PIECE_DETECTED:
         case PINCHERS_MOVING: {
-            if (operatorInput.isPickUpCube()) {
-                boolean pinchDone = movePincherToEncoderCount(GamePiece.CUBE.pincherEncoderCount, .5);
-                state = pinchDone ? State.PIECE_GRABBED : State.PINCHERS_MOVING;
+            if (operatorInput != null) {
+                // check for operator override. If both selected, cube wins. If none selected, command is cancelled.
+                if (operatorInput.isPickUpCone()) {
+                    if (pickupTarget == CUBE) {
+                        System.out.println("Changing pickup target from CUBE to CONE based on operator input");
+                        pickupTarget = CONE;
+                    }
+                }
+                else if (operatorInput.isPickUpCube()) {
+                    if (pickupTarget == CONE) {
+                        System.out.println("Changing pickup target from CONE to CUBE based on operator input");
+                        pickupTarget = CUBE;
+                    }
+                }
+                else {
+                    pickupTarget = NONE;
+                    state        = State.CANCELLED;
+                    break;
+                }
             }
-            else if (operatorInput.isPickUpCone()) {
-                boolean pinchDone = movePincherToEncoderCount(GamePiece.CONE.pincherEncoderCount, .5);
-                state = pinchDone ? State.PIECE_GRABBED : State.PINCHERS_MOVING;
-            }
+            boolean pinchDone = movePincherToEncoderCount(pickupTarget.pincherEncoderCount, .5);
+            state = pinchDone ? State.PIECE_GRABBED : State.PINCHERS_MOVING;
+            break;
+        }
 
-            // FIXME: What happens when neither trigger is pressed?
+        case CANCELLED: {
+            // note when this occurs the robot remains in this state.
+            System.out.println("No pickup target specified by operator. Cancelling command.");
             break;
         }
 
@@ -126,7 +154,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
     @Override
     public boolean isFinished() {
-        return state == State.PIECE_GRABBED && armSubsystem.getHeldGamePiece() != GamePiece.NONE;
+        return state == State.CANCELLED || (state == State.PIECE_GRABBED && armSubsystem.getHeldGamePiece() != NONE);
     }
 
     @Override

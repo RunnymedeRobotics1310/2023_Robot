@@ -119,8 +119,7 @@ abstract class BaseArmCommand extends CommandBase {
     }
 
     /**
-     * Safely move the arm from whatever position it is in to the compact pose, which has the arm
-     * down, retracted, and with
+     * Safely move the arm from whatever position it is in to the compact pose, which has the arm down, retracted, and with
      * pinchers closed.
      *
      * @return true if in the compact pose, false if still moving there
@@ -140,7 +139,7 @@ abstract class BaseArmCommand extends CommandBase {
             }
         }
         else {
-            System.out.println("moveToCompactPose. Compact Pose State: " + compactState);
+            // System.out.println("Moving to compact pose. Current state: " + compactState);
         }
 
         // get into the compact pose
