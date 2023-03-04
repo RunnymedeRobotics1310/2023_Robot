@@ -33,23 +33,44 @@ public class SetCameraViewCommand extends CommandBase {
         System.out.println("SetCameraViewCommand started, current camera view : " + currentCameraView
             + ", target camera view " + newCameraView);
 
-        if (visionSubsystem.getCameraView() == newCameraView) {
+        if (!(newCameraView == CameraView.HIGH || newCameraView == CameraView.LOW)) {
+
+            // Only HIGH or LOW are valid for this command, otherwise cancel
             visionSubsystem.setCameraMotorSpeed(0);
             this.cancel();
+
+        }
+        else if (visionSubsystem.getCameraView() == newCameraView) {
+
+            // If already at the selected position, then cancel
+            visionSubsystem.setCameraMotorSpeed(0);
+            this.cancel();
+
         }
         else if (newCameraView == CameraView.HIGH) {
+
+            // Run the motor forward to raise the camera view
             visionSubsystem.setCameraMotorSpeed(VisionConstants.MAX_CAMERA_MOTOR_SPEED);
+
         }
         else {
+
+            // Run the motor in reverse to lower the camera view
             visionSubsystem.setCameraMotorSpeed(-VisionConstants.MAX_CAMERA_MOTOR_SPEED);
+
         }
+    }
+
+    @Override
+    public void execute() {
+        // Nothing to do here. Wait for the camera to get to the position
     }
 
     @Override
     public boolean isFinished() {
 
         // Is it possible to cancel this command?
-        // The camera will stop in an unknown position.
+        // The camera will stop in an in-between position.
         if (operatorInput.isCancel()) {
             return true;
         }
@@ -75,6 +96,6 @@ public class SetCameraViewCommand extends CommandBase {
             System.out.print("SetCameraViewCommand ended: ");
         }
 
-        System.out.println("Current camera view " + visionSubsystem.getCameraView());
+        System.out.println("current camera view " + visionSubsystem.getCameraView());
     }
 }

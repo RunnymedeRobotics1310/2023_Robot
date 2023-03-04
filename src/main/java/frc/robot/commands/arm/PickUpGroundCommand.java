@@ -11,7 +11,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
     private final ArmSubsystem  armSubsystem;
     private final OperatorInput operatorInput;
-    private       GamePiece     pickupTarget;
+    private GamePiece           pickupTarget;
 
     // https://docs.google.com/document/d/1JzU-BzCXjGCwosouylmWGN83-x8lv-oPzklcXDqNN2U/edit#
 
@@ -111,7 +111,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
         case ARM_MOVING: {
             // if ground pickup location is too low, override it with the location that will ensure that we clear the frame.
-            boolean liftDone = moveArmLiftToAngle(
+            boolean liftDone  = moveArmLiftToAngle(
                 Double.max(CLEAR_FRAME_ARM_ANGLE, GROUND_PICKUP_POSITION.angle), .15);
             boolean extDone   = moveArmExtendToEncoderCount(GROUND_PICKUP_POSITION.extension, .5);
             boolean pinchDone = openPincher();

@@ -4,9 +4,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
@@ -68,6 +66,11 @@ public class VisionSubsystem extends SubsystemBase {
     private double            cameraEncoderOffset       = 0;
 
     public VisionSubsystem() {
+
+        // Set the max current on the camera Neo550 to 20A. This will prevent the motor
+        // from burning out when stalled.
+        // See https://www.revrobotics.com/neo-550-brushless-motor-locked-rotor-testing/
+        cameraMotor.setSmartCurrentLimit(20);
 
         // When the robot starts, the camera must be set to the high view (0)
         setCameraEncoderPosition(0);
@@ -266,7 +269,7 @@ public class VisionSubsystem extends SubsystemBase {
      */
     public void setCameraMotorSpeed(double speed) {
 
-        cameraMotorSpeed = speed;
+        cameraMotorSpeed = checkCameraMotorLimits(speed);
 
         cameraMotor.set(speed);
     }
@@ -379,4 +382,44 @@ public class VisionSubsystem extends SubsystemBase {
         d[1] = ty.getDouble(-1.0);
         return d;
     }
+
+    /**
+     * Check the camera motor limits and return the appropriate output speed based on the limits
+     *
+     * @param inputSpeed
+     * @return output speed for the camera motor based on the current camera position.
+     */
+    private double checkCameraMotorLimits(double inputSpeed) {
+
+        boolean atLimit = false;
+
+        /*
+         * High
+         */
+
+        if (getCameraView() == CameraView.HIGH
+            && inputSpeed > 0) {
+
+            atLimit = true;
+        }
+
+        /*
+         * Low
+         */
+
+        if (getCameraView() == CameraView.LOW) {
+
+            if (inputSpeed < 0) {
+                atLimit = true;
+            }
+        }
+
+        if (atLimit) {
+            return 0;
+        }
+
+        return inputSpeed;
+    }
+
+
 }

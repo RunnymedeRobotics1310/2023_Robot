@@ -27,7 +27,7 @@ public final class Constants {
         public static enum GamePiece {
 
             // TODO: set these values
-            CUBE(5), CONE(10), NONE(0);
+            CUBE(65), CONE(124), NONE(0);
 
             public final double pincherEncoderCount;
 
