@@ -126,7 +126,8 @@ public final class Constants {
         public static final double      ARM_LIFT_LIMIT_ENCODER_VALUE      = 16;
         public static final int         ARM_DOWN_LIMIT_SWITCH_DIO_PORT    = 0;
 
-        public static final double      MAX_LIFT_SPEED                    = 1;
+        /** The maximum speed to drive the arm lift - manually or automatically */
+        public static final double      MAX_LIFT_SPEED                    = .25;
 
         /** Hard stop angle where 0 = straight down, and 90 = parallel to floor */
         public static final double      ARM_DOWN_ANGLE_DEGREES            = 23;
@@ -134,7 +135,7 @@ public final class Constants {
         /** Down position is 23 degrees, and there are 12.5 encoder counts to horizontal, 90 deg */
         public static final double      ARM_DEGREES_PER_ENCODER_COUNT     = (90 - ARM_DOWN_ANGLE_DEGREES) / 12.5;
 
-        public static final double      CLEAR_FRAME_LIFT_ENCODER_LOCATION = 3;                                   // TODO:
+        public static final double      CLEAR_FRAME_ARM_ANGLE             = 30;                                  // TODO:
                                                                                                                  // get
                                                                                                                  // real
                                                                                                                  // value

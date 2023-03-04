@@ -548,16 +548,66 @@ public class ArmSubsystem extends SubsystemBase {
 
     private double calcArmLiftHoldSpeed() {
 
+        /*
+         * When the arm is not intended to move, some force is required in
+         * order to hold the arm steady.
+         *
+         * The following measurements were obtained using experiments with the arm:
+         *
+         * Arm Angle = 90 degrees
+         *
+         * .............Motor Speed
+         *
+         * Extension ..No Cone ..With Cone
+         *
+         * Retracted ____.06 ______.08
+         * Extended _____.10 ______.14
+         *
+         */
+
+        /*
+         * The angle multiplier is based on the amount of force required to
+         * overcome gravity at this angle.
+         *
+         * At zero degrees, straight down, no additional force is required to
+         * overcome gravity.
+         *
+         * At 90 degrees, parallel to the floor, the speeds measured above are required to hold
+         * a retracted arm parallel to the floor.
+         *
+         * The amount of force follows the sin (trigonometry) function which
+         *
+         */
         double angleMultiplier  = Math.sin(Math.toRadians(getArmLiftAngle()));
 
-        double extendMultiplier = 1 + (getArmExtendEncoder() / ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE * .6);
+        /*
+         * The extension multiplier is based on the amount of additional force required as the
+         * arm extends.
+         *
+         * Based on the above observations, the amount of force required when the arm
+         * is extended is approximately 1.7.
+         *
+         * No cone. : .10 (extendeed) / .06 (retracted) = 1.67
+         * With cone: .14 (extendeed) / .08 (retracted) = 1.75
+         *
+         * We are choosing a value in between at 1.7
+         */
+        double extendMultiplier = 1 + (getArmExtendEncoder() / ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE * .7);
 
+        /*
+         * The base compensation comes from the retracted arm values
+         */
         double baseCompensation = 0.06;
 
         if (getHeldGamePiece() == GamePiece.CONE) {
             baseCompensation += 0.02;
         }
 
+        /*
+         * The net combination is the multiplication of the base compensation
+         * and the angle and extension adjustments.
+         *
+         */
         return baseCompensation * angleMultiplier * extendMultiplier;
     }
 }

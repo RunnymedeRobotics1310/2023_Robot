@@ -1,7 +1,7 @@
 package frc.robot.commands.arm;
 
 import static frc.robot.Constants.ArmConstants.ARM_EXTEND_MOTOR_TOLERANCE;
-import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_LIFT_ENCODER_LOCATION;
+import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_ARM_ANGLE;
 import static frc.robot.Constants.ArmConstants.MAX_PINCHER_SPEED;
 import static frc.robot.Constants.ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE;
 import static frc.robot.Constants.ArmConstants.PINCHER_MOTOR_TOLERANCE;
@@ -120,7 +120,8 @@ abstract class BaseArmCommand extends CommandBase {
     }
 
     /**
-     * Safely move the arm from whatever position it is in to the compact pose, which has the arm down, retracted, and with
+     * Safely move the arm from whatever position it is in to the compact pose, which has the arm
+     * down, retracted, and with
      * pinchers closed.
      *
      * @return true if in the compact pose, false if still moving there
@@ -134,7 +135,7 @@ abstract class BaseArmCommand extends CommandBase {
                 compactState = CompactState.COMPACT_POSE;
             }
             else {
-                boolean tooLow = armSubsystem.getArmLiftEncoder() < CLEAR_FRAME_LIFT_ENCODER_LOCATION;
+                boolean tooLow = armSubsystem.getArmLiftAngle() < CLEAR_FRAME_ARM_ANGLE;
                 compactState = tooLow ? CompactState.PREPARING : CompactState.RETRACTING;
             }
         }
@@ -146,7 +147,7 @@ abstract class BaseArmCommand extends CommandBase {
             if (!armSubsystem.isPincherAtCloseLimit()) {
                 armSubsystem.setPincherSpeed(.5);
             }
-            boolean done = moveArmLiftToAngle(CLEAR_FRAME_LIFT_ENCODER_LOCATION, .3);
+            boolean done = moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE, .3);
             compactState = done ? CompactState.RETRACTING : CompactState.PREPARING;
             break;
         }

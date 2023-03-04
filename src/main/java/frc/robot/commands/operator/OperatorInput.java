@@ -1,5 +1,6 @@
 package frc.robot.commands.operator;
 
+import frc.robot.Constants.ArmConstants;
 
 /**
  * The DriverController exposes all driver functions
@@ -133,7 +134,7 @@ public class OperatorInput {
     }
 
     public double getArmLiftMotorSpeed() {
-        return operatorController.getLeftY() / 4;
+        return operatorController.getLeftY() * ArmConstants.MAX_LIFT_SPEED;
     }
 
     public double getArmExtendMotorSpeed() {
