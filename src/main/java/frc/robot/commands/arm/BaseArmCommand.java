@@ -1,10 +1,10 @@
 package frc.robot.commands.arm;
 
-import static frc.robot.Constants.ArmConstants.ARM_EXTEND_MOTOR_TOLERANCE;
+import static frc.robot.Constants.ArmConstants.ARM_EXTEND_POSITION_TOLERANCE;
 import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_ARM_ANGLE;
 import static frc.robot.Constants.ArmConstants.MAX_PINCHER_SPEED;
 import static frc.robot.Constants.ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE;
-import static frc.robot.Constants.ArmConstants.PINCHER_MOTOR_TOLERANCE;
+import static frc.robot.Constants.ArmConstants.PINCHER_POSITION_TOLERANCE;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystem;
@@ -62,7 +62,7 @@ abstract class BaseArmCommand extends CommandBase {
     protected final boolean moveArmExtendToEncoderCount(double targetCount, double speed) {
         double absSpd = Math.abs(speed);
         double gap    = armSubsystem.getArmExtendEncoder() - targetCount;
-        if (Math.abs(gap) > ARM_EXTEND_MOTOR_TOLERANCE) {
+        if (Math.abs(gap) > ARM_EXTEND_POSITION_TOLERANCE) {
             armSubsystem.setArmExtendSpeed(gap > 0 ? -absSpd : absSpd);
             return false;
         }
@@ -82,7 +82,7 @@ abstract class BaseArmCommand extends CommandBase {
     protected final boolean movePincherToEncoderCount(double targetCount, double speed) {
         double absSpd = Math.abs(speed);
         double gap    = armSubsystem.getPincherEncoder() - targetCount;
-        if (Math.abs(gap) > PINCHER_MOTOR_TOLERANCE) {
+        if (Math.abs(gap) > PINCHER_POSITION_TOLERANCE) {
             armSubsystem.setPincherSpeed(gap > 0 ? -absSpd : absSpd);
             return false;
         }

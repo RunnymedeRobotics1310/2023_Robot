@@ -61,7 +61,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
         if (!armSubsystem.isArmAtLiftAngle(GROUND_PICKUP_POSITION.angle))
             return false;
         double ext = armSubsystem.getArmExtendEncoder();
-        if (Math.abs(ext - GROUND_PICKUP_POSITION.extension) > ARM_EXTEND_MOTOR_TOLERANCE)
+        if (Math.abs(ext - GROUND_PICKUP_POSITION.extension) > ARM_EXTEND_POSITION_TOLERANCE)
             return false;
         if (!armSubsystem.isPincherOpen())
             return false;
