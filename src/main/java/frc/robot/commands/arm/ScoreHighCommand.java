@@ -1,13 +1,12 @@
 package frc.robot.commands.arm;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ArmPosition;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.subsystems.ArmSubsystem;
 
-public class ScoreHighCommand extends CommandBase {
+public class ScoreHighCommand extends BaseArmCommand {
 
     private final ArmSubsystem armSubsystem;
 
@@ -15,6 +14,7 @@ public class ScoreHighCommand extends CommandBase {
     // https://docs.google.com/document/d/1JzU-BzCXjGCwosouylmWGN83-x8lv-oPzklcXDqNN2U/edit#
 
     public ScoreHighCommand(ArmSubsystem armSubsystem) {
+        super(armSubsystem);
 
         this.armSubsystem = armSubsystem;
 
@@ -26,65 +26,49 @@ public class ScoreHighCommand extends CommandBase {
     public void initialize() {
 
         System.out.println("ScoreHighCommand started");
-
-        armSubsystem.setArmLiftSpeed(0);
-        armSubsystem.setArmExtendSpeed(0);
-        armSubsystem.setPincherSpeed(0);
+        printArmState();
+        stopArmMotors();
 
     }
 
     @Override
     public void execute() {
-        // Q is working on this
 
-        // ensure that we have a piece
-        GamePiece gamePiece = armSubsystem.getHeldGamePiece();
-
-        if (gamePiece == GamePiece.NONE) {
-            System.out.print("Can not score high, no piece is held.");
-            // FIXME: This is an infinite loop?
-            return;
-        }
-
-        // FIXME:
-        // Quentin: There are some new constants for the arm, and a helper method to get the scoring
-        // position for all of the scoring spots
-        // The scoring position has an angle and extension. The isAtLiftAngle is in the
-        // subsystem which can tell you if the current arm position equals the passed in position.
-        // FIXME: We should do this for the extension as well.
-
+        GamePiece   gamePiece       = armSubsystem.getHeldGamePiece();
         ArmPosition scoringPosition = ArmConstants.getScoringPosition(gamePiece, ScoringRow.TOP);
 
-        if (armSubsystem.isArmAtLiftAngle(scoringPosition.angle)) {
-            armSubsystem.setArmLiftSpeed(0);
-        }
-        else if (armSubsystem.getArmLiftAngle() < scoringPosition.angle) {
-            armSubsystem.setArmLiftSpeed(.25);
-        }
-        else {
-            armSubsystem.setArmLiftSpeed(-.25);
+        // ensure that we have a piece
+        if (gamePiece == GamePiece.NONE) {
+            System.out.print("Can not score high, no piece is held.");
         }
 
-        // Cube arm extend
-        // FIXME: Quentin, please add a method to the arm subsystem
-        // .isAtExtendPosition(double position)
-        // and you can follow the lift angle pattern above for the extension.
-
-        // TODO: determine if there are timing considerations?
-        // Does the arm have to be lifted _before_ the extension can happen?
+        // Move arm to scoring position
+        boolean lift = moveArmLiftToAngle(scoringPosition.angle, ArmConstants.MAX_LIFT_SPEED);
+        if (lift) {
+            boolean extend = moveArmExtendToEncoderCount(scoringPosition.extension, ArmConstants.MAX_EXTEND_SPEED);
+            if (extend) {
+                System.out.print("ScoreHighCommand finished");
+            }
+        }
     }
 
     @Override
     public boolean isFinished() {
-        // FIXME: do everything
-        // finish
+        GamePiece   gamePiece       = armSubsystem.getHeldGamePiece();
+        ArmPosition scoringPosition = ArmConstants.getScoringPosition(gamePiece, ScoringRow.TOP);
 
-        return true;
+        // Check position
+        if (armSubsystem.isArmAtLiftAngle(scoringPosition.angle)
+            && armSubsystem.isAtExtendPosition(scoringPosition.extension)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void end(boolean interrupted) {
-        // FIXME: do everything
+
+        stopArmMotors();
         if (interrupted) {
             System.out.print("ScoreHighCommand interrupted");
         }

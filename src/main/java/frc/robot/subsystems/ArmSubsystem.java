@@ -205,6 +205,21 @@ public class ArmSubsystem extends SubsystemBase {
         return false;
     }
 
+    /**
+     * determine if the arm is at the supplied position in encoder counts,
+     * within the arm extend position tolerance
+     * 
+     * @param position to compare
+     * @return {@code true} if at extension, {@code false} otherwise
+     */
+    public boolean isAtExtendPosition(double position) {
+
+        if (Math.abs(position - getArmExtendEncoder()) <= ArmConstants.ARM_EXTEND_POSITION_TOLERANCE) {
+            return true;
+        }
+        return false;
+    }
+
     /** Determine if the arm is at the upper encoder limit */
     public boolean isArmAtUpperLimit() {
 
