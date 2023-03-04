@@ -71,7 +71,7 @@ public class SwitchVisionTargetCommand extends InstantCommand {
                 case CUBE:
                     if (visionSubsystem.getCameraView() != CameraView.LOW) {
                         CommandScheduler.getInstance()
-                            .schedule(new SetCameraViewCommand(CameraView.LOW, operatorInput, visionSubsystem));
+                            .schedule(new SetCameraViewCommand(CameraView.LOW, visionSubsystem));
                     }
                     break;
 
@@ -79,7 +79,7 @@ public class SwitchVisionTargetCommand extends InstantCommand {
                 case TAG:
                     if (visionSubsystem.getCameraView() != CameraView.HIGH) {
                         CommandScheduler.getInstance()
-                            .schedule(new SetCameraViewCommand(CameraView.HIGH, operatorInput, visionSubsystem));
+                            .schedule(new SetCameraViewCommand(CameraView.HIGH, visionSubsystem));
                     }
                     break;
 
