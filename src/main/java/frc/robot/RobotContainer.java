@@ -11,25 +11,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.AutoConstants.AutoAction;
-import frc.robot.Constants.AutoConstants.AutoLane;
-import frc.robot.Constants.AutoConstants.Orientation;
+import frc.robot.Constants.AutoConstants.*;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.OiConstants;
+import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.SystemTestCommand;
 import frc.robot.commands.arm.DefaultArmCommand;
 import frc.robot.commands.arm.ScoreHighCommand;
 import frc.robot.commands.auto.AutonomousCommand;
-import frc.robot.commands.drive.DefaultDriveCommand;
-import frc.robot.commands.drive.DriveModeSelector;
-import frc.robot.commands.drive.ResetGyroPitchCommand;
-import frc.robot.commands.drive.SetGyroHeadingCommand;
+import frc.robot.commands.drive.*;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.vision.DefaultVisionCommand;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.commands.vision.SetCameraViewCommand;
+import frc.robot.subsystems.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -59,7 +54,7 @@ public class RobotContainer {
     private final DriveModeSelector driveModeSelector             = new DriveModeSelector();
 
     // The driver's controller
-    private final OperatorInput     driverController              = new OperatorInput(
+    private final OperatorInput     operatorInput                 = new OperatorInput(
         OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
 
     /**
@@ -69,13 +64,13 @@ public class RobotContainer {
 
         // Initialize all Subsystem default commands.
         driveSubsystem.setDefaultCommand(
-            new DefaultDriveCommand(driverController, driveSubsystem, driveModeSelector));
+            new DefaultDriveCommand(operatorInput, driveSubsystem, driveModeSelector));
 
         armSubsystem.setDefaultCommand(
-            new DefaultArmCommand(driverController, armSubsystem));
+            new DefaultArmCommand(operatorInput, armSubsystem));
 
         visionSubsystem.setDefaultCommand(
-            new DefaultVisionCommand(driverController, visionSubsystem));
+            new DefaultVisionCommand(operatorInput, visionSubsystem));
 
         // calibrate subsystems
         calibrateVision();
@@ -168,41 +163,46 @@ public class RobotContainer {
         // Cancel all commands on the XBox controller three lines (aka. start) button
         // NOTE: The SystemTestCommand uses the same button, so update the code in the
         // SystemTestCommand if this button changes
-        new Trigger(() -> driverController.isCancel())
+        new Trigger(() -> operatorInput.isCancel())
             .onTrue(new CancelCommand(driveSubsystem));
 
         // Enter Test Mode (Start and Back pressed at the same time)
-        new Trigger(() -> (driverController.isToggleTestMode()))
-            .onTrue(new SystemTestCommand(driverController,
-                driveSubsystem, armSubsystem, visionSubsystem));
+        new Trigger(() -> (operatorInput.isToggleTestMode()))
+            .onTrue(
+                new SystemTestCommand(operatorInput,
+                    driveSubsystem, armSubsystem, visionSubsystem));
 
         // Reset the Gyro heading to zero on the menu (aka. back) button
-        new Trigger(() -> driverController.isGyroReset())
+        new Trigger(() -> operatorInput.isGyroReset())
             .onTrue(new SetGyroHeadingCommand(0, driveSubsystem)
                 .andThen(new ResetGyroPitchCommand(driveSubsystem)));
 
         // scoring (a/b/y/x)
         // FIXME: Only try to score if there is a game piece?
-        new Trigger(() -> (driverController.isHigh()
+        new Trigger(() -> (operatorInput.isHigh()
             && (armSubsystem.getHeldGamePiece() == GamePiece.CONE
                 || armSubsystem.getHeldGamePiece() == GamePiece.CUBE)))
             .onTrue(new ScoreHighCommand(armSubsystem));
 
-        new Trigger(() -> (driverController.isMid()))
+        new Trigger(() -> (operatorInput.isMid()))
             .onTrue(new InstantCommand());
 
-        new Trigger(() -> (driverController.isLow()))
+        new Trigger(() -> (operatorInput.isLow()))
             .onTrue(new InstantCommand());
 
-        new Trigger(() -> (driverController.isDrop()))
+        new Trigger(() -> (operatorInput.isDrop()))
             .onTrue(new InstantCommand());
 
         // grab things
-        new Trigger(() -> (driverController.isPickUpCone()))
+        new Trigger(() -> (operatorInput.isPickUpCone()))
             .onTrue(new InstantCommand());
 
-        new Trigger(() -> (driverController.isPickUpCube()))
+        new Trigger(() -> (operatorInput.isPickUpCube()))
             .onTrue(new InstantCommand());
+
+        new Trigger(() -> (operatorInput.isCameraViewHigh()))
+            .onTrue(new SetCameraViewCommand(CameraView.HIGH, visionSubsystem));
+
     }
 
     /**

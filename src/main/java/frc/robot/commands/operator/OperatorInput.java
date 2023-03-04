@@ -120,6 +120,14 @@ public class OperatorInput {
         return !shift() && driverController.getBackButton() && driverController.getStartButton();
     }
 
+    public boolean isCameraViewHigh() {
+        return !shift() && driverController.getPOV() == 0;
+    }
+
+    public boolean isCameraViewLow() {
+        return !shift() && driverController.getPOV() == 180;
+    }
+
     public double getCameraMotorSpeed() {
         if (operatorController.getLeftTriggerAxis() > 0 && operatorController.getRightTriggerAxis() > 0) {
             return 0;

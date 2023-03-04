@@ -3,23 +3,19 @@ package frc.robot.commands.vision;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.CameraView;
-import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.VisionSubsystem;
 
 public class SetCameraViewCommand extends CommandBase {
 
     private final CameraView      newCameraView;
-    private final OperatorInput   operatorInput;
     private final VisionSubsystem visionSubsystem;
 
     // fixme: do everything - see table
     // https://docs.google.com/document/d/1JzU-BzCXjGCwosouylmWGN83-x8lv-oPzklcXDqNN2U/edit#
 
-    public SetCameraViewCommand(CameraView newCameraView, OperatorInput operatorInput,
-        VisionSubsystem visionSubsystem) {
+    public SetCameraViewCommand(CameraView newCameraView, VisionSubsystem visionSubsystem) {
 
         this.newCameraView   = newCameraView;
-        this.operatorInput   = operatorInput;
         this.visionSubsystem = visionSubsystem;
 
         addRequirements(visionSubsystem);
@@ -68,12 +64,6 @@ public class SetCameraViewCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-
-        // Is it possible to cancel this command?
-        // The camera will stop in an in-between position.
-        if (operatorInput.isCancel()) {
-            return true;
-        }
 
         if (visionSubsystem.getCameraView() == newCameraView) {
             return true;
