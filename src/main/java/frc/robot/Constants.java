@@ -100,10 +100,17 @@ public final class Constants {
             /** Point at an angle to view the intake */
             LOW,
             /** Point towards the high goal */
-            HIGH
+            HIGH,
+            /** Neither high nor low */
+            IN_BETWEEN
         }
 
-        public static final int CAMERA_ANGLE_MOTOR_PORT = 50;
+        public static final int    CAMERA_ANGLE_MOTOR_PORT         = 50;
+
+        /** The maximum speed to drive the camera - manually or automatically */
+        public static final double MAX_CAMERA_MOTOR_SPEED          = 1;
+        public static final double CAMERA_DOWN_LIMIT_ENCODER_VALUE = -125;
+        public static final double CAMERA_POSITION_TOLERANCE       = 5;
     }
 
     public static class ArmPosition {
