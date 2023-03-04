@@ -182,7 +182,10 @@ public class RobotContainer {
                 .andThen(new ResetGyroPitchCommand(driveSubsystem)));
 
         // scoring (a/b/y/x)
-        new Trigger(() -> (driverController.isHigh()))
+        // FIXME: Only try to score if there is a game piece?
+        new Trigger(() -> (driverController.isHigh()
+            && (armSubsystem.getHeldGamePiece() == GamePiece.CONE
+                || armSubsystem.getHeldGamePiece() == GamePiece.CUBE)))
             .onTrue(new ScoreHighCommand(armSubsystem));
 
         new Trigger(() -> (driverController.isMid()))
