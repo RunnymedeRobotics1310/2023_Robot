@@ -15,11 +15,12 @@ import frc.robot.Constants.AutoConstants.AutoAction;
 import frc.robot.Constants.AutoConstants.AutoLane;
 import frc.robot.Constants.AutoConstants.Orientation;
 import frc.robot.Constants.GameConstants.GamePiece;
+import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.OiConstants;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.SystemTestCommand;
 import frc.robot.commands.arm.DefaultArmCommand;
-import frc.robot.commands.arm.ScoreHighCommand;
+import frc.robot.commands.arm.ScoreCommand;
 import frc.robot.commands.auto.AutonomousCommand;
 import frc.robot.commands.drive.DefaultDriveCommand;
 import frc.robot.commands.drive.DriveModeSelector;
@@ -186,13 +187,13 @@ public class RobotContainer {
         new Trigger(() -> (driverController.isHigh()
             && (armSubsystem.getHeldGamePiece() == GamePiece.CONE
                 || armSubsystem.getHeldGamePiece() == GamePiece.CUBE)))
-            .onTrue(new ScoreHighCommand(armSubsystem));
+            .onTrue(new ScoreCommand(armSubsystem, ScoringRow.TOP));
 
         new Trigger(() -> (driverController.isMid()))
-            .onTrue(new InstantCommand());
+            .onTrue(new ScoreCommand(armSubsystem, ScoringRow.MIDDLE));
 
         new Trigger(() -> (driverController.isLow()))
-            .onTrue(new InstantCommand());
+            .onTrue(new ScoreCommand(armSubsystem, ScoringRow.BOTTOM));
 
         new Trigger(() -> (driverController.isDrop()))
             .onTrue(new InstantCommand());

@@ -6,20 +6,20 @@ import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.subsystems.ArmSubsystem;
 
-public class ScoreHighCommand extends BaseArmCommand {
+public class ScoreCommand extends BaseArmCommand {
 
     private final ArmSubsystem armSubsystem;
     private final ScoringRow   scoringRow;
     private ArmPosition        scoringPosition = null;
     private GamePiece          gamePiece       = null;
 
-    public ScoreHighCommand(ArmSubsystem armSubsystem) {
+    public ScoreCommand(ArmSubsystem armSubsystem, ScoringRow scoringRow) {
         super(armSubsystem);
 
         this.armSubsystem = armSubsystem;
 
         addRequirements(armSubsystem);
-        scoringRow = ScoringRow.TOP;
+        this.scoringRow = scoringRow;
     }
 
     @Override
