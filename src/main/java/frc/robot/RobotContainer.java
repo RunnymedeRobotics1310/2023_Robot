@@ -13,12 +13,13 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants.*;
 import frc.robot.Constants.GameConstants.GamePiece;
+import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.OiConstants;
 import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.SystemTestCommand;
 import frc.robot.commands.arm.DefaultArmCommand;
-import frc.robot.commands.arm.ScoreHighCommand;
+import frc.robot.commands.arm.ScoreCommand;
 import frc.robot.commands.auto.AutonomousCommand;
 import frc.robot.commands.drive.*;
 import frc.robot.commands.operator.OperatorInput;
@@ -182,13 +183,13 @@ public class RobotContainer {
         new Trigger(() -> (operatorInput.isHigh()
             && (armSubsystem.getHeldGamePiece() == GamePiece.CONE
                 || armSubsystem.getHeldGamePiece() == GamePiece.CUBE)))
-            .onTrue(new ScoreHighCommand(armSubsystem));
+            .onTrue(new ScoreCommand(armSubsystem, ScoringRow.TOP));
 
         new Trigger(() -> (operatorInput.isMid()))
-            .onTrue(new InstantCommand());
+            .onTrue(new ScoreCommand(armSubsystem, ScoringRow.MIDDLE));
 
         new Trigger(() -> (operatorInput.isLow()))
-            .onTrue(new InstantCommand());
+            .onTrue(new ScoreCommand(armSubsystem, ScoringRow.BOTTOM));
 
         new Trigger(() -> (operatorInput.isDrop()))
             .onTrue(new InstantCommand());
