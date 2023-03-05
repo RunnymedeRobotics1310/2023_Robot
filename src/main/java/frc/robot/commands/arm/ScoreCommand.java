@@ -28,7 +28,8 @@ public class ScoreCommand extends BaseArmCommand {
         gamePiece       = armSubsystem.getHeldGamePiece();
         scoringPosition = ArmConstants.getScoringPosition(gamePiece, scoringRow);
 
-        System.out.println("ScoreHighCommand started");
+        System.out.println("ScoreCommand started.  Scoring row : " + scoringRow);
+
         printArmState();
         stopArmMotors();
     }
@@ -48,16 +49,18 @@ public class ScoreCommand extends BaseArmCommand {
 
         // ensure that we have a piece and haven't dropped it
         if (!armSubsystem.isGamePieceDetected()) {
-            System.out.print("Can not score high, no piece is held.");
+            System.out.print("Can not score, no piece is held.");
             return true;
         }
 
         // Check position
         if (armSubsystem.isArmAtLiftAngle(scoringPosition.angle)
             && armSubsystem.isAtExtendPosition(scoringPosition.extension)) {
-            System.out.print("ScoreHighCommand finished");
+
+            System.out.print("ScoreCommand finished");
             return true;
         }
+
         return false;
     }
 
@@ -67,10 +70,11 @@ public class ScoreCommand extends BaseArmCommand {
         stopArmMotors();
 
         if (interrupted) {
-            System.out.print("ScoreHighCommand interrupted");
+            System.out.print("ScoreCommand interrupted");
         }
         else {
-            System.out.print("ScoreHighCommand ended");
+            System.out.print("ScoreCommand ended");
         }
+        printArmState();
     }
 }
