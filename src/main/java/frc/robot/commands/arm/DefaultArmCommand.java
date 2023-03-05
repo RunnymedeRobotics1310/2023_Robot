@@ -33,13 +33,6 @@ public class DefaultArmCommand extends CommandBase {
     @Override
     public void execute() {
 
-        // zero the encoders if required
-        if (driverController.isArmReset()) {
-            armSubsystem.setArmLiftEncoder(0);
-            armSubsystem.setArmExtendEncoder(0);
-            armSubsystem.setPincherEncoder(0);
-        }
-
         armSubsystem.setArmLiftSpeed(driverController.getArmLiftMotorSpeed());
         armSubsystem.setArmExtendSpeed(driverController.getArmExtendMotorSpeed());
         armSubsystem.setPincherSpeed(driverController.getPincherMotorSpeed());

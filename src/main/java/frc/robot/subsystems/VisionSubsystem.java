@@ -70,7 +70,7 @@ public class VisionSubsystem extends SubsystemBase {
         // Set the max current on the camera Neo550 to 20A. This will prevent the motor
         // from burning out when stalled.
         // See https://www.revrobotics.com/neo-550-brushless-motor-locked-rotor-testing/
-        cameraMotor.setSmartCurrentLimit(20);
+        cameraMotor.setSmartCurrentLimit(VisionConstants.CAMERA_MOTOR_CURRENT_LIMIT);
 
         // When the robot starts, the camera must be set to the high view (0)
         setCameraEncoderPosition(0);
@@ -397,41 +397,40 @@ public class VisionSubsystem extends SubsystemBase {
         /*
          * High
          */
+        if (inputSpeed > 0) {
 
-        if (getCameraView() == CameraView.HIGH
-            && inputSpeed > 0) {
+            if (getCameraView() == CameraView.HIGH) {
 
-            return 0;
-        }
+                return 0;
+            }
 
-        // If we are getting close to the limit, then slow down
-        if (Math.abs(getCameraEncoder()) < VisionConstants.CAMERA_POSITION_SLOW_ZONE
-            && inputSpeed > 0) {
+            // If we are getting close to the limit, then slow down
+            if (Math.abs(getCameraEncoder()) < VisionConstants.CAMERA_POSITION_SLOW_ZONE) {
 
-            return Math.min(inputSpeed, VisionConstants.MAX_CAMERA_SLOW_ZONE_SPEED);
+                return Math.min(inputSpeed, VisionConstants.MAX_CAMERA_SLOW_ZONE_SPEED);
+            }
         }
 
         /*
          * Low
          */
 
-        if (getCameraView() == CameraView.LOW) {
+        if (inputSpeed < 0) {
 
-            if (inputSpeed < 0) {
+            if (getCameraView() == CameraView.LOW) {
+
                 return 0;
             }
-        }
 
-        // If we are getting close to the limit, then slow down
-        if (Math.abs(
-            getCameraEncoder() - VisionConstants.CAMERA_DOWN_LIMIT_ENCODER_VALUE) < VisionConstants.CAMERA_POSITION_SLOW_ZONE
-            && inputSpeed < 0) {
+            // If we are getting close to the limit, then slow down
+            if (Math.abs(
+                getCameraEncoder()
+                    - VisionConstants.CAMERA_DOWN_LIMIT_ENCODER_VALUE) < VisionConstants.CAMERA_POSITION_SLOW_ZONE) {
 
-            return Math.max(inputSpeed, -VisionConstants.MAX_CAMERA_SLOW_ZONE_SPEED);
+                return Math.max(inputSpeed, -VisionConstants.MAX_CAMERA_SLOW_ZONE_SPEED);
+            }
         }
 
         return inputSpeed;
     }
-
-
 }

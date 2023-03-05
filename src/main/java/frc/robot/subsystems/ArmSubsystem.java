@@ -1,11 +1,9 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.*;
 import com.revrobotics.CANSparkMax.ExternalFollower;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxLimitSwitch.Type;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -68,7 +66,7 @@ public class ArmSubsystem extends SubsystemBase {
      * the arm extender SparkMAX
      * reverse limit.
      */
-    private SparkMaxLimitSwitch    armRetractedDetector   = armExtendMotor.getForwardLimitSwitch(Type.kNormallyOpen);
+    private SparkMaxLimitSwitch    armExtendLimitDetector = armExtendMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
     /**
      * The pincher open detector is a hall effect limit switch that is normally open, plugged into
@@ -109,7 +107,11 @@ public class ArmSubsystem extends SubsystemBase {
         // Set the arm extender to always brake
         armExtendMotor.setIdleMode(IdleMode.kBrake);
 
-        armRetractedDetector.enableLimitSwitch(false);
+        // The arm extend limit detector will have two magnets and one
+        // limit switch that will detect both forward and reverse limits
+        // NOTE: Not the ideal configuration - a true limit detector
+        // will have one magnet and two limit switches.
+        armExtendLimitDetector.enableLimitSwitch(false);
 
         setArmExtendEncoder(0);
 
@@ -119,10 +121,18 @@ public class ArmSubsystem extends SubsystemBase {
         // Set the polarity on the motor
         pincherMotor.setInverted(ArmConstants.PINCHER_MOTOR_REVERSED);
 
-        gamePieceDetector.enableLimitSwitch(false);
+        // The pincher motor is a neo550 which should be current limited
+        // when stalled in order to not burn out the motor
+        pincherMotor.setSmartCurrentLimit(ArmConstants.PINCHER_MOTOR_CURRENT_LIMIT);
 
         // Set the arm extender to always brake
         pincherMotor.setIdleMode(IdleMode.kBrake);
+
+        pincherOpenDetector.enableLimitSwitch(true);
+
+        // Disable the forward limit switch because it is
+        // used to detect a game piece instead
+        gamePieceDetector.enableLimitSwitch(false);
 
         setPincherEncoder(0);
     }
@@ -208,7 +218,7 @@ public class ArmSubsystem extends SubsystemBase {
     /**
      * determine if the arm is at the supplied position in encoder counts,
      * within the arm extend position tolerance
-     * 
+     *
      * @param position to compare
      * @return {@code true} if at extension, {@code false} otherwise
      */
@@ -233,10 +243,27 @@ public class ArmSubsystem extends SubsystemBase {
     /** Determine if the arm is fully extended. This safety mechanism keeps the arm to 4 ft. */
     public boolean isArmAtExtendLimit() {
 
-        // There is no arm extend limit switch - the arm extend
-        // limit is a soft limit that uses the arm encoder counts.
+        // The arm extension uses a limit switch as a backup for the arm extension limit.
+        // This limit switch is used for both the forward and reverse limits.
+        // The limit switch cannot really determine whether the arm is fully extended
+        // or fully retracted.
 
-        return armExtendEncoder.getPosition() > ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE;
+        // Hopefully the armExtenderEncoder is approximately accurate,
+        // and the limit detector is a backup if the encoder counts are
+        // not quite accurate (but are close). Anything less than
+        // half of the full extend value is considered a retract limit.
+
+        if (armExtendLimitDetector.isPressed()
+            && getArmExtendEncoder() > ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE / 2) {
+            return true;
+        }
+
+        // Also stop when the encoder counts are reached.
+        if (getArmExtendEncoder() >= ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE) {
+            return true;
+        }
+
+        return false;
     }
 
     /** Determine if the arm is fully retracted */
@@ -246,7 +273,21 @@ public class ArmSubsystem extends SubsystemBase {
         // magnetic sensor that "isPressed" when the sensor detects a magnet.
         // This sensor is not inverted because the CANLimitSwitch
         // is configured for a normally open switch.
-        return armRetractedDetector.isPressed();
+
+        // This limit switch is used for both the forward and reverse limits.
+        // The limit switch cannot really determine whether the arm is fully extended
+        // or fully retracted.
+        // Hopefully the armExtenderEncoder is approximately accurate,
+        // and the limit detector is a backup if the encoder counts are
+        // not quite accurate (but are close). Anything less than
+        // half of the full extend value is considered a retract limit.
+
+        if (armExtendLimitDetector.isPressed()
+            && getArmExtendEncoder() < ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE / 2) {
+            return true;
+        }
+
+        return false;
     }
 
     /** Determine if a game piece is detected in the pincher */
@@ -367,6 +408,21 @@ public class ArmSubsystem extends SubsystemBase {
     public void periodic() {
 
         /*
+         * Check for any encoder resets based on limit switches
+         */
+        if (isArmDown()) {
+            setArmLiftEncoder(0);
+        }
+
+        if (isArmRetracted()) {
+            setArmExtendEncoder(0);
+        }
+
+        if (isPincherOpen()) {
+            setPincherEncoder(0);
+        }
+
+        /*
          * Safety-check all of the motors speeds, and
          * set the motor outputs.
          *
@@ -377,6 +433,7 @@ public class ArmSubsystem extends SubsystemBase {
         setArmLiftSpeed(armLiftSpeed);
         setArmExtendSpeed(armExtendSpeed);
         setPincherSpeed(pincherSpeed);
+
         /*
          * Update the SmartDashboard
          */
@@ -426,42 +483,45 @@ public class ArmSubsystem extends SubsystemBase {
      */
     private double checkArmLiftLimits(double inputSpeed) {
 
-        boolean atLimit = false;
         /*
          * Lifting
          *
          * If the arm encoder count is larger than the lift limit
          * and the speed is positive (lifting) then stop
          */
+        if (inputSpeed > 0) {
 
-        if (isArmAtUpperLimit()
-            && inputSpeed > 0) {
+            if (isArmAtUpperLimit()) {
+                return 0;
+            }
 
-            atLimit = true;
+            // Slow down if approaching the limit
+            if (Math.abs(getArmLiftAngle() - ArmConstants.ARM_LIFT_LIMIT_DEGREES) < ArmConstants.ARM_LIFT_SLOW_ZONE_DEGREES) {
+
+                return Math.min(inputSpeed, ArmConstants.MAX_LIFT_SLOW_ZONE_SPEED);
+            }
         }
 
         /*
          * Lowering
          *
-         * If the lowering limit is detected, zero the encoder
-         *
          * If the lowering limit is detected and the speed
          * is negative (lowering), then stop
          */
+        if (inputSpeed < 0) {
 
-        if (isArmDown()) {
+            if (isArmDown()) {
+                return 0;
+            }
 
-            setArmLiftEncoder(0);
+            // Slow down if approaching the limit
+            if (Math.abs(getArmLiftAngle() - ArmConstants.ARM_DOWN_ANGLE_DEGREES) < ArmConstants.ARM_LIFT_SLOW_ZONE_DEGREES) {
 
-            if (inputSpeed < 0) {
-                atLimit = true;
+                return Math.max(inputSpeed, -ArmConstants.MAX_LIFT_SLOW_ZONE_SPEED);
             }
         }
 
-        if (atLimit) {
-            return 0;
-        }
-
+        // If not at (or near) the limit, then return the input speed
         return inputSpeed;
     }
 
@@ -473,8 +533,6 @@ public class ArmSubsystem extends SubsystemBase {
      */
     private double checkArmExtendLimits(double inputSpeed) {
 
-        boolean atLimit = false;
-
         /*
          * Extending
          *
@@ -482,10 +540,18 @@ public class ArmSubsystem extends SubsystemBase {
          * and the speed is positive (extending) then stop
          */
 
-        if (isArmAtExtendLimit()
-            && inputSpeed > 0) {
+        if (inputSpeed > 0) {
 
-            atLimit = true;
+            if (isArmAtExtendLimit()) {
+                return 0;
+            }
+
+            // Slow down if approaching the limit
+            if (Math.abs(getArmExtendEncoder()
+                - ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE) < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
+
+                return Math.min(inputSpeed, ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED);
+            }
         }
 
         /*
@@ -497,17 +563,18 @@ public class ArmSubsystem extends SubsystemBase {
          * is negative (retracting), then stop
          */
 
-        if (isArmRetracted()) {
+        if (inputSpeed < 0) {
 
-            setArmExtendEncoder(0);
-
-            if (inputSpeed < 0) {
-                atLimit = true;
+            if (isArmRetracted()) {
+                return 0;
             }
-        }
 
-        if (atLimit) {
-            return 0;
+            // Slow down if approaching the limit
+            if (Math.abs(getArmExtendEncoder()) < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
+
+                return Math.max(inputSpeed, -ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED);
+            }
+
         }
 
         return inputSpeed;
@@ -521,8 +588,6 @@ public class ArmSubsystem extends SubsystemBase {
      */
     private double checkPincherLimits(double inputSpeed) {
 
-        boolean atLimit = false;
-
         /*
          * Closing
          *
@@ -530,10 +595,13 @@ public class ArmSubsystem extends SubsystemBase {
          * and the speed is positive (closing) then stop
          */
 
-        if (isPincherAtCloseLimit()
-            && inputSpeed > 0) {
+        if (inputSpeed > 0) {
 
-            atLimit = true;
+            if (isPincherAtCloseLimit()) {
+                return 0;
+            }
+
+            // NOTE: Do not slow down when closing the pincher because the power may be needed to close on a cone.
         }
 
         /*
@@ -545,22 +613,28 @@ public class ArmSubsystem extends SubsystemBase {
          * is negative (opening), then stop
          */
 
-        if (isPincherOpen()) {
+        if (inputSpeed < 0) {
 
-            setPincherEncoder(0);
-
-            if (inputSpeed < 0) {
-                atLimit = true;
+            if (isPincherOpen()) {
+                return 0;
             }
-        }
 
-        if (atLimit) {
-            return 0;
+            // Slow down if approaching the limit
+            if (Math.abs(getPincherEncoder()) < ArmConstants.PINCHER_SLOW_ZONE_ENCODER_VALUE) {
+
+                return Math.max(inputSpeed, -ArmConstants.MAX_PINCHER_SLOW_ZONE_SPEED);
+            }
+
         }
 
         return inputSpeed;
     }
 
+    /**
+     * calculate the amount of torque to apply to the motor to hold the arm steady at any angle or arm extension.
+     *
+     * @return the speed adjustment to overcome gravity
+     */
     private double calcArmLiftHoldSpeed() {
 
         /*
@@ -587,11 +661,11 @@ public class ArmSubsystem extends SubsystemBase {
          * At zero degrees, straight down, no additional force is required to
          * overcome gravity.
          *
-         * At 90 degrees, parallel to the floor, the speeds measured above are required to hold
-         * a retracted arm parallel to the floor.
+         * At 90 degrees, parallel to the floor, the speeds measured above^^^ are required
+         * to hold a retracted and extended arm parallel to the floor.
          *
-         * The amount of force follows the sin (trigonometry) function which
-         *
+         * The amount of force required follows the sin (trigonometry) function
+         * at angles other than 90 degrees.
          */
         double angleMultiplier  = Math.sin(Math.toRadians(getArmLiftAngle()));
 
@@ -600,17 +674,17 @@ public class ArmSubsystem extends SubsystemBase {
          * arm extends.
          *
          * Based on the above observations, the amount of force required when the arm
-         * is extended is approximately 1.7.
+         * is extended is approximately 1.7 times the amount required when retracted.
          *
-         * No cone. : .10 (extendeed) / .06 (retracted) = 1.67
-         * With cone: .14 (extendeed) / .08 (retracted) = 1.75
+         * No cone. : .10 (extended) / .06 (retracted) = 1.67
+         * With cone: .14 (extended) / .08 (retracted) = 1.75
          *
          * We are choosing a value in between at 1.7
          */
         double extendMultiplier = 1 + (getArmExtendEncoder() / ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE * .7);
 
         /*
-         * The base compensation comes from the retracted arm values
+         * The base compensation comes from the retracted arm values in the table
          */
         double baseCompensation = 0.06;
 
@@ -619,9 +693,8 @@ public class ArmSubsystem extends SubsystemBase {
         }
 
         /*
-         * The net combination is the multiplication of the base compensation
+         * The total compensation is the multiplication of the base compensation
          * and the angle and extension adjustments.
-         *
          */
         return baseCompensation * angleMultiplier * extendMultiplier;
     }

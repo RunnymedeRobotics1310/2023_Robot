@@ -1,10 +1,6 @@
 package frc.robot.commands.arm;
 
-import static frc.robot.Constants.ArmConstants.ARM_EXTEND_POSITION_TOLERANCE;
-import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_ARM_ANGLE;
-import static frc.robot.Constants.ArmConstants.MAX_PINCHER_SPEED;
-import static frc.robot.Constants.ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE;
-import static frc.robot.Constants.ArmConstants.PINCHER_POSITION_TOLERANCE;
+import static frc.robot.Constants.ArmConstants.*;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystem;
@@ -19,7 +15,7 @@ abstract class BaseArmCommand extends CommandBase {
 
     protected final void printArmState() {
         System.out.println("BaseArmCommand: armSubsystem.getHeldGamePiece: " + armSubsystem.getHeldGamePiece());
-        System.out.println("BaseArmCommand: Arm height: " + armSubsystem.getArmLiftEncoder());
+        System.out.println("BaseArmCommand: Arm angle: " + armSubsystem.getArmLiftAngle());
         System.out.println("BaseArmCommand: Arm extent: " + armSubsystem.getArmExtendEncoder());
         System.out.println("BaseArmCommand: Pincher: " + armSubsystem.getPincherEncoder());
     }
@@ -60,16 +56,18 @@ abstract class BaseArmCommand extends CommandBase {
      * @return true if at the desired location, false if still moving to that point
      */
     protected final boolean moveArmExtendToEncoderCount(double targetCount, double speed) {
-        double absSpd = Math.abs(speed);
-        double gap    = armSubsystem.getArmExtendEncoder() - targetCount;
-        if (Math.abs(gap) > ARM_EXTEND_POSITION_TOLERANCE) {
-            armSubsystem.setArmExtendSpeed(gap > 0 ? -absSpd : absSpd);
-            return false;
-        }
-        else {
+
+        if (armSubsystem.isAtExtendPosition(targetCount)) {
             armSubsystem.setArmExtendSpeed(0);
             return true;
         }
+
+        double absSpd = Math.abs(speed);
+        double gap    = armSubsystem.getArmExtendEncoder() - targetCount;
+
+        armSubsystem.setArmExtendSpeed(gap > 0 ? -absSpd : absSpd);
+
+        return false;
     }
 
     /**
