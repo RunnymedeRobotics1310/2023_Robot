@@ -113,7 +113,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         // NOTE: The camera encoder position will be a negative number because the
         // the positive direction is a higher camera angle and the negative direction
-        // is a lower camera angle. The max camera ange is 0, so this encoder always
+        // is a lower camera angle. The max camera angle is 0, so this encoder always
         // has a negative value.
 
         double cameraEncoderPosition = getCameraEncoder();
@@ -343,6 +343,9 @@ public class VisionSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
+        // Call the safety code on the camera motor movement
+        setCameraMotorSpeed(cameraMotorSpeed);
+
         // read values periodically and post to smart dashboard periodically
         SmartDashboard.putBoolean("Limelight Target Found", isVisionTargetFound());
         SmartDashboard.putBoolean("Cube", currentVisionTargetType == VisionTargetType.CUBE && isVisionTargetFound());
@@ -391,8 +394,6 @@ public class VisionSubsystem extends SubsystemBase {
      */
     private double checkCameraMotorLimits(double inputSpeed) {
 
-        boolean atLimit = false;
-
         /*
          * High
          */
@@ -400,7 +401,14 @@ public class VisionSubsystem extends SubsystemBase {
         if (getCameraView() == CameraView.HIGH
             && inputSpeed > 0) {
 
-            atLimit = true;
+            return 0;
+        }
+
+        // If we are getting close to the limit, then slow down
+        if (Math.abs(getCameraEncoder()) < VisionConstants.CAMERA_POSITION_SLOW_ZONE
+            && inputSpeed > 0) {
+
+            return Math.min(inputSpeed, VisionConstants.MAX_CAMERA_SLOW_ZONE_SPEED);
         }
 
         /*
@@ -410,12 +418,16 @@ public class VisionSubsystem extends SubsystemBase {
         if (getCameraView() == CameraView.LOW) {
 
             if (inputSpeed < 0) {
-                atLimit = true;
+                return 0;
             }
         }
 
-        if (atLimit) {
-            return 0;
+        // If we are getting close to the limit, then slow down
+        if (Math.abs(
+            getCameraEncoder() - VisionConstants.CAMERA_DOWN_LIMIT_ENCODER_VALUE) < VisionConstants.CAMERA_POSITION_SLOW_ZONE
+            && inputSpeed < 0) {
+
+            return Math.max(inputSpeed, -VisionConstants.MAX_CAMERA_SLOW_ZONE_SPEED);
         }
 
         return inputSpeed;
