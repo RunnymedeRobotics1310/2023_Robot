@@ -13,7 +13,7 @@ public class ScoreCommand extends BaseArmCommand {
     private ArmPosition        scoringPosition = null;
     private GamePiece          gamePiece       = null;
 
-    public ScoreCommand(ArmSubsystem armSubsystem, ScoringRow scoringRow) {
+    public ScoreCommand(ScoringRow scoringRow, ArmSubsystem armSubsystem) {
         super(armSubsystem);
 
         this.armSubsystem = armSubsystem;
@@ -37,10 +37,14 @@ public class ScoreCommand extends BaseArmCommand {
     @Override
     public void execute() {
 
-        // Move arm to scoring position
-        boolean lift = moveArmLiftToAngle(scoringPosition.angle, ArmConstants.MAX_LIFT_SPEED);
-        if (lift) {
-            moveArmExtendToEncoderCount(scoringPosition.extension, ArmConstants.MAX_EXTEND_SPEED);
+        // Reset extension
+        boolean reset = moveArmExtendToEncoderCount(0, ArmConstants.MAX_EXTEND_SPEED);
+        if (reset) {
+            // Move arm to scoring position
+            boolean lift = moveArmLiftToAngle(scoringPosition.angle, ArmConstants.MAX_LIFT_SPEED);
+            if (lift) {
+                moveArmExtendToEncoderCount(scoringPosition.extension, ArmConstants.MAX_EXTEND_SPEED);
+            }
         }
     }
 
