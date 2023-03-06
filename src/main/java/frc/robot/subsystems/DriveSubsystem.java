@@ -79,8 +79,12 @@ public class DriveSubsystem extends SubsystemBase {
         YAW, PITCH, ROLL
     };
 
+    private final ArmSubsystem armSubsystem;
+
     /** Creates a new DriveSubsystem. */
-    public DriveSubsystem() {
+    public DriveSubsystem(ArmSubsystem armSubsystem) {
+
+        this.armSubsystem = armSubsystem;
 
         // Ensure that following is disabled
         leftPrimaryMotor.follow(ExternalFollower.kFollowerDisabled, 0);
@@ -269,11 +273,13 @@ public class DriveSubsystem extends SubsystemBase {
         this.leftSpeed  = leftSpeed;
         this.rightSpeed = rightSpeed;
 
-        leftPrimaryMotor.set(leftSpeed);
-        leftFollowerMotor.set(leftSpeed);
+        checkMotorSpeedLimits();
 
-        rightPrimaryMotor.set(rightSpeed);
-        rightFollowerMotor.set(rightSpeed);
+        leftPrimaryMotor.set(this.leftSpeed);
+        leftFollowerMotor.set(this.leftSpeed);
+
+        rightPrimaryMotor.set(this.rightSpeed);
+        rightFollowerMotor.set(this.rightSpeed);
     }
 
     public void setTestMotorSpeeds(double leftPrimaryMotorSpeed, double leftFollowerMotorSpeed,
@@ -296,6 +302,9 @@ public class DriveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+
+        // Check the motor speed limits every loop
+        setMotorSpeeds(leftSpeed, rightSpeed);
 
         SmartDashboard.putNumber("Right Motor", rightSpeed);
         SmartDashboard.putNumber("Left  Motor", leftSpeed);
@@ -334,5 +343,58 @@ public class DriveSubsystem extends SubsystemBase {
         rightFollowerMotor.setIdleMode(idleMode);
     }
 
+    private void checkMotorSpeedLimits() {
+
+        // If the arm is not retracted, then the max speed is .25
+        // normally, the drive speed is .5 and can be boosted.
+
+        // Determine if the arm is inside the robot
+        boolean armInsideFrame = armSubsystem.isArmInsideFrame();
+
+        if (!armSubsystem.isArmRetracted() && !armInsideFrame) {
+
+            // Limit each side to 0.25
+
+            leftSpeed  = Math.max(Math.abs(leftSpeed), .25) * Math.signum(leftSpeed);
+            rightSpeed = Math.max(Math.abs(rightSpeed), .25) * Math.signum(rightSpeed);
+
+            // Watch out for sharp turns
+            limitTurning(0.25);
+        }
+        else if (!armInsideFrame) {
+
+            // If the arm is not inside the frame, limit all turns to 0.5
+            limitTurning(.5);
+        }
+
+        else {
+            // Always limit the turning to 1.0
+            limitTurning(1.0);
+        }
+
+    }
+
+    private void limitTurning(double turnLimit) {
+
+        if (Math.abs(leftSpeed - rightSpeed) > turnLimit) {
+
+            double center = (leftSpeed + rightSpeed) / 2;
+
+            if (leftSpeed > center) {
+                leftSpeed = center + turnLimit / 2;
+            }
+            else {
+                leftSpeed = center - turnLimit / 2;
+            }
+
+            if (rightSpeed > center) {
+                rightSpeed = center + turnLimit / 2;
+            }
+            else {
+                rightSpeed = center - turnLimit / 2;
+            }
+        }
+
+    }
 
 }

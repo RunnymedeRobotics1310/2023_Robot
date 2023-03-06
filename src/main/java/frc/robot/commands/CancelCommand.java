@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 
 /**
@@ -10,6 +11,7 @@ import frc.robot.subsystems.DriveSubsystem;
 public class CancelCommand extends CommandBase {
 
     private final DriveSubsystem driveSubsystem;
+    private final ArmSubsystem   armSubsystem;
 
     private long                 startTime = 0;
 
@@ -19,10 +21,12 @@ public class CancelCommand extends CommandBase {
      * All subsystems must be passed to this command, and each subsystem should have a stop command
      * that safely stops the robot from moving.
      */
-    public CancelCommand(DriveSubsystem driveSubsystem) {
-        this.driveSubsystem = driveSubsystem;
+    public CancelCommand(DriveSubsystem driveSubsystem, ArmSubsystem armSubsystem) {
 
-        addRequirements(driveSubsystem);
+        this.driveSubsystem = driveSubsystem;
+        this.armSubsystem   = armSubsystem;
+
+        addRequirements(driveSubsystem, armSubsystem);
     }
 
     @Override
@@ -31,6 +35,7 @@ public class CancelCommand extends CommandBase {
         System.out.println("Cancel Command started.");
 
         driveSubsystem.stop();
+        armSubsystem.stop();
 
         startTime = System.currentTimeMillis();
     }

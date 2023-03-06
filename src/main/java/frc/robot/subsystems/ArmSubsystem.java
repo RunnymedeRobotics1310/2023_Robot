@@ -266,6 +266,22 @@ public class ArmSubsystem extends SubsystemBase {
         return false;
     }
 
+    /**
+     * Determine if the arm is safely inside the frame
+     *
+     * @return {@code true} if inside the frame, {@code false} otherwise
+     */
+    public boolean isArmInsideFrame() {
+
+        // FIXME: measure the conditions where the arm is inside the frame.
+        // make some constants.
+
+        if (getArmLiftAngle() > 30) {
+            return false;
+        }
+        return true;
+    }
+
     /** Determine if the arm is fully retracted */
     public boolean isArmRetracted() {
 
@@ -416,6 +432,10 @@ public class ArmSubsystem extends SubsystemBase {
 
         if (isArmRetracted()) {
             setArmExtendEncoder(0);
+        }
+
+        if (isArmAtExtendLimit()) {
+            setArmExtendEncoder(ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE);
         }
 
         if (isPincherOpen()) {
