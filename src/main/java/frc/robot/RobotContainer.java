@@ -200,7 +200,7 @@ public class RobotContainer {
 
         new Trigger(() -> (operatorInput.isPickUpCube()))
             .onTrue(new PickUpGroundCommand(GamePiece.CUBE, operatorInput, armSubsystem, visionSubsystem)
-                .andThen(new DriveToTargetCommand(VisionTargetType.CONE, .2, driveSubsystem, visionSubsystem)));
+                .andThen(new DriveToTargetCommand(VisionTargetType.CUBE, .2, driveSubsystem, visionSubsystem)));
 
         new Trigger(() -> (operatorInput.isCameraViewHigh()))
             .onTrue(new SetCameraViewCommand(CameraView.HIGH, visionSubsystem));
