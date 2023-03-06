@@ -4,21 +4,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.VisionConstants.CameraView;
-import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
 
 public class SwitchVisionTargetCommand extends InstantCommand {
-
-    /**
-     * Switches the vision target to the next {@link VisionTargetType} enum value
-     *
-     * @param visionSubsystem
-     */
-    public SwitchVisionTargetCommand(OperatorInput operatorInput, VisionSubsystem visionSubsystem) {
-
-        this(null, operatorInput, visionSubsystem);
-    }
 
     /**
      * Switch the vision target to the specified {@link VisionTargetType}.
@@ -26,8 +15,7 @@ public class SwitchVisionTargetCommand extends InstantCommand {
      * @param visionTargetType requested vision target type
      * @param visionSubsystem
      */
-    public SwitchVisionTargetCommand(VisionTargetType visionTargetType, OperatorInput operatorInput,
-        VisionSubsystem visionSubsystem) {
+    public SwitchVisionTargetCommand(VisionTargetType visionTargetType, VisionSubsystem visionSubsystem) {
 
         super(() -> {
 

@@ -215,6 +215,7 @@ public class RobotContainer {
 
         return new AutonomousCommand(
             driveSubsystem,
+            armSubsystem,
             visionSubsystem,
             startingLaneChooser,
             startingGamePieceChooser,

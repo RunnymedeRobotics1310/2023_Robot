@@ -3,38 +3,27 @@ package frc.robot.commands.arm;
 import static frc.robot.Constants.ArmConstants.*;
 import static frc.robot.Constants.GameConstants.GamePiece.*;
 
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.commands.operator.OperatorInput;
+import frc.robot.commands.vision.SwitchVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
 
+/**
+ * Pickup from ground
+ * <p>
+ * see: https://docs.google.com/document/d/1JzU-BzCXjGCwosouylmWGN83-x8lv-oPzklcXDqNN2U/edit#
+ *
+ */
 public class PickUpGroundCommand extends BaseArmCommand {
 
-    private final ArmSubsystem  armSubsystem;
-    private final OperatorInput operatorInput;
-    private GamePiece           pickupTarget;
+    private final ArmSubsystem    armSubsystem;
+    private final VisionSubsystem visionSubsystem;
+    private final OperatorInput   operatorInput;
 
-    // https://docs.google.com/document/d/1JzU-BzCXjGCwosouylmWGN83-x8lv-oPzklcXDqNN2U/edit#
-
-    /**
-     * Pick up a piece from the ground. This command will remain active until a piece is grasped or it is interrupted or
-     * cancelled.
-     *
-     * @param armSubsystem the arm subsystem
-     * @param operatorInput optional operator input object which allows the operator to change the selected game piece after the
-     * command has started. If not specified, the initialPickupTarget will remain the active pickup target for the duration of the
-     * command.
-     * @param initialPickupTarget the type of game piece to be picked up - unless later overridden by the operator
-     */
-    public PickUpGroundCommand(ArmSubsystem armSubsystem, OperatorInput operatorInput, GamePiece initialPickupTarget) {
-        super(armSubsystem);
-
-        this.armSubsystem  = armSubsystem;
-        this.operatorInput = operatorInput;
-        this.pickupTarget  = initialPickupTarget;
-
-        addRequirements(armSubsystem);
-
-    }
+    private GamePiece             pickupTarget;
 
     private enum State {
 
@@ -50,22 +39,39 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
     private State state = State.MOVING_TO_COMPACT_POSE;
 
-    private void printStatus(String msg) {
-        System.out.println("PickupGroundCommand: " + msg);
-        System.out.println("PickupGroundCommand: Target: " + pickupTarget);
-        System.out.println("PickupGroundCommand: State: " + state);
-        printArmState();
+    /**
+     * Pick up a piece from the ground in auto.
+     *
+     * @param gamePiece to pick up
+     * @param armSubsystem the arm subsystem
+     */
+    public PickUpGroundCommand(GamePiece gamePiece, ArmSubsystem armSubsystem) {
+        this(gamePiece, null, armSubsystem, null);
     }
 
-    private boolean isGroundPickupPose() {
-        if (!armSubsystem.isArmAtLiftAngle(GROUND_PICKUP_POSITION.angle))
-            return false;
-        double ext = armSubsystem.getArmExtendEncoder();
-        if (Math.abs(ext - GROUND_PICKUP_POSITION.extension) > ARM_EXTEND_POSITION_TOLERANCE)
-            return false;
-        if (!armSubsystem.isPincherOpen())
-            return false;
-        return true;
+    /**
+     * Pick up a piece from the ground. This command will remain active until a piece is grasped or it is interrupted or
+     * cancelled.
+     *
+     * @param initialPickupTarget the type of game piece to be picked up - unless later overridden by the operator
+     * @param operatorInput optional operator input object which allows the operator to change the selected game piece after the
+     * command has started. If not specified, the initialPickupTarget will remain the active pickup target for the duration of the
+     * command.
+     * @param armSubsystem the arm subsystem
+     * @param visionSubsystem the vision subsystem
+     */
+    public PickUpGroundCommand(GamePiece initialPickupTarget, OperatorInput operatorInput, ArmSubsystem armSubsystem,
+        VisionSubsystem visionSubsystem) {
+
+        super(armSubsystem);
+
+        this.armSubsystem    = armSubsystem;
+        this.visionSubsystem = visionSubsystem;
+        this.operatorInput   = operatorInput;
+        this.pickupTarget    = initialPickupTarget;
+
+        addRequirements(armSubsystem);
+
     }
 
     @Override
@@ -85,6 +91,8 @@ public class PickUpGroundCommand extends BaseArmCommand {
             armSubsystem.setArmLiftSpeed(0);
             state = State.MOVING_TO_COMPACT_POSE;
         }
+
+        setVisionTarget(pickupTarget);
     }
 
     @Override
@@ -130,18 +138,21 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
         case PIECE_DETECTED:
         case PINCHERS_MOVING: {
+
             if (operatorInput != null) {
                 // check for operator override. If both selected, cube wins. If none selected, command is cancelled.
                 if (operatorInput.isPickUpCone()) {
                     if (pickupTarget == CUBE) {
                         System.out.println("Changing pickup target from CUBE to CONE based on operator input");
                         pickupTarget = CONE;
+                        setVisionTarget(pickupTarget);
                     }
                 }
                 else if (operatorInput.isPickUpCube()) {
                     if (pickupTarget == CONE) {
                         System.out.println("Changing pickup target from CONE to CUBE based on operator input");
                         pickupTarget = CUBE;
+                        setVisionTarget(pickupTarget);
                     }
                 }
                 else {
@@ -175,5 +186,56 @@ public class PickUpGroundCommand extends BaseArmCommand {
     public void end(boolean interrupted) {
         printStatus("end. Interrupted? " + interrupted);
         stopArmMotors();
+    }
+
+    private boolean isGroundPickupPose() {
+        if (!armSubsystem.isArmAtLiftAngle(GROUND_PICKUP_POSITION.angle))
+            return false;
+        double ext = armSubsystem.getArmExtendEncoder();
+        if (Math.abs(ext - GROUND_PICKUP_POSITION.extension) > ARM_EXTEND_POSITION_TOLERANCE)
+            return false;
+        if (!armSubsystem.isPincherOpen())
+            return false;
+        return true;
+    }
+
+    private void printStatus(String msg) {
+        System.out.println("PickupGroundCommand: " + msg);
+        System.out.println("PickupGroundCommand: Target: " + pickupTarget);
+        System.out.println("PickupGroundCommand: State: " + state);
+        printArmState();
+    }
+
+    private void setVisionTarget(GamePiece gamePiece) {
+
+        // Do not change the vision target unless the vision subsystem is passed in.
+        if (visionSubsystem == null) {
+            return;
+        }
+
+        VisionTargetType visionTargetType = null;
+
+        switch (gamePiece) {
+
+        case CONE:
+            visionTargetType = VisionTargetType.CONE;
+            break;
+
+        case CUBE:
+            visionTargetType = VisionTargetType.CUBE;
+            break;
+
+        default:
+            break;
+        }
+
+        // Schedule a command to set the vision target
+        if (visionTargetType != null
+            && visionSubsystem.getCurrentVisionTargetType() != visionTargetType) {
+
+            CommandScheduler.getInstance()
+                .schedule(new SwitchVisionTargetCommand(visionTargetType, visionSubsystem));
+        }
+
     }
 }

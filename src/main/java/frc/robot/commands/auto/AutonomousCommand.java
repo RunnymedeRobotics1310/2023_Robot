@@ -5,37 +5,38 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants.AutoConstants.AutoAction;
-import frc.robot.Constants.AutoConstants.AutoLane;
-import frc.robot.Constants.AutoConstants.Orientation;
+import frc.robot.Constants.AutoConstants.*;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.Zone;
-import frc.robot.commands.drive.BalanceCommand;
-import frc.robot.commands.drive.DriveOnHeadingCommand;
-import frc.robot.commands.drive.DriveToTargetCommand;
-import frc.robot.commands.drive.SetGyroHeadingCommand;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.Constants.VisionConstants.CameraView;
+import frc.robot.commands.arm.DriveWithPieceCommand;
+import frc.robot.commands.arm.PickUpGroundCommand;
+import frc.robot.commands.drive.*;
+import frc.robot.commands.vision.SetCameraViewCommand;
+import frc.robot.commands.vision.SwitchVisionTargetCommand;
+import frc.robot.subsystems.*;
 import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
 
 public class AutonomousCommand extends SequentialCommandGroup {
 
-    private AutoLane        startingLane           = null;
-    private GamePiece       currentGamePiece       = null;
-    private Orientation     currentOrientation     = null;
-    private Zone            currentZone            = null;
+    private AutoLane              startingLane       = null;
+    private GamePiece             currentGamePiece   = null;
+    private Orientation           currentOrientation = null;
+    private Zone                  currentZone        = null;
 
-    private Alliance        alliance               = null;
+    private Alliance              alliance           = null;
 
     private AutoAction      firstGamePieceScoring  = null;
     private AutoAction      exitZoneAction         = null;
     private AutoAction      secondGamePieceScoring = null;
     private AutoAction      balanceAction          = null;
-    private DriveSubsystem  driveSubsystem         = null;
-    private VisionSubsystem visionSubsystem        = null;
+
+    private final ArmSubsystem    armSubsystem;
+    private final DriveSubsystem  driveSubsystem;
+    private final VisionSubsystem visionSubsystem;
 
 
-    public AutonomousCommand(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem,
+    public AutonomousCommand(DriveSubsystem driveSubsystem, ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem,
         SendableChooser<AutoLane> startingLaneChooser,
         SendableChooser<GamePiece> loadedGamePieceChooser,
         SendableChooser<Orientation> startingOrientationChooser,
@@ -45,6 +46,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
         SendableChooser<AutoAction> balanceChooser) {
 
         this.driveSubsystem  = driveSubsystem;
+        this.armSubsystem    = armSubsystem;
         this.visionSubsystem = visionSubsystem;
 
         // Default is to do nothing.
@@ -190,6 +192,17 @@ public class AutonomousCommand extends SequentialCommandGroup {
             return;
         }
 
+        // Start by switching the camera view if picking up a game piece.
+        // this will set the camera angle while driving
+        if (exitZoneAction == AutoAction.PICK_UP_CUBE) {
+            addCommands(new SetCameraViewCommand(CameraView.LOW, visionSubsystem));
+            addCommands(new SwitchVisionTargetCommand(VisionTargetType.CUBE, visionSubsystem));
+        }
+        if (exitZoneAction == AutoAction.PICK_UP_CONE) {
+            addCommands(new SetCameraViewCommand(CameraView.LOW, visionSubsystem));
+            addCommands(new SwitchVisionTargetCommand(VisionTargetType.CONE, visionSubsystem));
+        }
+
         // Drive out of the zone
         // This command may cause a rotation to heading 0.
         addCommands(new DriveOnHeadingCommand(0, 0.6, 400, 2, driveSubsystem));
@@ -202,25 +215,15 @@ public class AutonomousCommand extends SequentialCommandGroup {
          */
         if (exitZoneAction == AutoAction.PICK_UP_CUBE) {
             // FIXME: ensure cube is close enough to the robot that the arm can reach it
+            addCommands(new PickUpGroundCommand(GamePiece.CUBE, armSubsystem));
             addCommands(new DriveToTargetCommand(VisionTargetType.CUBE, .2, driveSubsystem, visionSubsystem));
+            addCommands(new DriveWithPieceCommand(armSubsystem));
         }
         if (exitZoneAction == AutoAction.PICK_UP_CONE) {
-            // FIXME: add commands to drive right up to the cone
+            addCommands(new PickUpGroundCommand(GamePiece.CONE, armSubsystem));
+            addCommands(new DriveToTargetCommand(VisionTargetType.CONE, .2, driveSubsystem, visionSubsystem));
+            addCommands(new DriveWithPieceCommand(armSubsystem));
         }
-
-        /*
-         * Grab a piece
-         */
-
-        // FIXME:
-        // Game piece should be directly in front of robot now but orientation of robot w.r.t. field
-        // may not be 0/180
-        // Add new command to tell arm to pick up the piece it sees in front of itself (arm will
-        // need to be able to see)
-        // look for piece
-        // align arm with piece
-        // pick up piece
-        // reposition arm to transport position
     }
 
     /**
