@@ -79,7 +79,7 @@ public final class Constants {
         public static final boolean LEFT_MOTOR_REVERSED  = false;
         public static final boolean RIGHT_MOTOR_REVERSED = true;
 
-        public static final double  CM_PER_ENCODER_COUNT = 2;    // FIXME:
+        public static final double  CM_PER_ENCODER_COUNT = 3.503;
 
         public static final boolean GYRO_REVERSED        = false;
     }
@@ -114,7 +114,7 @@ public final class Constants {
         public static final double MAX_CAMERA_MOTOR_SPEED          = 1;
         public static final double MAX_CAMERA_SLOW_ZONE_SPEED      = .2;
 
-        public static final double CAMERA_DOWN_LIMIT_ENCODER_VALUE = -125;
+        public static final double CAMERA_DOWN_LIMIT_ENCODER_VALUE = -255;
         public static final double CAMERA_POSITION_TOLERANCE       = 3;
         public static final double CAMERA_POSITION_SLOW_ZONE       = 15;
     }

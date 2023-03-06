@@ -143,6 +143,11 @@ public class DriveSubsystem extends SubsystemBase {
         // Send the offset to the navX in order to have the
         // compass on the dashboard appear at the correct heading.
         navXGyro.setAngleAdjustment(gyroHeadingOffset);
+
+        // FIXME: Hack
+        if (heading == 0) {
+            resetEncoders();
+        }
     }
 
     /**
@@ -235,6 +240,24 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
+     * Gets the left velocity.
+     *
+     * @return the left drive encoder speed
+     */
+    public double getLeftEncoderSpeed() {
+        return leftEncoder.getVelocity();
+    }
+
+    /**
+     * Gets the right velocity.
+     *
+     * @return the right drive encoder speed
+     */
+    public double getRightEncoderSpeed() {
+        return rightEncoder.getVelocity();
+    }
+
+    /**
      * Gets the right drive encoder.
      *
      * @return the right drive encoder
@@ -313,6 +336,8 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Left Encoder", Math.round(getLeftEncoder() * 100) / 100d);
         SmartDashboard.putNumber("Avg Encoder", Math.round(getAverageEncoderValue() * 100) / 100d);
         SmartDashboard.putNumber("Distance (cm)", Math.round(getEncoderDistanceCm() * 10) / 10d);
+        SmartDashboard.putNumber("Right Velocity", Math.round(getRightEncoderSpeed() * 100) / 100d);
+        SmartDashboard.putNumber("Left Velocity", Math.round(getLeftEncoderSpeed() * 100) / 100d);
 
         SmartDashboard.putNumber("Ultrasonic Voltage", ultrasonicDistanceSensor.getVoltage());
         SmartDashboard.putNumber("Ultrasonic Distance (cm)", Math.round(getUltrasonicDistanceCm()));
