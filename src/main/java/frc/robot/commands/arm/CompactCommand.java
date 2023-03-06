@@ -1,48 +1,51 @@
 package frc.robot.commands.arm;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystem;
 
-public class CompactCommand extends CommandBase {
-
-    private final ArmSubsystem armSubsystem;
-
-    // fixme: do everything - see table
-    // https://docs.google.com/document/d/1JzU-BzCXjGCwosouylmWGN83-x8lv-oPzklcXDqNN2U/edit#
+public class CompactCommand extends BaseArmCommand {
 
     public CompactCommand(ArmSubsystem armSubsystem) {
-
-        this.armSubsystem = armSubsystem;
-
+        super(armSubsystem);
         addRequirements(armSubsystem);
+    }
 
+    private void printStatus(String msg) {
+        System.out.println("Compact Command: " + msg);
+        printArmState();
     }
 
     @Override
     public void initialize() {
-
-        System.out.println("CompactCommand started");
-
+        printStatus("initialize");
+        if (isCompactPose()) {
+            stopArmMotors();
+        }
     }
 
     @Override
     public void execute() {
 
-        // FIXME: do everything
-        // pose: compact
-
-        ;
-
+        if (isCompactPose()) {
+            return;
+        }
+        else {
+            moveToCompactPose();
+        }
     }
 
     @Override
     public boolean isFinished() {
-        // FIXME: do everything
-        return true;
+        return isCompactPose();
     }
 
     @Override
     public void end(boolean interrupted) {
-        // FIXME: do everything
+        if (interrupted) {
+            printStatus("End. Interrupted");
+        }
+        else {
+            printStatus("End. Not interrupted");
+        }
+        stopArmMotors();
     }
 }
