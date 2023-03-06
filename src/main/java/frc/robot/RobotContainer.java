@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants.*;
 import frc.robot.Constants.GameConstants.GamePiece;
@@ -18,14 +17,14 @@ import frc.robot.Constants.OiConstants;
 import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.SystemTestCommand;
-import frc.robot.commands.arm.DefaultArmCommand;
-import frc.robot.commands.arm.ScoreCommand;
+import frc.robot.commands.arm.*;
 import frc.robot.commands.auto.AutonomousCommand;
 import frc.robot.commands.drive.*;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.vision.DefaultVisionCommand;
 import frc.robot.commands.vision.SetCameraViewCommand;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -192,14 +191,16 @@ public class RobotContainer {
             .onTrue(new ScoreCommand(armSubsystem, ScoringRow.BOTTOM));
 
         new Trigger(() -> (operatorInput.isDrop()))
-            .onTrue(new InstantCommand());
+            .onTrue(new ReleaseCommand(armSubsystem));
 
         // grab things
         new Trigger(() -> (operatorInput.isPickUpCone()))
-            .onTrue(new InstantCommand());
+            .onTrue(new PickUpGroundCommand(GamePiece.CONE, operatorInput, armSubsystem, visionSubsystem)
+                .andThen(new DriveToTargetCommand(VisionTargetType.CONE, .2, driveSubsystem, visionSubsystem)));
 
         new Trigger(() -> (operatorInput.isPickUpCube()))
-            .onTrue(new InstantCommand());
+            .onTrue(new PickUpGroundCommand(GamePiece.CUBE, operatorInput, armSubsystem, visionSubsystem)
+                .andThen(new DriveToTargetCommand(VisionTargetType.CONE, .2, driveSubsystem, visionSubsystem)));
 
         new Trigger(() -> (operatorInput.isCameraViewHigh()))
             .onTrue(new SetCameraViewCommand(CameraView.HIGH, visionSubsystem));

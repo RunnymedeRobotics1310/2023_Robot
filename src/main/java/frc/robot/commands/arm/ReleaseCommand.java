@@ -30,6 +30,9 @@ public class ReleaseCommand extends CommandBase {
 
         // FIXME: do everything
         // open claws
+        // FIXME: setting the encoder only changes the encoder value,
+        // we need to drive the motors to release the game piece.
+    	armSubsystem.setPincherEncoder(0);
         // run CompactCommand
 
         ;
