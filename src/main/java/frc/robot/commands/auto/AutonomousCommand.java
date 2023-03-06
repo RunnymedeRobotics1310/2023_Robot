@@ -19,17 +19,17 @@ import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
 
 public class AutonomousCommand extends SequentialCommandGroup {
 
-    private AutoLane              startingLane       = null;
-    private GamePiece             currentGamePiece   = null;
-    private Orientation           currentOrientation = null;
-    private Zone                  currentZone        = null;
+    private AutoLane              startingLane           = null;
+    private GamePiece             currentGamePiece       = null;
+    private Orientation           currentOrientation     = null;
+    private Zone                  currentZone            = null;
 
-    private Alliance              alliance           = null;
+    private Alliance              alliance               = null;
 
-    private AutoAction      firstGamePieceScoring  = null;
-    private AutoAction      exitZoneAction         = null;
-    private AutoAction      secondGamePieceScoring = null;
-    private AutoAction      balanceAction          = null;
+    private AutoAction            firstGamePieceScoring  = null;
+    private AutoAction            exitZoneAction         = null;
+    private AutoAction            secondGamePieceScoring = null;
+    private AutoAction            balanceAction          = null;
 
     private final ArmSubsystem    armSubsystem;
     private final DriveSubsystem  driveSubsystem;
@@ -214,14 +214,20 @@ public class AutonomousCommand extends SequentialCommandGroup {
          * If a piece is not required, this portion is complete
          */
         if (exitZoneAction == AutoAction.PICK_UP_CUBE) {
-            // FIXME: ensure cube is close enough to the robot that the arm can reach it
-            addCommands(new PickUpGroundCommand(GamePiece.CUBE, armSubsystem));
-            addCommands(new DriveToTargetCommand(VisionTargetType.CUBE, .2, driveSubsystem, visionSubsystem));
+
+            // Start the pickup, and at the same time, drive toward the vision target. This command
+            // will end when the PickupGroundCommand ends, canceling the DriveToVisionTarget if required.
+            addCommands(new PickUpGroundCommand(GamePiece.CUBE, armSubsystem)
+                .deadlineWith(new DriveToTargetCommand(VisionTargetType.CUBE, .2, driveSubsystem, visionSubsystem)));
+
             addCommands(new DriveWithPieceCommand(armSubsystem));
+
         }
         if (exitZoneAction == AutoAction.PICK_UP_CONE) {
-            addCommands(new PickUpGroundCommand(GamePiece.CONE, armSubsystem));
-            addCommands(new DriveToTargetCommand(VisionTargetType.CONE, .2, driveSubsystem, visionSubsystem));
+
+            addCommands(new PickUpGroundCommand(GamePiece.CONE, armSubsystem)
+                .deadlineWith(new DriveToTargetCommand(VisionTargetType.CONE, .2, driveSubsystem, visionSubsystem)));
+
             addCommands(new DriveWithPieceCommand(armSubsystem));
         }
     }
