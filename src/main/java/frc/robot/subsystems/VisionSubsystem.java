@@ -4,9 +4,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
@@ -18,54 +16,57 @@ public class VisionSubsystem extends SubsystemBase {
         CUBE, CONE, TAG, CONE_POST, NONE
     };
 
-    private static final long LED_MODE_PIPELINE         = 0;
-    private static final long LED_MODE_OFF              = 1;
-    private static final long LED_MODE_BLINK            = 2;
-    private static final long LED_MODE_ON               = 3;
+    private static final long LED_MODE_PIPELINE             = 0;
+    private static final long LED_MODE_OFF                  = 1;
+    private static final long LED_MODE_BLINK                = 2;
+    private static final long LED_MODE_ON                   = 3;
 
-    private static final long CAM_MODE_VISION           = 0;
-    private static final long CAM_MODE_DRIVER           = 1;
+    private static final long CAM_MODE_VISION               = 0;
+    private static final long CAM_MODE_DRIVER               = 1;
 
     // configure more pipelines here
-    private static final long PIPELINE_CONE_DETECT      = 0;
-    private static final long PIPELINE_CUBE_DETECT      = 1;
-    private static final long PIPELINE_APRIL_TAG_DETECT = 3;
+    private static final long PIPELINE_CONE_DETECT          = 0;
+    private static final long PIPELINE_CUBE_DETECT          = 1;
+    private static final long PIPELINE_APRIL_TAG_DETECT     = 3;
 
 
     // calibration data
-    private double[]          topLeft                   = new double[2];
-    private double[]          topRight                  = new double[2];
-    private double[]          bottomRight               = new double[2];
-    private double[]          bottomLeft                = new double[2];
+    private double[]          topLeft                       = new double[2];
+    private double[]          topRight                      = new double[2];
+    private double[]          bottomRight                   = new double[2];
+    private double[]          bottomLeft                    = new double[2];
 
-    NetworkTable              table                     = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTable              table                         = NetworkTableInstance.getDefault().getTable("limelight");
 
     // inputs/configs
-    NetworkTableEntry         ledMode                   = table.getEntry("ledMode");
-    NetworkTableEntry         camMode                   = table.getEntry("camMode");
-    NetworkTableEntry         pipeline                  = table.getEntry("pipeline");
+    NetworkTableEntry         ledMode                       = table.getEntry("ledMode");
+    NetworkTableEntry         camMode                       = table.getEntry("camMode");
+    NetworkTableEntry         pipeline                      = table.getEntry("pipeline");
 
     // output
-    NetworkTableEntry         tv                        = table.getEntry("tv");
-    NetworkTableEntry         tx                        = table.getEntry("tx");
-    NetworkTableEntry         ty                        = table.getEntry("ty");
-    NetworkTableEntry         ta                        = table.getEntry("ta");
-    NetworkTableEntry         tl                        = table.getEntry("tl");
+    NetworkTableEntry         tv                            = table.getEntry("tv");
+    NetworkTableEntry         tx                            = table.getEntry("tx");
+    NetworkTableEntry         ty                            = table.getEntry("ty");
+    NetworkTableEntry         ta                            = table.getEntry("ta");
+    NetworkTableEntry         tl                            = table.getEntry("tl");
 
-    private VisionTargetType  currentVisionTargetType   = VisionTargetType.NONE;
+    private boolean           isCameraPositionInitialized   = false;
+    private long              cameraInitializationStartTime = 0;
+
+    private VisionTargetType  currentVisionTargetType       = VisionTargetType.NONE;
 
     /*
      * Camera motor and encoder
      */
-    private final CANSparkMax cameraMotor               = new CANSparkMax(VisionConstants.CAMERA_ANGLE_MOTOR_PORT,
+    private final CANSparkMax cameraMotor                   = new CANSparkMax(VisionConstants.CAMERA_ANGLE_MOTOR_PORT,
         MotorType.kBrushless);
 
-    private double            cameraMotorSpeed          = 0;
+    private double            cameraMotorSpeed              = 0;
 
     // Arm lift encoder
-    private RelativeEncoder   cameraEncoder             = cameraMotor.getEncoder();
+    private RelativeEncoder   cameraEncoder                 = cameraMotor.getEncoder();
 
-    private double            cameraEncoderOffset       = 0;
+    private double            cameraEncoderOffset           = 0;
 
     public VisionSubsystem() {
 
@@ -271,9 +272,30 @@ public class VisionSubsystem extends SubsystemBase {
      */
     public void setCameraMotorSpeed(double speed) {
 
+        if (!isCameraPositionInitialized) {
+            initializeCameraPosition();
+            return;
+        }
+
         cameraMotorSpeed = checkCameraMotorLimits(speed);
 
         cameraMotor.set(speed);
+    }
+
+    public void initializeCameraPosition() {
+
+        if (cameraInitializationStartTime == 0) {
+            cameraInitializationStartTime = System.currentTimeMillis();
+        }
+
+        cameraMotor.set(.2);
+
+        // End after 3 seconds
+        if (System.currentTimeMillis() - cameraInitializationStartTime > 3000) {
+            cameraMotor.set(0);
+            isCameraPositionInitialized = true;
+            cameraEncoder.setPosition(2);
+        }
     }
 
     /**
