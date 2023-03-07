@@ -3,50 +3,47 @@ package frc.robot.commands.arm;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystem;
 
-public class ReleaseCommand extends CommandBase {
+public class ReleaseCommand extends BaseArmCommand {
 
     private final ArmSubsystem armSubsystem;
 
-    // fixme: do everything - see table
-    // https://docs.google.com/document/d/1JzU-BzCXjGCwosouylmWGN83-x8lv-oPzklcXDqNN2U/edit#
-
     public ReleaseCommand(ArmSubsystem armSubsystem) {
-
+        super(armSubsystem);
         this.armSubsystem = armSubsystem;
-
         addRequirements(armSubsystem);
-
     }
 
     @Override
     public void initialize() {
 
         System.out.println("ReleaseCommand started");
+        printArmState();
 
     }
 
     @Override
     public void execute() {
 
-        // FIXME: do everything
-        // open claws
-        // FIXME: setting the encoder only changes the encoder value,
-        // we need to drive the motors to release the game piece.
-    	armSubsystem.setPincherEncoder(0);
-        // run CompactCommand
-
-        ;
+        if (armSubsystem.isGamePieceDetected()) {
+            movePincherToEncoderCount(0, 1);
+        }
+        else {
+            // as soon as the game piece is NO LONGER detected the pincher motor
+            // reverses direction to go into compact pose
+            moveToCompactPose();
+        }
 
     }
 
     @Override
     public boolean isFinished() {
-        // FIXME: do everything
-        return true;
+        return !armSubsystem.isGamePieceDetected() && isCompactPose();
     }
 
     @Override
     public void end(boolean interrupted) {
-        // FIXME: do everything
+        System.out.println("ReleaseCommand end.  " + (interrupted ? "Interrupted." : "Not interrupted"));
+        printArmState();
+        stopArmMotors();
     }
 }

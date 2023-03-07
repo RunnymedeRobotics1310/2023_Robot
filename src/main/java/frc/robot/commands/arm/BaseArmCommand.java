@@ -116,7 +116,7 @@ abstract class BaseArmCommand extends CommandBase {
 
     protected final boolean isCompactPose() {
         return armSubsystem.isArmDown()
-            && armSubsystem.isArmRetracted() /*&& armSubsystem.isPincherAtCloseLimit()*/; // TODO: URGENT: FIXME - return this
+            && armSubsystem.isArmRetracted() /*&& armSubsystem.isPincherAtCloseLimit()*/; // TODO: URGENT: FIXME - restore this
     }
 
     /**
