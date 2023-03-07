@@ -1,11 +1,9 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.*;
 import com.revrobotics.CANSparkMax.ExternalFollower;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxLimitSwitch.Type;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -264,11 +262,6 @@ public class ArmSubsystem extends SubsystemBase {
         // not quite accurate (but are close). Anything less than
         // half of the full extend value is considered a retract limit.
 
-        if (armExtendLimitDetector.isPressed()
-            && getArmExtendEncoder() > ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE / 2) {
-            return true;
-        }
-
         // Also stop when the encoder counts are reached.
         if (getArmExtendEncoder() >= ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE) {
             return true;
@@ -300,19 +293,6 @@ public class ArmSubsystem extends SubsystemBase {
         // magnetic sensor that "isPressed" when the sensor detects a magnet.
         // This sensor is not inverted because the CANLimitSwitch
         // is configured for a normally open switch.
-
-        // This limit switch is used for both the forward and reverse limits.
-        // The limit switch cannot really determine whether the arm is fully extended
-        // or fully retracted.
-        // Hopefully the armExtenderEncoder is approximately accurate,
-        // and the limit detector is a backup if the encoder counts are
-        // not quite accurate (but are close). Anything less than
-        // half of the full extend value is considered a retract limit.
-
-        if (armExtendLimitDetector.isPressed()
-            && getArmExtendEncoder() < ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE / 2) {
-            return true;
-        }
 
         return false;
     }
@@ -483,10 +463,6 @@ public class ArmSubsystem extends SubsystemBase {
 
         if (isArmRetracted()) {
             setArmExtendEncoder(0);
-        }
-
-        if (isArmAtExtendLimit()) {
-            setArmExtendEncoder(ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE);
         }
 
         if (isPincherOpen()) {
