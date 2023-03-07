@@ -192,7 +192,7 @@ abstract class BaseArmCommand extends CommandBase {
             stopArmMotors();
             return true;
         }
-        else {
+        else if (driveWithPieceState == null) {
             boolean tooLow = armSubsystem.getArmLiftAngle() < CLEAR_FRAME_ARM_ANGLE;
             driveWithPieceState = tooLow ? DriveWithPieceState.PREPARING : DriveWithPieceState.RETRACTING;
         }

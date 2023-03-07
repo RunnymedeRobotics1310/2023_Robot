@@ -1,59 +1,39 @@
 package frc.robot.commands.arm;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystem;
 
-public class DriveWithPieceCommand extends CommandBase {
+public class DriveWithPieceCommand extends BaseArmCommand {
 
-    private final ArmSubsystem armSubsystem;
-
-    // fixme: do everything - see table
-    // https://docs.google.com/document/d/1JzU-BzCXjGCwosouylmWGN83-x8lv-oPzklcXDqNN2U/edit#
-
+    /**
+     * Exposess moveToDriveWithPiece pose in command form so that it can be included in an auto routine. Not expected to be
+     * invoked by an operator directly.
+     *
+     * @param armSubsystem
+     */
     public DriveWithPieceCommand(ArmSubsystem armSubsystem) {
-        this.armSubsystem = armSubsystem;
+        super(armSubsystem);
         addRequirements(armSubsystem);
     }
 
     @Override
     public void initialize() {
         System.out.println("DriveWithPieceCommand started");
-        // fixme
-        // stop arms
-        // print current position etc.
+        stopArmMotors();
+        printArmState();
     }
 
     @Override
     public void execute() {
-        // FIXME: do everything
-        // if not holding a piece abort
-        if (armSubsystem.isGamePieceDetected()) {
-            return;
-        }
-        // if holding a cone enter driving with cone pose
-        // if holding a cube enter driving with cube pose
+        moveToDriveWithPiecePose();
     }
 
     @Override
     public boolean isFinished() {
-        // FIXME: do everything
-        // if not holding a piece true
-        if (!armSubsystem.isGamePieceDetected()) {
-            return true;
-        }
-        // otherwise keep running until interrupted
-        return false;
+        return moveToDriveWithPiecePose();
     }
 
     @Override
     public void end(boolean interrupted) {
-        // FIXME: do everything
-        if (interrupted) {
-            // do nothing but log
-        }
-        else {
-            // still do nothing but log
-        }
-        // print state when ended
+        System.out.println("DriveWithPiece Command end. " + (interrupted ? "INTERRUPTED" : "NOT INTERRUPTED"));
     }
 }
