@@ -101,7 +101,7 @@ public class OperatorInput {
     }
 
     public boolean isCancel() {
-        return driverController.getStartButton();
+        return driverController.getStartButton() || operatorController.getStartButton();
     }
 
     public boolean isVisionReset() {
