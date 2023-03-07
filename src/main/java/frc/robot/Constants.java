@@ -80,7 +80,7 @@ public final class Constants {
         public static final boolean LEFT_MOTOR_REVERSED  = false;
         public static final boolean RIGHT_MOTOR_REVERSED = true;
 
-        public static final double CM_PER_ENCODER_COUNT = 2;    // FIXME:
+        public static final double  CM_PER_ENCODER_COUNT = 3.503;
 
         public static final boolean GYRO_REVERSED = false;
     }
@@ -115,7 +115,7 @@ public final class Constants {
         public static final double MAX_CAMERA_MOTOR_SPEED     = 1;
         public static final double MAX_CAMERA_SLOW_ZONE_SPEED = .2;
 
-        public static final double CAMERA_DOWN_LIMIT_ENCODER_VALUE = -125;
+        public static final double CAMERA_DOWN_LIMIT_ENCODER_VALUE = -255;
         public static final double CAMERA_POSITION_TOLERANCE       = 3;
         public static final double CAMERA_POSITION_SLOW_ZONE       = 15;
     }
@@ -213,7 +213,7 @@ public final class Constants {
         public static final ArmPosition SUBSTATION_PICKUP_POSITION = new ArmPosition(30, 10);
 
         // Drive with Piece constants
-        public static final ArmPosition DRIVE_WITH_CONE_POSITION = new ArmPosition(10, 0); // todo: fixme: get actuals
+        public static final ArmPosition DRIVE_WITH_CONE_POSITION = new ArmPosition(45, 0); // todo: fixme: get actuals
         public static final ArmPosition DRIVE_WITH_CUBE_POSITION = new ArmPosition(ARM_DOWN_ANGLE_DEGREES, 0); // Confirmed
 
         public static ArmPosition getDrivePosition(GamePiece gamePiece) {

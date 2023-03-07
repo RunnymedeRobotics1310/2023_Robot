@@ -26,6 +26,7 @@ import frc.robot.commands.arm.ScoreCommand;
 import frc.robot.commands.auto.AutonomousCommand;
 import frc.robot.commands.drive.DefaultDriveCommand;
 import frc.robot.commands.drive.DriveModeSelector;
+import frc.robot.commands.drive.DriveOnHeadingCommand;
 import frc.robot.commands.drive.DriveToTargetCommand;
 import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
@@ -213,6 +214,12 @@ public class RobotContainer {
 
         new Trigger(() -> (operatorInput.isCameraViewHigh()))
             .onTrue(new SetCameraViewCommand(CameraView.HIGH, visionSubsystem));
+
+        new Trigger(() -> (operatorInput.isCameraViewLow()))
+            .onTrue(new SetCameraViewCommand(CameraView.LOW, visionSubsystem));
+
+        new Trigger(() -> (operatorInput.driveForward()))
+            .onTrue(new DriveOnHeadingCommand(0, 0.2, 300, driveSubsystem));
 
     }
 
