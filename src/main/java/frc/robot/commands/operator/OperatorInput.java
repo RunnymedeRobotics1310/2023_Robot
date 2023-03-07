@@ -153,6 +153,10 @@ public class OperatorInput {
         return operatorController.getRightY();
     }
 
+    public boolean driveForward() {
+        return operatorController.getPOV() == 0;
+    }
+
     /**
      * return the raw underlying {@link RunnymedeGameController}. ONLY FOR USE IN TEST MODE.
      */

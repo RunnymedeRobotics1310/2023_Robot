@@ -10,20 +10,32 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.AutoConstants.*;
+import frc.robot.Constants.AutoConstants.AutoAction;
+import frc.robot.Constants.AutoConstants.AutoLane;
+import frc.robot.Constants.AutoConstants.Orientation;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.OiConstants;
 import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.SystemTestCommand;
-import frc.robot.commands.arm.*;
+import frc.robot.commands.arm.DefaultArmCommand;
+import frc.robot.commands.arm.PickUpGroundCommand;
+import frc.robot.commands.arm.ReleaseCommand;
+import frc.robot.commands.arm.ScoreCommand;
 import frc.robot.commands.auto.AutonomousCommand;
-import frc.robot.commands.drive.*;
+import frc.robot.commands.drive.DefaultDriveCommand;
+import frc.robot.commands.drive.DriveModeSelector;
+import frc.robot.commands.drive.DriveOnHeadingCommand;
+import frc.robot.commands.drive.DriveToTargetCommand;
+import frc.robot.commands.drive.ResetGyroPitchCommand;
+import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.vision.DefaultVisionCommand;
 import frc.robot.commands.vision.SetCameraViewCommand;
-import frc.robot.subsystems.*;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
 
 /**
@@ -205,6 +217,9 @@ public class RobotContainer {
 
         new Trigger(() -> (operatorInput.isCameraViewLow()))
             .onTrue(new SetCameraViewCommand(CameraView.LOW, visionSubsystem));
+
+        new Trigger(() -> (operatorInput.driveForward()))
+            .onTrue(new DriveOnHeadingCommand(0, 0.2, 300, driveSubsystem));
 
     }
 
