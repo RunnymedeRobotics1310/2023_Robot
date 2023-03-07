@@ -15,68 +15,69 @@ import frc.robot.Constants.GameConstants.GamePiece;
 
 public class ArmSubsystem extends SubsystemBase {
 
-    private static final MotorType motorType              = MotorType.kBrushless;
+    private static final MotorType motorType               = MotorType.kBrushless;
 
     /*
      * Arm lift motors and encoder
      */
-    private final CANSparkMax      armLiftMotor           = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT, motorType);
-    private final CANSparkMax      armLiftFollower        = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT + 1, motorType);
+    private final CANSparkMax      armLiftMotor            = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT, motorType);
+    private final CANSparkMax      armLiftFollower         = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT + 1, motorType);
 
-    private IdleMode               armLiftIdleMode        = null;
-    private double                 armLiftSpeed           = 0;
+    private IdleMode               armLiftIdleMode         = null;
+    private double                 armLiftSpeed            = 0;
 
     // Arm lift encoder
-    private RelativeEncoder        armLiftEncoder         = armLiftMotor.getEncoder();
+    private RelativeEncoder        armLiftEncoder          = armLiftMotor.getEncoder();
+    private double                 armLiftEncoderOffset    = 0;
 
-    private double                 armLiftEncoderOffset   = 0;
+    // Arm lift PID
+    private boolean                armLiftPidEnabled       = false;
+    private double                 armLiftPidAngleSetpoint = ArmConstants.ARM_DOWN_ANGLE_DEGREES;
+    // Arm Test Mode
+    private boolean                armTestMode             = false;
 
     /*
      * Arm extend motor and encoder
      */
-    private final CANSparkMax      armExtendMotor         = new CANSparkMax(ArmConstants.ARM_EXTEND_MOTOR_PORT, motorType);
-
-    private double                 armExtendSpeed         = 0;
+    private final CANSparkMax      armExtendMotor          = new CANSparkMax(ArmConstants.ARM_EXTEND_MOTOR_PORT, motorType);
+    private double                 armExtendSpeed          = 0;
 
     // Arm lift encoder
-    private RelativeEncoder        armExtendEncoder       = armExtendMotor.getEncoder();
-
-    private double                 armExtendEncoderOffset = 0;
+    private RelativeEncoder        armExtendEncoder        = armExtendMotor.getEncoder();
+    private double                 armExtendEncoderOffset  = 0;
 
     /*
      * Pincher motor and encoder
      */
-    private final CANSparkMax      pincherMotor           = new CANSparkMax(ArmConstants.PINCHER_MOTOR_PORT, motorType);
-
-    private double                 pincherSpeed           = 0;
+    private final CANSparkMax      pincherMotor            = new CANSparkMax(ArmConstants.PINCHER_MOTOR_PORT, motorType);
+    private double                 pincherSpeed            = 0;
 
     // Pincher encoder
-    private RelativeEncoder        pincherEncoder         = pincherMotor.getEncoder();
-
-    private double                 pincherEncoderOffset   = 0;
+    private RelativeEncoder        pincherEncoder          = pincherMotor.getEncoder();
+    private double                 pincherEncoderOffset    = 0;
 
     /*
      * Limit Switches
      */
     /** The arm down detector is an infra-red limit switch plugged into the RoboRio */
-    private DigitalInput           armDownDetector        = new DigitalInput(ArmConstants.ARM_DOWN_LIMIT_SWITCH_DIO_PORT);
+    private DigitalInput           armDownDetector         = new DigitalInput(ArmConstants.ARM_DOWN_LIMIT_SWITCH_DIO_PORT);
 
     /**
      * The arm retracted detector is a hall effect limit switch that is normally open, plugged into the arm extender SparkMAX
      * reverse limit.
      */
-    private SparkMaxLimitSwitch    armExtendLimitDetector = armExtendMotor.getForwardLimitSwitch(Type.kNormallyOpen);
+    private SparkMaxLimitSwitch    armExtendLimitDetector  = armExtendMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
     /**
      * The pincher open detector is a hall effect limit switch that is normally open, plugged into the pincher SparkMAX reverse
      * limit.
      */
-    private SparkMaxLimitSwitch    pincherOpenDetector    = pincherMotor.getReverseLimitSwitch(Type.kNormallyOpen);
+    private SparkMaxLimitSwitch    pincherOpenDetector     = pincherMotor.getReverseLimitSwitch(Type.kNormallyOpen);
 
     /**
      * The game piece detector is an infra-red sensor that is normally open, plugged into the pincher SparkMAX forward limit.
      */
-    private SparkMaxLimitSwitch    gamePieceDetector      = pincherMotor.getForwardLimitSwitch(Type.kNormallyOpen);
+    private SparkMaxLimitSwitch    gamePieceDetector       = pincherMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
     /** Creates a new ArmSubsystem */
     public ArmSubsystem() {
@@ -343,6 +344,44 @@ public class ArmSubsystem extends SubsystemBase {
         return getPincherEncoder() > ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE;
     }
 
+    public void moveArmToAngle(double angle) {
+
+        // if the arm lift pid is not enabled,
+        // this routine does nothing
+        if (!armLiftPidEnabled) {
+            return;
+        }
+
+        setArmLiftIdleMode(IdleMode.kBrake);
+
+        armLiftPidAngleSetpoint = angle;
+
+        armTestMode             = false;
+        armLiftPidEnabled       = true;
+    }
+
+    /**
+     * Set the arm pid enabled
+     *
+     * @param speed
+     */
+    public void setArmLiftPidEnabled(boolean enabled) {
+
+        // If already set, there is nothing to do.
+        if (armLiftPidEnabled == enabled) {
+            return;
+        }
+
+        armLiftPidEnabled = enabled;
+
+        if (armLiftPidEnabled) {
+            armLiftPidAngleSetpoint = getArmLiftAngle();
+        }
+        else {
+            armLiftSpeed = 0;
+        }
+    }
+
     /**
      * Set the speed of the lift motors
      *
@@ -350,21 +389,19 @@ public class ArmSubsystem extends SubsystemBase {
      */
     public void setArmLiftSpeed(double speed) {
 
+        // Do not set the speed if the pid is enabled
+        if (armLiftPidEnabled) {
+            return;
+        }
+
         setArmLiftIdleMode(IdleMode.kBrake);
+
+        armTestMode  = false;
 
         armLiftSpeed = checkArmLiftLimits(speed);
 
-        // If the arm is not at a limit, then
-        // add the hold value to try to hold the arm in place.
-        // At the upper limit, let the arm drift lower, and at
-        // the lower limit, the arm should be held up by the
-        // robot so no extra current is needed to hold the arm.
-
-        double outputArmSpeed = armLiftSpeed;
-
-        if (!isArmAtUpperLimit() && !isArmDown()) {
-            outputArmSpeed += calcArmLiftHoldSpeed();
-        }
+        // Add the hold value to hold the arm steady at the angle
+        double outputArmSpeed = armLiftSpeed + calcArmLiftHoldSpeed();
 
         armLiftMotor.set(outputArmSpeed);
         armLiftFollower.set(outputArmSpeed);
@@ -375,6 +412,9 @@ public class ArmSubsystem extends SubsystemBase {
     public void setArmLiftTestSpeed(double armLiftMotorSpeed, double armLiftFollowerSpeed) {
 
         setArmLiftIdleMode(IdleMode.kCoast);
+
+        armTestMode       = true;
+        armLiftPidEnabled = false;
 
         armLiftMotor.set(armLiftMotorSpeed);
         armLiftFollower.set(armLiftFollowerSpeed);
@@ -454,7 +494,15 @@ public class ArmSubsystem extends SubsystemBase {
          * at the beginning and may not ever set it again. The periodic
          * loop checks the limits every loop.
          */
-        setArmLiftSpeed(armLiftSpeed);
+        if (armLiftPidEnabled) {
+            calculateArmLiftPidOutput();
+        }
+        else {
+            if (!armTestMode) {
+                setArmLiftSpeed(armLiftSpeed);
+            }
+        }
+
         setArmExtendSpeed(armExtendSpeed);
         setPincherSpeed(pincherSpeed);
 
@@ -466,6 +514,8 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Lift Encoder", Math.round(getArmLiftEncoder() * 100) / 100d);
         SmartDashboard.putNumber("Raw Lift Encoder", Math.round(armLiftEncoder.getPosition() * 100) / 100d);
         SmartDashboard.putNumber("Arm Lift Angle", getArmLiftAngle());
+        SmartDashboard.putBoolean("Arm PID Enabled", armLiftPidEnabled);
+        SmartDashboard.putNumber("Arm PID Target Angle", armLiftPidAngleSetpoint);
 
 
         SmartDashboard.putNumber("Extend  Motor", armExtendSpeed);
@@ -497,6 +547,28 @@ public class ArmSubsystem extends SubsystemBase {
 
         armLiftMotor.setIdleMode(idleMode);
         armLiftFollower.setIdleMode(idleMode);
+    }
+
+    private void calculateArmLiftPidOutput() {
+
+        // This method will set the arm lift motor speed based on the
+        // angle error.
+
+        double angleError = armLiftPidAngleSetpoint - getArmLiftAngle();
+
+        armLiftSpeed = angleError * ArmConstants.ARM_LIFT_PID_P;
+
+        // Limit the output
+        armLiftSpeed = checkArmLiftLimits(armLiftSpeed);
+
+        // Add the hold value to hold the arm steady at the angle
+        double outputArmSpeed = armLiftSpeed + calcArmLiftHoldSpeed();
+
+        armLiftMotor.set(outputArmSpeed);
+        armLiftFollower.set(outputArmSpeed);
+
+        SmartDashboard.putNumber("Arm Lift output", outputArmSpeed);
+
     }
 
     /**
@@ -545,8 +617,8 @@ public class ArmSubsystem extends SubsystemBase {
             }
         }
 
-        // If not at (or near) the limit, then return the input speed
-        return inputSpeed;
+        // If not at (or near) the limit, then return the limited value of the input speed
+        return Math.min(Math.abs(inputSpeed), ArmConstants.MAX_LIFT_SPEED) * Math.signum(inputSpeed);
     }
 
     /**
@@ -660,6 +732,13 @@ public class ArmSubsystem extends SubsystemBase {
      * @return the speed adjustment to overcome gravity
      */
     private double calcArmLiftHoldSpeed() {
+
+        /*
+         * If at the limits, then do not hold the motor
+         */
+        if (isArmDown() || isArmAtUpperLimit()) {
+            return 0;
+        }
 
         /*
          * When the arm is not intended to move, some force is required in
