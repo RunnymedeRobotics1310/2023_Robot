@@ -76,6 +76,8 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
     @Override
     public void initialize() {
+        // todo: fixme: be smarter about initial state. We may not need to go into
+        // compact pose a lot of the time, and this would save a lot of time on the field.
         printStatus("initialize");
         if (isCompactPose()) {
             state = State.COMPACT_POSE;
