@@ -117,7 +117,7 @@ public final class Constants {
         public static final double MAX_CAMERA_MOTOR_SPEED          = 1;
         public static final double MAX_CAMERA_SLOW_ZONE_SPEED      = .2;
 
-        public static final double CAMERA_DOWN_LIMIT_ENCODER_VALUE = -255;
+        public static final double CAMERA_DOWN_LIMIT_ENCODER_VALUE = -200;
         public static final double CAMERA_POSITION_TOLERANCE       = 3;
         public static final double CAMERA_POSITION_SLOW_ZONE       = 15;
     }

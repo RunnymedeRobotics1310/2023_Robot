@@ -272,14 +272,17 @@ public class VisionSubsystem extends SubsystemBase {
      */
     public void setCameraMotorSpeed(double speed) {
 
-        if (!isCameraPositionInitialized) {
-            initializeCameraPosition();
-            return;
-        }
+        // Ignore
+        cameraMotor.set(0);
 
-        cameraMotorSpeed = checkCameraMotorLimits(speed);
-
-        cameraMotor.set(speed);
+//        if (!isCameraPositionInitialized) {
+//            initializeCameraPosition();
+//            return;
+//        }
+//
+//        cameraMotorSpeed = checkCameraMotorLimits(speed);
+//
+//        cameraMotor.set(speed);
     }
 
     public void initializeCameraPosition() {
@@ -288,7 +291,7 @@ public class VisionSubsystem extends SubsystemBase {
             cameraInitializationStartTime = System.currentTimeMillis();
         }
 
-        cameraMotor.set(.2);
+        cameraMotor.set(.4);
 
         // End after 3 seconds
         if (System.currentTimeMillis() - cameraInitializationStartTime > 3000) {
