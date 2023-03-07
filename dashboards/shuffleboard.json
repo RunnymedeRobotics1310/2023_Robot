@@ -1703,6 +1703,19 @@
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
+          },
+          "6,4": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Arm Lift Angle",
+              "_title": "SmartDashboard/Arm Lift Angle",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
@@ -1712,6 +1725,6 @@
     "x": 0.0,
     "y": 0.0,
     "width": 1920.0,
-    "height": 836.0
+    "height": 916.0
   }
 }
