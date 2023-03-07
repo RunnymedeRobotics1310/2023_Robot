@@ -7,14 +7,16 @@ import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean constants. This class should
+ * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
+ * constants. This class should
  * not be used for any other purpose.
  * <p>
  * All constants should be declared globally (i.e. public static).
  * <br>
  * Do not put anything functional in this class.
  * <p>
- * It is advised to statically import this class (or one of its inner classes) wherever the constants are needed, to reduce
+ * It is advised to statically import this class (or one of its inner classes) wherever the
+ * constants are needed, to reduce
  * verbosity.
  */
 public final class Constants {
@@ -27,7 +29,7 @@ public final class Constants {
         public static enum GamePiece {
 
             CUBE(65), // Confirmed
-            CONE(129), // Confirmed
+            CONE(120), // Confirmed
             NONE(ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE); // Confirmed
 
             public final double pincherEncoderCount;
@@ -150,7 +152,7 @@ public final class Constants {
 
         public static final double      CLEAR_FRAME_ARM_ANGLE              = 36;
         /** Arm lift PID proportional gain */
-        public static final double      ARM_LIFT_PID_P                     = 0.005;
+        public static final double      ARM_LIFT_PID_P                     = 0.015;
 
         /*
          * Arm Angle Constants
@@ -192,9 +194,9 @@ public final class Constants {
 
         public static final double      MAX_PINCHER_SPEED                  = 1;
         public static final double      MAX_PINCHER_SLOW_ZONE_SPEED        = .15;
-        public static final double      PINCHER_CLOSE_LIMIT_ENCODER_VALUE  = 126;
+        public static final double      PINCHER_CLOSE_LIMIT_ENCODER_VALUE  = 120;
         public static final double      PINCHER_POSITION_TOLERANCE         = 2;
-        public static final double      PINCHER_SLOW_ZONE_ENCODER_VALUE    = 10;
+        public static final double      PINCHER_SLOW_ZONE_ENCODER_VALUE    = 15;
 
 
         /*
@@ -227,7 +229,8 @@ public final class Constants {
             if (gamePiece == GamePiece.CUBE) {
                 return DRIVE_WITH_CUBE_POSITION;
             }
-            return DRIVE_WITH_CONE_POSITION; // TODO: FIXME: THE DEFAULT SHOULD BE THE ONE THAT WORKS FOR BOTH
+            return DRIVE_WITH_CONE_POSITION; // TODO: FIXME: THE DEFAULT SHOULD BE THE ONE THAT
+                                             // WORKS FOR BOTH
         }
 
         // Helper routine to get a scoring position

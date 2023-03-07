@@ -1,9 +1,11 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.*;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ExternalFollower;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxLimitSwitch.Type;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -63,19 +65,22 @@ public class ArmSubsystem extends SubsystemBase {
     private DigitalInput           armDownDetector         = new DigitalInput(ArmConstants.ARM_DOWN_LIMIT_SWITCH_DIO_PORT);
 
     /**
-     * The arm retracted detector is a hall effect limit switch that is normally open, plugged into the arm extender SparkMAX
+     * The arm retracted detector is a hall effect limit switch that is normally open, plugged into
+     * the arm extender SparkMAX
      * reverse limit.
      */
     private SparkMaxLimitSwitch    armExtendLimitDetector  = armExtendMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
     /**
-     * The pincher open detector is a hall effect limit switch that is normally open, plugged into the pincher SparkMAX reverse
+     * The pincher open detector is a hall effect limit switch that is normally open, plugged into
+     * the pincher SparkMAX reverse
      * limit.
      */
     private SparkMaxLimitSwitch    pincherOpenDetector     = pincherMotor.getReverseLimitSwitch(Type.kNormallyOpen);
 
     /**
-     * The game piece detector is an infra-red sensor that is normally open, plugged into the pincher SparkMAX forward limit.
+     * The game piece detector is an infra-red sensor that is normally open, plugged into the
+     * pincher SparkMAX forward limit.
      */
     private SparkMaxLimitSwitch    gamePieceDetector       = pincherMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
@@ -218,7 +223,8 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     /**
-     * determine if the arm is at the supplied position in encoder counts, within the arm extend position tolerance
+     * determine if the arm is at the supplied position in encoder counts, within the arm extend
+     * position tolerance
      *
      * @param position to compare
      * @return {@code true} if at extension, {@code false} otherwise
@@ -534,6 +540,8 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Pincher Open", isPincherOpen());
         SmartDashboard.putBoolean("Pincher Closed", isPincherAtCloseLimit());
         SmartDashboard.putBoolean("Game Piece", isGamePieceDetected());
+        SmartDashboard.putString("Current Game Piece", getHeldGamePiece().toString());
+
     }
 
     private void setArmLiftIdleMode(IdleMode idleMode) {
@@ -698,7 +706,8 @@ public class ArmSubsystem extends SubsystemBase {
                 return 0;
             }
 
-            // NOTE: Do not slow down when closing the pincher because the power may be needed to close on a cone.
+            // NOTE: Do not slow down when closing the pincher because the power may be needed to
+            // close on a cone.
         }
 
         /*
@@ -728,7 +737,8 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     /**
-     * calculate the amount of torque to apply to the motor to hold the arm steady at any angle or arm extension.
+     * calculate the amount of torque to apply to the motor to hold the arm steady at any angle or
+     * arm extension.
      *
      * @return the speed adjustment to overcome gravity
      */
