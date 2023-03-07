@@ -2,11 +2,10 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.operator.RunnymedeGameController;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.*;
 
 /**
  * This command is used to safely stop the robot in its current position, and to cancel any running commands
@@ -17,7 +16,7 @@ public class SystemTestCommand extends CommandBase {
         NONE,
         DRIVE_LEFT_1, DRIVE_LEFT_2, DRIVE_LEFT,
         DRIVE_RIGHT_1, DRIVE_RIGHT_2, DRIVE_RIGHT,
-        ARM_LIFT_1, ARM_LIFT_2, ARM_LIFT,
+        ARM_LIFT_1, ARM_LIFT_2, ARM_LIFT, ARM_LIFT_PID,
         ARM_EXTEND,
         PINCHER,
         CAMERA
@@ -31,12 +30,12 @@ public class SystemTestCommand extends CommandBase {
     private final ArmSubsystem            armSubsystem;
     private final VisionSubsystem         visionSubsystem;
 
-    private long   startTime     = 0;
-    private Motor  selectedMotor = Motor.NONE;
-    private double povMotorSpeed = 0;
+    private long                          startTime           = 0;
+    private Motor                         selectedMotor       = Motor.NONE;
+    private double                        povMotorSpeed       = 0;
 
-    private boolean previousLeftBumper  = false;
-    private boolean previousRightBumper = false;
+    private boolean                       previousLeftBumper  = false;
+    private boolean                       previousRightBumper = false;
 
     /**
      * System Test Command
@@ -148,7 +147,7 @@ public class SystemTestCommand extends CommandBase {
         double leftTrigger  = controller.getLeftTriggerAxis();
         double rightTrigger = controller.getRightTriggerAxis();
 
-        double motorSpeed = 0;
+        double motorSpeed   = 0;
 
         if (leftTrigger > 0 && rightTrigger > 0) {
 
@@ -243,17 +242,26 @@ public class SystemTestCommand extends CommandBase {
             break;
 
         case ARM_LIFT_1:
+            armSubsystem.setArmLiftPidEnabled(false);
             armSubsystem.setArmLiftTestSpeed(motorSpeed, 0);
             SmartDashboard.putBoolean("Test Arm", true);
             break;
 
         case ARM_LIFT_2:
+            armSubsystem.setArmLiftPidEnabled(false);
             armSubsystem.setArmLiftTestSpeed(0, motorSpeed);
             SmartDashboard.putBoolean("Test Arm", true);
             break;
 
         case ARM_LIFT:
+            armSubsystem.setArmLiftPidEnabled(false);
             armSubsystem.setArmLiftSpeed(motorSpeed);
+            SmartDashboard.putBoolean("Test Arm", true);
+            break;
+
+        case ARM_LIFT_PID:
+            armSubsystem.setArmLiftPidEnabled(true);
+            armSubsystem.moveArmToAngle(ArmConstants.ARM_DOWN_ANGLE_DEGREES + motorSpeed * 100);
             SmartDashboard.putBoolean("Test Arm", true);
             break;
 

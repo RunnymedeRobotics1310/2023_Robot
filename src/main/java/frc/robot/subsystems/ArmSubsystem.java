@@ -459,6 +459,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     /** Safely stop the all arm motors from moving */
     public void stop() {
+        setArmLiftPidEnabled(false);
         setArmLiftSpeed(0);
         setArmExtendSpeed(0);
         setPincherSpeed(0);
