@@ -1,7 +1,12 @@
 package frc.robot.commands.arm;
 
-import static frc.robot.Constants.ArmConstants.*;
-import static frc.robot.Constants.GameConstants.GamePiece.*;
+import static frc.robot.Constants.ArmConstants.ARM_EXTEND_POSITION_TOLERANCE;
+import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_ARM_ANGLE;
+import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_POSITION;
+import static frc.robot.Constants.ArmConstants.MAX_PINCHER_SPEED;
+import static frc.robot.Constants.GameConstants.GamePiece.CONE;
+import static frc.robot.Constants.GameConstants.GamePiece.CUBE;
+import static frc.robot.Constants.GameConstants.GamePiece.NONE;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.GameConstants.GamePiece;
@@ -22,7 +27,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
     private final VisionSubsystem visionSubsystem;
     private final OperatorInput   operatorInput;
 
-    private GamePiece pickupTarget;
+    private GamePiece             pickupTarget;
 
     private enum State {
 
@@ -50,12 +55,16 @@ public class PickUpGroundCommand extends BaseArmCommand {
     }
 
     /**
-     * Pick up a piece from the ground. This command will remain active until a piece is grasped or it is interrupted or
+     * Pick up a piece from the ground. This command will remain active until a piece is grasped or
+     * it is interrupted or
      * cancelled.
      *
-     * @param initialPickupTarget the type of game piece to be picked up - unless later overridden by the operator
-     * @param operatorInput optional operator input object which allows the operator to change the selected game piece after the
-     * command has started. If not specified, the initialPickupTarget will remain the active pickup target for the duration of the
+     * @param initialPickupTarget the type of game piece to be picked up - unless later overridden
+     * by the operator
+     * @param operatorInput optional operator input object which allows the operator to change the
+     * selected game piece after the
+     * command has started. If not specified, the initialPickupTarget will remain the active pickup
+     * target for the duration of the
      * command.
      * @param armSubsystem the arm subsystem
      * @param visionSubsystem the vision subsystem
@@ -110,7 +119,8 @@ public class PickUpGroundCommand extends BaseArmCommand {
     public void execute() {
 
         if (operatorInput != null) {
-            // check for operator override. If both selected, cube wins. If none selected, command is cancelled.
+            // check for operator override. If both selected, cube wins. If none selected, command
+            // is cancelled.
             if (operatorInput.isPickUpCone()) {
                 if (pickupTarget == CUBE) {
                     System.out.println("Changing pickup target from CUBE to CONE based on operator input");
@@ -127,7 +137,8 @@ public class PickUpGroundCommand extends BaseArmCommand {
             }
             else {
                 pickupTarget = NONE;
-                state        = State.CANCELLED;
+                printStatus("Changing state");
+                state = State.CANCELLED;
             }
         }
 
@@ -137,6 +148,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
         case MOVING_TO_COMPACT_POSE: {
             boolean compactDone = moveToCompactPose();
             if (compactDone) {
+                printStatus("Changing state");
                 state = State.SAFE_TO_MOVE;
             }
             break;
@@ -146,18 +158,21 @@ public class PickUpGroundCommand extends BaseArmCommand {
             // sets arm position to ground pickup
             boolean liftDone = moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE);
             if (liftDone) {
+                printStatus("Changing state");
                 state = State.ARM_MOVING;
             }
             break;
         }
 
         case ARM_MOVING: {
-            // if ground pickup location is too low, override it with the location that will ensure that we clear the frame.
-            boolean liftDone = moveArmLiftToAngle(
+            // if ground pickup location is too low, override it with the location that will ensure
+            // that we clear the frame.
+            boolean liftDone  = moveArmLiftToAngle(
                 Double.max(CLEAR_FRAME_ARM_ANGLE, GROUND_PICKUP_POSITION.angle));
             boolean extDone   = moveArmExtendToEncoderCount(GROUND_PICKUP_POSITION.extension, .5);
             boolean pinchDone = openPincher();
             if (liftDone && extDone && pinchDone) {
+                printStatus("Changing state");
                 state = State.ARM_IN_POSITION;
             }
             break;
@@ -165,6 +180,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
         case ARM_IN_POSITION: {
             if (armSubsystem.isGamePieceDetected()) {
+                printStatus("Changing state");
                 state = State.PIECE_DETECTED;
             }
             break;
@@ -173,12 +189,14 @@ public class PickUpGroundCommand extends BaseArmCommand {
         case PIECE_DETECTED:
         case PINCHERS_MOVING: {
             boolean pinchDone = movePincherToEncoderCount(pickupTarget.pincherEncoderCount);
+            printStatus("Changing state");
             state = pinchDone ? State.PIECE_GRABBED : State.PINCHERS_MOVING;
             break;
         }
 
         case PIECE_GRABBED:
             boolean armInPositionDOne = moveToDriveWithPiecePose();
+            printStatus("Changing state");
             state = armInPositionDOne ? State.DRIVING_POSITION : State.PIECE_GRABBED;
             break;
 
