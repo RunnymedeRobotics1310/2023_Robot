@@ -3,6 +3,7 @@ package frc.robot.commands.arm;
 import static frc.robot.Constants.ArmConstants.*;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.ArmSubsystem;
 
 abstract class BaseArmCommand extends CommandBase {
@@ -118,8 +119,7 @@ abstract class BaseArmCommand extends CommandBase {
     }
 
     /**
-     * Safely move the arm from whatever position it is in to the compact pose, which has the arm
-     * down, retracted, and with
+     * Safely move the arm from whatever position it is in to the compact pose, which has the arm down, retracted, and with
      * pinchers closed.
      *
      * @return true if in the compact pose, false if still moving there
@@ -168,6 +168,66 @@ abstract class BaseArmCommand extends CommandBase {
             System.out.println("Compact pose achieved");
             stopArmMotors();
             compactState = null; // ready to go again
+            return true;
+        }
+        }
+        return false;
+    }
+
+    private enum DriveWithPieceState {PREPARING, RETRACTING, FINALIZING_ANGLE, FINALIZING_EXTENT, IN_POSITION;}
+
+    private DriveWithPieceState driveWithPieceState = null;
+
+    protected final boolean moveToDriveWithPiecePose() {
+
+        final Constants.GameConstants.GamePiece heldGamePiece = armSubsystem.getHeldGamePiece();
+        if (heldGamePiece == Constants.GameConstants.GamePiece.NONE) {
+            System.out.println("Attempting to move to a drive with game piece position but not holding a piece. Compacting.");
+            return moveToCompactPose();
+        }
+
+        final Constants.ArmPosition target = Constants.ArmConstants.getDrivePosition(heldGamePiece);
+        if (armSubsystem.isInPosition(target)) {
+            stopArmMotors();
+            return true;
+        }
+        else {
+            boolean tooLow = armSubsystem.getArmLiftAngle() < CLEAR_FRAME_ARM_ANGLE;
+            driveWithPieceState = tooLow ? DriveWithPieceState.PREPARING : DriveWithPieceState.RETRACTING;
+        }
+
+        // get into the compact pose
+        switch (driveWithPieceState) {
+
+        case PREPARING: {
+            boolean done = moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE, .3);
+            driveWithPieceState = done ? DriveWithPieceState.RETRACTING : DriveWithPieceState.PREPARING;
+            break;
+        }
+
+        case RETRACTING: {
+            boolean done = moveArmExtendToEncoderCount(0, .8);
+            driveWithPieceState = done ? DriveWithPieceState.FINALIZING_ANGLE : DriveWithPieceState.RETRACTING;
+            break;
+        }
+
+        case FINALIZING_ANGLE: {
+            boolean done = moveArmLiftToAngle(target.angle, .1);
+            driveWithPieceState = done ? DriveWithPieceState.FINALIZING_EXTENT : DriveWithPieceState.FINALIZING_ANGLE;
+            break;
+        }
+
+        case FINALIZING_EXTENT: {
+            boolean done = moveArmExtendToEncoderCount(target.extension, .1);
+            driveWithPieceState = done ? DriveWithPieceState.IN_POSITION : DriveWithPieceState.FINALIZING_EXTENT;
+            break;
+        }
+
+        case IN_POSITION: {
+            // done!
+            System.out.println("Drive with piece pose achieved");
+            stopArmMotors();
+            driveWithPieceState = null; // ready to go again
             return true;
         }
         }

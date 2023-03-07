@@ -15,71 +15,68 @@ import frc.robot.Constants.GameConstants.GamePiece;
 
 public class ArmSubsystem extends SubsystemBase {
 
-    private static final MotorType motorType              = MotorType.kBrushless;
+    private static final MotorType motorType = MotorType.kBrushless;
 
     /*
      * Arm lift motors and encoder
      */
-    private final CANSparkMax      armLiftMotor           = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT, motorType);
-    private final CANSparkMax      armLiftFollower        = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT + 1, motorType);
+    private final CANSparkMax armLiftMotor    = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT, motorType);
+    private final CANSparkMax armLiftFollower = new CANSparkMax(ArmConstants.ARM_LIFT_MOTOR_PORT + 1, motorType);
 
-    private IdleMode               armLiftIdleMode        = null;
-    private double                 armLiftSpeed           = 0;
+    private IdleMode armLiftIdleMode = null;
+    private double   armLiftSpeed    = 0;
 
     // Arm lift encoder
-    private RelativeEncoder        armLiftEncoder         = armLiftMotor.getEncoder();
+    private RelativeEncoder armLiftEncoder = armLiftMotor.getEncoder();
 
-    private double                 armLiftEncoderOffset   = 0;
+    private double armLiftEncoderOffset = 0;
 
     /*
      * Arm extend motor and encoder
      */
-    private final CANSparkMax      armExtendMotor         = new CANSparkMax(ArmConstants.ARM_EXTEND_MOTOR_PORT, motorType);
+    private final CANSparkMax armExtendMotor = new CANSparkMax(ArmConstants.ARM_EXTEND_MOTOR_PORT, motorType);
 
-    private double                 armExtendSpeed         = 0;
+    private double armExtendSpeed = 0;
 
     // Arm lift encoder
-    private RelativeEncoder        armExtendEncoder       = armExtendMotor.getEncoder();
+    private RelativeEncoder armExtendEncoder = armExtendMotor.getEncoder();
 
-    private double                 armExtendEncoderOffset = 0;
+    private double armExtendEncoderOffset = 0;
 
     /*
      * Pincher motor and encoder
      */
-    private final CANSparkMax      pincherMotor           = new CANSparkMax(ArmConstants.PINCHER_MOTOR_PORT, motorType);
+    private final CANSparkMax pincherMotor = new CANSparkMax(ArmConstants.PINCHER_MOTOR_PORT, motorType);
 
-    private double                 pincherSpeed           = 0;
+    private double pincherSpeed = 0;
 
     // Pincher encoder
-    private RelativeEncoder        pincherEncoder         = pincherMotor.getEncoder();
+    private RelativeEncoder pincherEncoder = pincherMotor.getEncoder();
 
-    private double                 pincherEncoderOffset   = 0;
+    private double pincherEncoderOffset = 0;
 
     /*
      * Limit Switches
      */
     /** The arm down detector is an infra-red limit switch plugged into the RoboRio */
-    private DigitalInput           armDownDetector        = new DigitalInput(ArmConstants.ARM_DOWN_LIMIT_SWITCH_DIO_PORT);
+    private DigitalInput armDownDetector = new DigitalInput(ArmConstants.ARM_DOWN_LIMIT_SWITCH_DIO_PORT);
 
     /**
-     * The arm retracted detector is a hall effect limit switch that is normally open, plugged into
-     * the arm extender SparkMAX
+     * The arm retracted detector is a hall effect limit switch that is normally open, plugged into the arm extender SparkMAX
      * reverse limit.
      */
-    private SparkMaxLimitSwitch    armExtendLimitDetector = armExtendMotor.getForwardLimitSwitch(Type.kNormallyOpen);
+    private SparkMaxLimitSwitch armExtendLimitDetector = armExtendMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
     /**
-     * The pincher open detector is a hall effect limit switch that is normally open, plugged into
-     * the pincher SparkMAX reverse
+     * The pincher open detector is a hall effect limit switch that is normally open, plugged into the pincher SparkMAX reverse
      * limit.
      */
-    private SparkMaxLimitSwitch    pincherOpenDetector    = pincherMotor.getReverseLimitSwitch(Type.kNormallyOpen);
+    private SparkMaxLimitSwitch pincherOpenDetector = pincherMotor.getReverseLimitSwitch(Type.kNormallyOpen);
 
     /**
-     * The game piece detector is an infra-red sensor that is normally open, plugged into the
-     * pincher SparkMAX forward limit.
+     * The game piece detector is an infra-red sensor that is normally open, plugged into the pincher SparkMAX forward limit.
      */
-    private SparkMaxLimitSwitch    gamePieceDetector      = pincherMotor.getForwardLimitSwitch(Type.kNormallyOpen);
+    private SparkMaxLimitSwitch gamePieceDetector = pincherMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
     /** Creates a new ArmSubsystem */
     public ArmSubsystem() {
@@ -216,8 +213,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     /**
-     * determine if the arm is at the supplied position in encoder counts,
-     * within the arm extend position tolerance
+     * determine if the arm is at the supplied position in encoder counts, within the arm extend position tolerance
      *
      * @param position to compare
      * @return {@code true} if at extension, {@code false} otherwise
@@ -228,6 +224,10 @@ public class ArmSubsystem extends SubsystemBase {
             return true;
         }
         return false;
+    }
+
+    public boolean isInPosition(Constants.ArmPosition position) {
+        return isAtExtendPosition(position.extension) && isArmAtLiftAngle(position.angle);
     }
 
     /** Determine if the arm is at the upper encoder limit */
@@ -687,7 +687,7 @@ public class ArmSubsystem extends SubsystemBase {
          * The amount of force required follows the sin (trigonometry) function
          * at angles other than 90 degrees.
          */
-        double angleMultiplier  = Math.sin(Math.toRadians(getArmLiftAngle()));
+        double angleMultiplier = Math.sin(Math.toRadians(getArmLiftAngle()));
 
         /*
          * The extension multiplier is based on the amount of additional force required as the

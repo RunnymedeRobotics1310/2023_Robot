@@ -15,7 +15,6 @@ import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
  * Pickup from ground
  * <p>
  * see: https://docs.google.com/document/d/1JzU-BzCXjGCwosouylmWGN83-x8lv-oPzklcXDqNN2U/edit#
- *
  */
 public class PickUpGroundCommand extends BaseArmCommand {
 
@@ -23,7 +22,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
     private final VisionSubsystem visionSubsystem;
     private final OperatorInput   operatorInput;
 
-    private GamePiece             pickupTarget;
+    private GamePiece pickupTarget;
 
     private enum State {
 
@@ -33,7 +32,8 @@ public class PickUpGroundCommand extends BaseArmCommand {
         ARM_IN_POSITION, // arm is in the proper position for hoovering
         PIECE_DETECTED, // piece has been found
         PINCHERS_MOVING, // close pinchers
-        PIECE_GRABBED, // all done!
+        PIECE_GRABBED, // moving to driving position
+        DRIVING_POSITION, // done
         CANCELLED // aborted
     }
 
@@ -119,7 +119,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
         case ARM_MOVING: {
             // if ground pickup location is too low, override it with the location that will ensure that we clear the frame.
-            boolean liftDone  = moveArmLiftToAngle(
+            boolean liftDone = moveArmLiftToAngle(
                 Double.max(CLEAR_FRAME_ARM_ANGLE, GROUND_PICKUP_POSITION.angle), .15);
             boolean extDone   = moveArmExtendToEncoderCount(GROUND_PICKUP_POSITION.extension, .5);
             boolean pinchDone = openPincher();
@@ -166,6 +166,11 @@ public class PickUpGroundCommand extends BaseArmCommand {
             break;
         }
 
+        case PIECE_GRABBED:
+            boolean armInPositionDOne = moveToDriveWithPiecePose();
+            state = armInPositionDOne ? State.DRIVING_POSITION : State.PIECE_GRABBED;
+            break;
+
         case CANCELLED: {
             // note when this occurs the robot remains in this state.
             System.out.println("No pickup target specified by operator. Cancelling command.");
@@ -179,7 +184,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
     @Override
     public boolean isFinished() {
-        return state == State.CANCELLED || (state == State.PIECE_GRABBED && armSubsystem.getHeldGamePiece() != NONE);
+        return state == State.CANCELLED || (state == State.DRIVING_POSITION && armSubsystem.getHeldGamePiece() != NONE);
     }
 
     @Override
