@@ -51,19 +51,19 @@ public class OperatorInput {
     }
 
     public boolean isHigh() {
-        return driverController.getYButton();
+        return driverController.getYButton() || operatorController.getYButton();
     }
 
     public boolean isMid() {
-        return driverController.getBButton();
+        return driverController.getBButton() || operatorController.getBButton();
     }
 
     public boolean isLow() {
-        return driverController.getAButton();
+        return driverController.getAButton() || operatorController.getAButton();
     }
 
     public boolean isDrop() {
-        return driverController.getXButton();
+        return driverController.getXButton() || operatorController.getXButton();
     }
 
     public boolean isPickUpCone() {
@@ -101,7 +101,7 @@ public class OperatorInput {
     }
 
     public boolean isCancel() {
-        return driverController.getStartButton();
+        return driverController.getStartButton() || operatorController.getStartButton();
     }
 
     public boolean isVisionReset() {
