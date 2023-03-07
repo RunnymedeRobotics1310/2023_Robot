@@ -27,7 +27,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
     private enum State {
 
         MOVING_TO_COMPACT_POSE,
-        COMPACT_POSE, // raise arm to safe height
+        SAFE_TO_MOVE, // raise arm to safe height
         ARM_MOVING, // extend arm, open pincher and raise arm
         ARM_IN_POSITION, // arm is in the proper position for hoovering
         PIECE_DETECTED, // piece has been found
@@ -76,15 +76,22 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
     @Override
     public void initialize() {
-        // todo: fixme: be smarter about initial state. We may not need to go into
-        // compact pose a lot of the time, and this would save a lot of time on the field.
         printStatus("initialize");
+        // Try to figure out the right state to start
         if (isCompactPose()) {
-            state = State.COMPACT_POSE;
+            state = State.SAFE_TO_MOVE;
             stopArmMotors();
         }
         else if (isGroundPickupPose()) {
             state = State.ARM_IN_POSITION;
+            stopArmMotors();
+        }
+        else if (armSubsystem.getArmLiftAngle() > CLEAR_FRAME_ARM_ANGLE && GROUND_PICKUP_POSITION.angle > CLEAR_FRAME_ARM_ANGLE) {
+            state = State.SAFE_TO_MOVE;
+            stopArmMotors();
+        }
+        else if (armSubsystem.getArmLiftAngle() > CLEAR_FRAME_ARM_ANGLE && GROUND_PICKUP_POSITION.angle < CLEAR_FRAME_ARM_ANGLE) {
+            state = State.MOVING_TO_COMPACT_POSE;
             stopArmMotors();
         }
         else {
@@ -95,6 +102,8 @@ public class PickUpGroundCommand extends BaseArmCommand {
         }
 
         setVisionTarget(pickupTarget);
+        printStatus("end of initialize");
+
     }
 
     @Override
@@ -128,12 +137,12 @@ public class PickUpGroundCommand extends BaseArmCommand {
         case MOVING_TO_COMPACT_POSE: {
             boolean compactDone = moveToCompactPose();
             if (compactDone) {
-                state = State.COMPACT_POSE;
+                state = State.SAFE_TO_MOVE;
             }
             break;
         }
 
-        case COMPACT_POSE: {
+        case SAFE_TO_MOVE: {
             // sets arm position to ground pickup
             boolean liftDone = moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE);
             if (liftDone) {
