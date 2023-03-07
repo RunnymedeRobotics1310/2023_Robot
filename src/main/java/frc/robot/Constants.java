@@ -7,15 +7,15 @@ import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose.
+ * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean constants. This class should
+ * not be used for any other purpose.
  * <p>
  * All constants should be declared globally (i.e. public static).
  * <br>
  * Do not put anything functional in this class.
  * <p>
- * It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
+ * It is advised to statically import this class (or one of its inner classes) wherever the constants are needed, to reduce
+ * verbosity.
  */
 public final class Constants {
 
@@ -26,8 +26,9 @@ public final class Constants {
 
         public static enum GamePiece {
 
-            // TODO: set these values
-            CUBE(65), CONE(124), NONE(0);
+            CUBE(65), // Confirmed
+            CONE(129),  // Confirmed
+            NONE(ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE); // Confirmed
 
             public final double pincherEncoderCount;
 
@@ -73,15 +74,15 @@ public final class Constants {
             TANK, ARCADE, QUENTIN, DUAL_STICK_ARCADE;
         }
 
-        public static final int     LEFT_MOTOR_PORT      = 10;
-        public static final int     RIGHT_MOTOR_PORT     = 20;
+        public static final int LEFT_MOTOR_PORT  = 10;
+        public static final int RIGHT_MOTOR_PORT = 20;
 
         public static final boolean LEFT_MOTOR_REVERSED  = false;
         public static final boolean RIGHT_MOTOR_REVERSED = true;
 
         public static final double  CM_PER_ENCODER_COUNT = 3.503;
 
-        public static final boolean GYRO_REVERSED        = false;
+        public static final boolean GYRO_REVERSED = false;
     }
 
     public static final class OiConstants {
@@ -105,14 +106,14 @@ public final class Constants {
             IN_BETWEEN
         }
 
-        public static final int    CAMERA_ANGLE_MOTOR_PORT         = 50;
+        public static final int CAMERA_ANGLE_MOTOR_PORT = 50;
 
         // Set the current limit of the Neo 550 to 20A
-        public static final int    CAMERA_MOTOR_CURRENT_LIMIT      = 20;
+        public static final int CAMERA_MOTOR_CURRENT_LIMIT = 20;
 
         /** The maximum speed to drive the camera - manually or automatically */
-        public static final double MAX_CAMERA_MOTOR_SPEED          = 1;
-        public static final double MAX_CAMERA_SLOW_ZONE_SPEED      = .2;
+        public static final double MAX_CAMERA_MOTOR_SPEED     = 1;
+        public static final double MAX_CAMERA_SLOW_ZONE_SPEED = .2;
 
         public static final double CAMERA_DOWN_LIMIT_ENCODER_VALUE = -255;
         public static final double CAMERA_POSITION_TOLERANCE       = 3;
@@ -134,82 +135,96 @@ public final class Constants {
         /*
          * Arm Lift Constants
          */
-        public static final int         ARM_LIFT_MOTOR_PORT                = 30;
-        public static final boolean     ARM_LIFT_MOTOR_REVERSED            = false;
+        public static final int     ARM_LIFT_MOTOR_PORT     = 30;
+        public static final boolean ARM_LIFT_MOTOR_REVERSED = false;
 
-        public static final int         ARM_DOWN_LIMIT_SWITCH_DIO_PORT     = 0;
+        public static final int ARM_DOWN_LIMIT_SWITCH_DIO_PORT = 0;
 
         /** The maximum speed to drive the arm lift - manually or automatically */
-        public static final double      MAX_LIFT_SPEED                     = .25;
-        public static final double      MAX_LIFT_SLOW_ZONE_SPEED           = .1;
+        public static final double MAX_LIFT_SPEED           = .25;
+        public static final double MAX_LIFT_SLOW_ZONE_SPEED = .1;
 
-        public static final double      ARM_LIFT_LIMIT_ENCODER_VALUE       = 16;
-        public static final double      ARM_LIFT_ANGLE_TOLERANCE_DEGREES   = 2;
-        public static final double      ARM_LIFT_SLOW_ZONE_DEGREES         = 5;
+        public static final double ARM_LIFT_LIMIT_ENCODER_VALUE     = 16;
+        public static final double ARM_LIFT_ANGLE_TOLERANCE_DEGREES = 2;
+        public static final double ARM_LIFT_SLOW_ZONE_DEGREES       = 5;
 
-        public static final double      CLEAR_FRAME_ARM_ANGLE              = 30;                                  // TODO: get
-                                                                                                                  // real value
+        public static final double CLEAR_FRAME_ARM_ANGLE = 36;                                  // Confirmed
+        // real value
 
         /*
          * Arm Angle Constants
          */
 
         /** Hard stop angle where 0 = straight down, and 90 = parallel to floor */
-        public static final double      ARM_DOWN_ANGLE_DEGREES             = 23;
+        public static final double ARM_DOWN_ANGLE_DEGREES = 23;
 
-        /** Down position is 23 degrees, and there are 12.5 encoder counts to horizontal, 90 deg */
-        public static final double      ARM_DEGREES_PER_ENCODER_COUNT      = (90 - ARM_DOWN_ANGLE_DEGREES) / 12.5;
+        /** Down position is 23 degrees, and there are 11.86 encoder counts to horizontal, 90 deg */
+        public static final double ARM_DEGREES_PER_ENCODER_COUNT = (90 - ARM_DOWN_ANGLE_DEGREES) / 11.86;
 
         // Calculate the lift limit in degrees instead of encoder counts */
-        public static final double      ARM_LIFT_LIMIT_DEGREES             = (ARM_LIFT_LIMIT_ENCODER_VALUE
+        public static final double ARM_LIFT_LIMIT_DEGREES = (ARM_LIFT_LIMIT_ENCODER_VALUE
             * ARM_DEGREES_PER_ENCODER_COUNT) + ARM_DOWN_ANGLE_DEGREES;
 
 
         /*
          * Arm Extender Constants
          */
-        public static final int         ARM_EXTEND_MOTOR_PORT              = 35;
-        public static final boolean     ARM_EXTEND_MOTOR_REVERSED          = true;
+        public static final int     ARM_EXTEND_MOTOR_PORT     = 35;
+        public static final boolean ARM_EXTEND_MOTOR_REVERSED = true;
 
-        public static final double      MAX_EXTEND_SPEED                   = 1;
-        public static final double      MAX_EXTEND_SLOW_ZONE_SPEED         = .15;
+        public static final double MAX_EXTEND_SPEED           = 1;
+        public static final double MAX_EXTEND_SLOW_ZONE_SPEED = .15;
 
-        public static final double      ARM_EXTEND_LIMIT_ENCODER_VALUE     = 56.0;
-        public static final double      ARM_EXTEND_POSITION_TOLERANCE      = 2;
-        public static final double      ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE = 7;
+        public static final double ARM_EXTEND_LIMIT_ENCODER_VALUE     = 56.0;
+        public static final double ARM_EXTEND_POSITION_TOLERANCE      = 2;
+        public static final double ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE = 7;
 
 
         /*
          * Pincher Constants
          */
-        public static final int         PINCHER_MOTOR_PORT                 = 40;
-        public static final boolean     PINCHER_MOTOR_REVERSED             = true;
+        public static final int     PINCHER_MOTOR_PORT     = 40;
+        public static final boolean PINCHER_MOTOR_REVERSED = true;
 
         // Set the current limit of the Neo 550 to 20A
-        public static final int         PINCHER_MOTOR_CURRENT_LIMIT        = 20;
+        public static final int PINCHER_MOTOR_CURRENT_LIMIT = 20;
 
-        public static final double      MAX_PINCHER_SPEED                  = 1;
-        public static final double      MAX_PINCHER_SLOW_ZONE_SPEED        = .15;
-        public static final double      PINCHER_CLOSE_LIMIT_ENCODER_VALUE  = 126;
-        public static final double      PINCHER_POSITION_TOLERANCE         = 2;
-        public static final double      PINCHER_SLOW_ZONE_ENCODER_VALUE    = 10;
+        public static final double MAX_PINCHER_SPEED                 = 1;
+        public static final double MAX_PINCHER_SLOW_ZONE_SPEED       = .15;
+        public static final double PINCHER_CLOSE_LIMIT_ENCODER_VALUE = 126;
+        public static final double PINCHER_POSITION_TOLERANCE        = 2;
+        public static final double PINCHER_SLOW_ZONE_ENCODER_VALUE   = 10;
 
 
         /*
          * Scoring Constants
          */
-        public static final ArmPosition SCORE_TOP_CONE_POSITION            = new ArmPosition(100, 50);
-        public static final ArmPosition SCORE_TOP_CUBE_POSITION            = new ArmPosition(100, 50);
+        public static final ArmPosition SCORE_TOP_CONE_POSITION = new ArmPosition(100, 52); // Confirmed
+        public static final ArmPosition SCORE_TOP_CUBE_POSITION = new ArmPosition(90, 50); // Confirmed
 
-        public static final ArmPosition SCORE_MIDDLE_CONE_POSITION         = new ArmPosition(75, 25);
-        public static final ArmPosition SCORE_MIDDLE_CUBE_POSITION         = new ArmPosition(75, 25);
+        public static final ArmPosition SCORE_MIDDLE_CONE_POSITION = new ArmPosition(90, 7); // Confirmed
+        public static final ArmPosition SCORE_MIDDLE_CUBE_POSITION = new ArmPosition(78, 13); // Confirmed
 
-        public static final ArmPosition SCORE_BOTTOM_CONE_POSITION         = new ArmPosition(40, 10);
-        public static final ArmPosition SCORE_BOTTOM_CUBE_POSITION         = new ArmPosition(40, 10);
+        public static final ArmPosition SCORE_BOTTOM_CONE_POSITION = new ArmPosition(50, 0); // Confirmed
+        public static final ArmPosition SCORE_BOTTOM_CUBE_POSITION = new ArmPosition(43, 7); // Confirmed
 
         // Pickup constants
-        public static final ArmPosition GROUND_PICKUP_POSITION             = new ArmPosition(30, 10);
-        public static final ArmPosition SUBSTATION_PICKUP_POSITION         = new ArmPosition(30, 10);
+        public static final ArmPosition GROUND_PICKUP_POSITION     = new ArmPosition(34, 14); // Confirmed
+        public static final ArmPosition SUBSTATION_PICKUP_POSITION = new ArmPosition(30, 10);
+
+        // Drive with Piece constants
+        public static final ArmPosition DRIVE_WITH_CONE_POSITION = new ArmPosition(45, 0); // todo: fixme: get actuals
+        public static final ArmPosition DRIVE_WITH_CUBE_POSITION = new ArmPosition(ARM_DOWN_ANGLE_DEGREES, 0); // Confirmed
+
+        public static ArmPosition getDrivePosition(GamePiece gamePiece) {
+            if (gamePiece == GamePiece.CONE) {
+                return DRIVE_WITH_CONE_POSITION;
+            }
+            if (gamePiece == GamePiece.CUBE) {
+                return DRIVE_WITH_CUBE_POSITION;
+            }
+            return DRIVE_WITH_CONE_POSITION; // TODO: FIXME: THE DEFAULT SHOULD BE THE ONE THAT WORKS FOR BOTH
+        }
 
         // Helper routine to get a scoring position
         public static ArmPosition getScoringPosition(GamePiece gamePiece, ScoringRow scoringRow) {
