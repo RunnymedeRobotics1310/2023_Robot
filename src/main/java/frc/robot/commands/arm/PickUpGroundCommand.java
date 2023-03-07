@@ -88,7 +88,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
             stopArmMotors();
         }
         else {
-            armSubsystem.setPincherSpeed(.25);
+            armSubsystem.setPincherSpeed(MAX_PINCHER_SPEED);
             armSubsystem.setArmExtendSpeed(0);
             armSubsystem.setArmLiftSpeed(0);
             state = State.MOVING_TO_COMPACT_POSE;
@@ -99,6 +99,29 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
     @Override
     public void execute() {
+
+        if (operatorInput != null) {
+            // check for operator override. If both selected, cube wins. If none selected, command is cancelled.
+            if (operatorInput.isPickUpCone()) {
+                if (pickupTarget == CUBE) {
+                    System.out.println("Changing pickup target from CUBE to CONE based on operator input");
+                    pickupTarget = CONE;
+                    setVisionTarget(pickupTarget);
+                }
+            }
+            else if (operatorInput.isPickUpCube()) {
+                if (pickupTarget == CONE) {
+                    System.out.println("Changing pickup target from CONE to CUBE based on operator input");
+                    pickupTarget = CUBE;
+                    setVisionTarget(pickupTarget);
+                }
+            }
+            else {
+                pickupTarget = NONE;
+                state        = State.CANCELLED;
+            }
+        }
+
 
         switch (state) {
 
@@ -112,7 +135,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
         case COMPACT_POSE: {
             // sets arm position to ground pickup
-            boolean liftDone = moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE, .15);
+            boolean liftDone = moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE);
             if (liftDone) {
                 state = State.ARM_MOVING;
             }
@@ -122,7 +145,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
         case ARM_MOVING: {
             // if ground pickup location is too low, override it with the location that will ensure that we clear the frame.
             boolean liftDone = moveArmLiftToAngle(
-                Double.max(CLEAR_FRAME_ARM_ANGLE, GROUND_PICKUP_POSITION.angle), .15);
+                Double.max(CLEAR_FRAME_ARM_ANGLE, GROUND_PICKUP_POSITION.angle));
             boolean extDone   = moveArmExtendToEncoderCount(GROUND_PICKUP_POSITION.extension, .5);
             boolean pinchDone = openPincher();
             if (liftDone && extDone && pinchDone) {
@@ -140,30 +163,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
         case PIECE_DETECTED:
         case PINCHERS_MOVING: {
-
-            if (operatorInput != null) {
-                // check for operator override. If both selected, cube wins. If none selected, command is cancelled.
-                if (operatorInput.isPickUpCone()) {
-                    if (pickupTarget == CUBE) {
-                        System.out.println("Changing pickup target from CUBE to CONE based on operator input");
-                        pickupTarget = CONE;
-                        setVisionTarget(pickupTarget);
-                    }
-                }
-                else if (operatorInput.isPickUpCube()) {
-                    if (pickupTarget == CONE) {
-                        System.out.println("Changing pickup target from CONE to CUBE based on operator input");
-                        pickupTarget = CUBE;
-                        setVisionTarget(pickupTarget);
-                    }
-                }
-                else {
-                    pickupTarget = NONE;
-                    state        = State.CANCELLED;
-                    break;
-                }
-            }
-            boolean pinchDone = movePincherToEncoderCount(pickupTarget.pincherEncoderCount, .5);
+            boolean pinchDone = movePincherToEncoderCount(pickupTarget.pincherEncoderCount);
             state = pinchDone ? State.PIECE_GRABBED : State.PINCHERS_MOVING;
             break;
         }

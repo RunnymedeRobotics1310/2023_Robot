@@ -31,22 +31,12 @@ abstract class BaseArmCommand extends CommandBase {
      * Move the motor to a specified encoder count
      *
      * @param targetAngle the angle in degrees
-     * @param speed the absolute value of the speed at which you should move
      * @return true if at the desired location, false if still moving to that point
      */
-    protected final boolean moveArmLiftToAngle(double targetAngle, double speed) {
-
-        if (armSubsystem.isArmAtLiftAngle(targetAngle)) {
-            armSubsystem.setArmLiftSpeed(0);
-            return true;
-        }
-
-        double absSpd = Math.abs(speed);
-        double gap    = armSubsystem.getArmLiftAngle() - targetAngle;
-
-        armSubsystem.setArmLiftSpeed(gap > 0 ? -absSpd : absSpd);
-
-        return false;
+    protected final boolean moveArmLiftToAngle(double targetAngle) {
+        armSubsystem.setArmLiftPidEnabled(true);
+        armSubsystem.moveArmToAngle(targetAngle);
+        return armSubsystem.isArmAtLiftAngle(targetAngle);
     }
 
     /**
@@ -75,14 +65,12 @@ abstract class BaseArmCommand extends CommandBase {
      * Move the motor to a specified encoder count
      *
      * @param targetCount the count to get to
-     * @param speed the absolute value of the speed at which you should move
      * @return true if at the desired location, false if still moving to that point
      */
-    protected final boolean movePincherToEncoderCount(double targetCount, double speed) {
-        double absSpd = Math.abs(speed);
-        double gap    = armSubsystem.getPincherEncoder() - targetCount;
+    protected final boolean movePincherToEncoderCount(double targetCount) {
+        double gap = armSubsystem.getPincherEncoder() - targetCount;
         if (Math.abs(gap) > PINCHER_POSITION_TOLERANCE) {
-            armSubsystem.setPincherSpeed(gap > 0 ? -absSpd : absSpd);
+            armSubsystem.setPincherSpeed(gap > 0 ? -MAX_PINCHER_SPEED : MAX_PINCHER_SPEED);
             return false;
         }
         else {
@@ -144,22 +132,22 @@ abstract class BaseArmCommand extends CommandBase {
 
         case PREPARING: {
             if (!armSubsystem.isPincherAtCloseLimit()) {
-                armSubsystem.setPincherSpeed(.5);
+                armSubsystem.setPincherSpeed(MAX_PINCHER_SPEED);
             }
-            boolean done = moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE, .3);
+            boolean done = moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE);
             compactState = done ? CompactState.RETRACTING : CompactState.PREPARING;
             break;
         }
 
         case RETRACTING: {
-            boolean done = movePincherToEncoderCount(PINCHER_CLOSE_LIMIT_ENCODER_VALUE, .5);
+            boolean done = movePincherToEncoderCount(PINCHER_CLOSE_LIMIT_ENCODER_VALUE);
             done         = moveArmExtendToEncoderCount(0, .3) && done;
             compactState = done ? CompactState.LOWERING : CompactState.RETRACTING;
             break;
         }
 
         case LOWERING: {
-            boolean done = moveArmLiftToAngle(0, .1);
+            boolean done = moveArmLiftToAngle(0);
             compactState = done ? CompactState.COMPACT_POSE : CompactState.LOWERING;
             break;
         }
@@ -201,25 +189,25 @@ abstract class BaseArmCommand extends CommandBase {
         switch (driveWithPieceState) {
 
         case PREPARING: {
-            boolean done = moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE, .3);
+            boolean done = moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE);
             driveWithPieceState = done ? DriveWithPieceState.RETRACTING : DriveWithPieceState.PREPARING;
             break;
         }
 
         case RETRACTING: {
-            boolean done = moveArmExtendToEncoderCount(0, .8);
+            boolean done = moveArmExtendToEncoderCount(0, .5);
             driveWithPieceState = done ? DriveWithPieceState.FINALIZING_ANGLE : DriveWithPieceState.RETRACTING;
             break;
         }
 
         case FINALIZING_ANGLE: {
-            boolean done = moveArmLiftToAngle(target.angle, .1);
+            boolean done = moveArmLiftToAngle(target.angle);
             driveWithPieceState = done ? DriveWithPieceState.FINALIZING_EXTENT : DriveWithPieceState.FINALIZING_ANGLE;
             break;
         }
 
         case FINALIZING_EXTENT: {
-            boolean done = moveArmExtendToEncoderCount(target.extension, .1);
+            boolean done = moveArmExtendToEncoderCount(target.extension, .5);
             driveWithPieceState = done ? DriveWithPieceState.IN_POSITION : DriveWithPieceState.FINALIZING_EXTENT;
             break;
         }
