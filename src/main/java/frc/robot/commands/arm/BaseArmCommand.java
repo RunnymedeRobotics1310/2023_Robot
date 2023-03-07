@@ -115,7 +115,8 @@ abstract class BaseArmCommand extends CommandBase {
     private CompactState compactState = null;
 
     protected final boolean isCompactPose() {
-        return armSubsystem.isArmDown() && armSubsystem.isArmRetracted() && armSubsystem.isPincherAtCloseLimit();
+        return armSubsystem.isArmDown()
+            && armSubsystem.isArmRetracted() /*&& armSubsystem.isPincherAtCloseLimit()*/; // TODO: URGENT: FIXME - return this
     }
 
     /**
