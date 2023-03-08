@@ -4,7 +4,9 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.networktables.*;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
@@ -273,14 +275,15 @@ public class VisionSubsystem extends SubsystemBase {
      */
     public void setCameraMotorSpeed(double speed) {
 
-        if (!isCameraPositionInitialized) {
-            initializeCameraPosition();
-            return;
-        }
+        return;
+        // if (!isCameraPositionInitialized) {
+        // initializeCameraPosition();
+        // return;
+        // }
 
-        cameraMotorSpeed = checkCameraMotorLimits(speed);
+        // cameraMotorSpeed = checkCameraMotorLimits(speed);
 
-        cameraMotor.set(cameraMotorSpeed);
+        // cameraMotor.set(cameraMotorSpeed);
     }
 
     public void initializeCameraPosition() {

@@ -1,9 +1,11 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.*;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ExternalFollower;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxLimitSwitch.Type;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -282,7 +284,7 @@ public class ArmSubsystem extends SubsystemBase {
         // limit is a soft limit that uses the arm encoder counts
 
         // The upper limit is larger than the cone top scoring position
-        return armLiftEncoder.getPosition() > ArmConstants.ARM_LIFT_LIMIT_ENCODER_VALUE;
+        return getArmLiftEncoder() > ArmConstants.ARM_LIFT_LIMIT_ENCODER_VALUE;
     }
 
     /** Determine if the arm is fully extended. This safety mechanism keeps the arm to 4 ft. */
@@ -376,7 +378,7 @@ public class ArmSubsystem extends SubsystemBase {
 
         setArmLiftIdleMode(IdleMode.kBrake);
 
-        armLiftPidAngleSetpoint = angle;
+        armLiftPidAngleSetpoint = Math.max(0, Math.min(angle, 110));
 
         armTestMode             = false;
     }
@@ -496,7 +498,8 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void stopArm() {
-        // The arm is controlled by a PID controller. Stop the arm by setting the angle to the current angle.
+        // The arm is controlled by a PID controller. Stop the arm by setting the angle to the
+        // current angle.
         setArmLiftPidEnabled(true);
         moveArmLiftToAngle(getArmLiftAngle());
     }
@@ -732,7 +735,8 @@ public class ArmSubsystem extends SubsystemBase {
                 return 0;
             }
 
-            // NOTE: Do not slow down when closing the pincher on a cone because the power may be needed.
+            // NOTE: Do not slow down when closing the pincher on a cone because the power may be
+            // needed.
             if (!isGamePieceDetected()) {
 
                 // Slow down if approaching the limit
