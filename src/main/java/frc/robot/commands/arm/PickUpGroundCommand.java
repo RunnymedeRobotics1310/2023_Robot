@@ -1,12 +1,7 @@
 package frc.robot.commands.arm;
 
-import static frc.robot.Constants.ArmConstants.ARM_EXTEND_POSITION_TOLERANCE;
-import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_ARM_ANGLE;
-import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_POSITION;
-import static frc.robot.Constants.ArmConstants.MAX_PINCHER_SPEED;
-import static frc.robot.Constants.GameConstants.GamePiece.CONE;
-import static frc.robot.Constants.GameConstants.GamePiece.CUBE;
-import static frc.robot.Constants.GameConstants.GamePiece.NONE;
+import static frc.robot.Constants.ArmConstants.*;
+import static frc.robot.Constants.GameConstants.GamePiece.*;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.GameConstants.GamePiece;
@@ -106,7 +101,6 @@ public class PickUpGroundCommand extends BaseArmCommand {
         else {
             armSubsystem.setPincherSpeed(MAX_PINCHER_SPEED);
             armSubsystem.setArmExtendSpeed(0);
-            armSubsystem.setArmLiftSpeed(0);
             state = State.MOVING_TO_COMPACT_POSE;
         }
 

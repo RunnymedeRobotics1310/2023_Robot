@@ -153,6 +153,16 @@ public final class Constants {
         public static final double      CLEAR_FRAME_ARM_ANGLE              = 36;
         /** Arm lift PID proportional gain */
         public static final double      ARM_LIFT_PID_P                     = 0.015;
+        /*
+         * The max arm angle loop increment is dependent on the max speed we want for the
+         * arm setpoint when moving the arm manually. Ideally the PID controller will
+         * keep up with the manual setpoint movement. Assume 4 seconds from fully
+         * down to full up (using the manual trim). Setting the setpoint will result
+         * in a faster movement.
+         *
+         * loop increment = 4 seconds to go from 20-120 degrees / 50 loops/sec
+         */
+        public static final double      MAX_ARM_ANGLE_LIFT_LOOP_INCREMENT  = 100 / 4 / 50d;
 
         /*
          * Arm Angle Constants

@@ -1,11 +1,9 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.*;
 import com.revrobotics.CANSparkMax.ExternalFollower;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxLimitSwitch.Type;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -100,6 +98,9 @@ public class ArmSubsystem extends SubsystemBase {
         setArmLiftIdleMode(IdleMode.kBrake);
 
         setArmLiftEncoder(0);
+
+        armLiftPidAngleSetpoint = ArmConstants.ARM_DOWN_ANGLE_DEGREES;
+        setArmLiftPidEnabled(true);
 
         /*
          * Arm Extend
@@ -402,8 +403,19 @@ public class ArmSubsystem extends SubsystemBase {
         armTestMode       = true;
         armLiftPidEnabled = false;
 
-        armLiftMotor.set(armLiftMotorSpeed);
-        armLiftFollower.set(armLiftFollowerSpeed);
+        double motorSpeed = 0;
+
+        if (armLiftMotorSpeed != 0) {
+            motorSpeed = armLiftMotorSpeed + calcArmLiftHoldSpeed();
+            armLiftMotor.set(motorSpeed);
+            SmartDashboard.putNumber("Arm Lift output", motorSpeed);
+        }
+
+        if (armLiftFollowerSpeed != 0) {
+            motorSpeed = armLiftFollowerSpeed + calcArmLiftHoldSpeed();
+            armLiftFollower.set(motorSpeed);
+            SmartDashboard.putNumber("Arm Lift output", motorSpeed);
+        }
     }
 
     /**
@@ -445,10 +457,15 @@ public class ArmSubsystem extends SubsystemBase {
 
     /** Safely stop the all arm motors from moving */
     public void stop() {
-        setArmLiftPidEnabled(false);
-        setArmLiftSpeed(0);
+        stopArm();
         setArmExtendSpeed(0);
         setPincherSpeed(0);
+    }
+
+    public void stopArm() {
+        // The arm is controlled by a PID controller. Stop the arm by setting the angle to the current angle.
+        setArmLiftPidEnabled(true);
+        moveArmToAngle(getArmLiftAngle());
     }
 
     @Override
@@ -787,5 +804,9 @@ public class ArmSubsystem extends SubsystemBase {
          * and the angle and extension adjustments.
          */
         return baseCompensation * angleMultiplier * extendMultiplier;
+    }
+
+    public double getArmLiftAngleSetpoint() {
+        return armLiftPidAngleSetpoint;
     }
 }

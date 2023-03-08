@@ -23,9 +23,7 @@ abstract class BaseArmCommand extends CommandBase {
     }
 
     protected final void stopArmMotors() {
-        armSubsystem.setArmExtendSpeed(0);
-        armSubsystem.setPincherSpeed(0);
-        armSubsystem.setArmLiftSpeed(0);
+        armSubsystem.stop();
     }
 
     /**
