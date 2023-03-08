@@ -10,10 +10,11 @@ import frc.robot.subsystems.ArmSubsystem;
 
 abstract class BaseArmCommand extends CommandBase {
 
-    private final ArmSubsystem armSubsystem;
+    protected final ArmSubsystem armSubsystem;
 
     protected BaseArmCommand(ArmSubsystem armSubsystem) {
         this.armSubsystem = armSubsystem;
+        addRequirements(armSubsystem);
     }
 
     protected final void printArmState() {
@@ -28,6 +29,15 @@ abstract class BaseArmCommand extends CommandBase {
     }
 
     /**
+     * Convenience method to move the arm to the bottom position (lowest arm angle).
+     *
+     * @return {@code true} if at the bottom, {@code false} otherwise
+     */
+    protected boolean lowerArmToBottom() {
+        return moveArmLiftToAngle(ArmConstants.ARM_DOWN_ANGLE_DEGREES);
+    }
+
+    /**
      * Move the motor to a specified encoder count
      *
      * @param targetAngle the angle in degrees
@@ -36,6 +46,15 @@ abstract class BaseArmCommand extends CommandBase {
     protected final boolean moveArmLiftToAngle(double targetAngle) {
         armSubsystem.moveArmLiftToAngle(targetAngle);
         return armSubsystem.isArmAtLiftAngle(targetAngle);
+    }
+
+    /**
+     * Convenience method to fully retract the arm.
+     *
+     * @return {@code true} if in frame, {@code false} otherwise
+     */
+    protected boolean retractArm() {
+        return moveArmExtendToEncoderCount(0, MAX_EXTEND_SPEED);
     }
 
     /**
@@ -49,17 +68,41 @@ abstract class BaseArmCommand extends CommandBase {
 
         SmartDashboard.putBoolean("At Extension Position", armSubsystem.isAtExtendPosition(targetCount));
 
-        if (armSubsystem.isAtExtendPosition(targetCount)) {
-            armSubsystem.setArmExtendSpeed(0);
-            return true;
+        if (targetCount == 0) {
+            if (armSubsystem.isArmRetracted()) {
+                armSubsystem.setArmExtendSpeed(0);
+                return true;
+            }
+        }
+        else {
+            if (armSubsystem.isAtExtendPosition(targetCount)) {
+                armSubsystem.setArmExtendSpeed(0);
+                return true;
+            }
         }
 
         double absSpd = Math.abs(speed);
-        double gap    = armSubsystem.getArmExtendEncoder() - targetCount;
+        double gap    = targetCount - armSubsystem.getArmExtendEncoder();
 
-        armSubsystem.setArmExtendSpeed(gap > 0 ? -absSpd : absSpd);
+        // Determine whether to slow down because we are close to the target.
+        if (Math.abs(gap) < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
+
+            absSpd = Math.min(absSpd, ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED);
+        }
+
+        armSubsystem.setArmExtendSpeed(gap < 0 ? -absSpd : absSpd);
 
         return false;
+
+    }
+
+    /**
+     * Convenience method to set the pincher inside the frame for storage.
+     *
+     * @return {@code true} if in frame, {@code false} otherwise
+     */
+    protected boolean movePincherInsideFrame() {
+        return movePincherToEncoderCount(ArmConstants.MIN_PINCHER_INSIDE_FRAME_POSITION);
     }
 
     /**
@@ -72,9 +115,17 @@ abstract class BaseArmCommand extends CommandBase {
 
         SmartDashboard.putBoolean("At Pincher Position", armSubsystem.isAtPincherPosition(targetCount));
 
-        if (armSubsystem.isAtPincherPosition(targetCount)) {
-            armSubsystem.setPincherSpeed(0);
-            return true;
+        if (targetCount == 0) {
+            if (armSubsystem.isPincherOpen()) {
+                armSubsystem.setPincherSpeed(0);
+                return true;
+            }
+        }
+        else {
+            if (armSubsystem.isAtPincherPosition(targetCount)) {
+                armSubsystem.setPincherSpeed(0);
+                return true;
+            }
         }
 
         double gap   = targetCount - armSubsystem.getPincherEncoder();
@@ -126,7 +177,7 @@ abstract class BaseArmCommand extends CommandBase {
 
     protected final boolean isCompactPose() {
         return armSubsystem.isArmDown()
-            && armSubsystem.isArmRetracted() /* && armSubsystem.isPincherAtCloseLimit() */; // TODO: URGENT: FIXME - restore this
+            && armSubsystem.isArmRetracted() && armSubsystem.isPincherInsideFrame();
     }
 
     /**

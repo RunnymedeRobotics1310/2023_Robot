@@ -18,7 +18,6 @@ import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
  */
 public class PickUpGroundCommand extends BaseArmCommand {
 
-    private final ArmSubsystem    armSubsystem;
     private final VisionSubsystem visionSubsystem;
     private final OperatorInput   operatorInput;
 
@@ -69,12 +68,9 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
         super(armSubsystem);
 
-        this.armSubsystem    = armSubsystem;
         this.visionSubsystem = visionSubsystem;
         this.operatorInput   = operatorInput;
         this.pickupTarget    = initialPickupTarget;
-
-        addRequirements(armSubsystem);
 
     }
 

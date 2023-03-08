@@ -8,17 +8,12 @@ import frc.robot.subsystems.ArmSubsystem;
 
 public class ScoreCommand extends BaseArmCommand {
 
-    private final ArmSubsystem armSubsystem;
-    private final ScoringRow   scoringRow;
-    private ArmPosition        scoringPosition = null;
-    private GamePiece          gamePiece       = null;
+    private final ScoringRow scoringRow;
+    private ArmPosition      scoringPosition = null;
+    private GamePiece        gamePiece       = null;
 
     public ScoreCommand(ScoringRow scoringRow, ArmSubsystem armSubsystem) {
         super(armSubsystem);
-
-        this.armSubsystem = armSubsystem;
-
-        addRequirements(armSubsystem);
         this.scoringRow = scoringRow;
     }
 

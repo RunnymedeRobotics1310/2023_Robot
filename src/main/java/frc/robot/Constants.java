@@ -150,7 +150,8 @@ public final class Constants {
         public static final double      ARM_LIFT_ANGLE_TOLERANCE_DEGREES    = 2;
         public static final double      ARM_LIFT_SLOW_ZONE_DEGREES          = 5;
 
-        public static final double      CLEAR_FRAME_ARM_ANGLE               = 36;
+        public static final double      CLEAR_FRAME_ARM_ANGLE               = 38;
+
         /** Arm lift PID proportional gain */
         public static final double      ARM_LIFT_PID_P                      = 0.015;
         /*
@@ -192,6 +193,10 @@ public final class Constants {
         public static final double      ARM_EXTEND_POSITION_TOLERANCE       = 2;
         public static final double      ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE  = 7;
 
+        // If the arm is below the frame clearance, and the arm extension is greater
+        // than the max inside frame extension, then the robot is outside the frame.
+        public static final double      MAX_ARM_EXTEND_INSIDE_FRAME         = 4;
+
 
         /*
          * Pincher Constants
@@ -208,15 +213,16 @@ public final class Constants {
         public static final double      PINCHER_POSITION_TOLERANCE          = 2;
         public static final double      PINCHER_SLOW_ZONE_ENCODER_VALUE     = 12;
         public static final double      PINCHER_GAME_PIECE_RELEASE_DISTANCE = 30;
+        public static final double      MIN_PINCHER_INSIDE_FRAME_POSITION   = 90;
 
 
         /*
          * Scoring Constants
          */
-        public static final ArmPosition SCORE_TOP_CONE_POSITION             = new ArmPosition(110, 52);                   // Confirmed
+        public static final ArmPosition SCORE_TOP_CONE_POSITION             = new ArmPosition(100, 52);                   // Confirmed
         public static final ArmPosition SCORE_TOP_CUBE_POSITION             = new ArmPosition(90, 50);                    // Confirmed
 
-        public static final ArmPosition SCORE_MIDDLE_CONE_POSITION          = new ArmPosition(100, 7);                    // Confirmed
+        public static final ArmPosition SCORE_MIDDLE_CONE_POSITION          = new ArmPosition(90, 7);                    // Confirmed
         public static final ArmPosition SCORE_MIDDLE_CUBE_POSITION          = new ArmPosition(78, 13);                    // Confirmed
 
         public static final ArmPosition SCORE_BOTTOM_CONE_POSITION          = new ArmPosition(50, 0);                     // Confirmed
@@ -224,7 +230,7 @@ public final class Constants {
 
         // Pickup constants
         public static final ArmPosition GROUND_PICKUP_POSITION              = new ArmPosition(34, 14);                    // Confirmed
-        public static final ArmPosition SUBSTATION_PICKUP_POSITION          = new ArmPosition(30, 10);
+        public static final ArmPosition SUBSTATION_PICKUP_POSITION          = new ArmPosition(70, 10);
 
         // Drive with Piece constants
         public static final ArmPosition DRIVE_WITH_CONE_POSITION            = new ArmPosition(45, 0);                     // todo:

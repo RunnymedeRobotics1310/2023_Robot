@@ -7,14 +7,10 @@ import frc.robot.subsystems.ArmSubsystem;
 
 public class ReleaseCommand extends BaseArmCommand {
 
-    private final ArmSubsystem armSubsystem;
-
-    private double             targetPincherPosition = 0;
+    private double targetPincherPosition = 0;
 
     public ReleaseCommand(ArmSubsystem armSubsystem) {
         super(armSubsystem);
-        this.armSubsystem = armSubsystem;
-        addRequirements(armSubsystem);
     }
 
     @Override

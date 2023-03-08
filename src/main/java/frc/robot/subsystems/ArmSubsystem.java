@@ -246,13 +246,28 @@ public class ArmSubsystem extends SubsystemBase {
      * position tolerance
      *
      * @param position to compare
-     * @return {@code true} if at extension, {@code false} otherwise
+     * @return {@code true} if at position, {@code false} otherwise
      */
     public boolean isAtPincherPosition(double position) {
 
         if (Math.abs(position - getPincherEncoder()) <= ArmConstants.PINCHER_POSITION_TOLERANCE) {
             return true;
         }
+        return false;
+    }
+
+    /**
+     * Determine if the pincher is currently inside the frame and can be safely lowered
+     *
+     * @return {@code true} if inside frame, {@code false} otherwise
+     */
+    public boolean isPincherInsideFrame() {
+
+        // The pincher encoder must be higher than the min frame position (within tolerance)
+        if (getPincherEncoder() > (ArmConstants.MIN_PINCHER_INSIDE_FRAME_POSITION - ArmConstants.PINCHER_POSITION_TOLERANCE)) {
+            return true;
+        }
+
         return false;
     }
 
