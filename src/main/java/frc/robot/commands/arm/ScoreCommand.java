@@ -37,6 +37,15 @@ public class ScoreCommand extends BaseArmCommand {
     @Override
     public void execute() {
 
+        // If the arm is starting inside the frame, then
+        // retract before moving the arm.
+        if (armSubsystem.getArmLiftAngle() < ArmConstants.CLEAR_FRAME_ARM_ANGLE) {
+
+            if (!moveArmExtendToEncoderCount(0, .5)) {
+                return;
+            }
+        }
+
         // If higher than target, retract first
         if (armSubsystem.getArmLiftAngle() > scoringPosition.angle) {
 
