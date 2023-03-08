@@ -121,7 +121,7 @@ public class OperatorInput {
     }
 
     public boolean isSubstationConePickup() {
-        return driverController.getPOV(270) > 0;
+        return driverController.getPOV() == 270;
     }
 
     public boolean isCameraViewHigh() {
