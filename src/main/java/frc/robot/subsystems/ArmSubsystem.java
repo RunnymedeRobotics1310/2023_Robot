@@ -1,9 +1,11 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.*;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ExternalFollower;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxLimitSwitch.Type;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -180,14 +182,13 @@ public class ArmSubsystem extends SubsystemBase {
 
     public Constants.GameConstants.GamePiece getHeldGamePiece() {
 
-        // TODO: Determine the valid ranges for cone and cube.
         if (gamePieceDetector.isPressed()) {
 
-            if (Math.abs(getPincherEncoder() - GamePiece.CONE.pincherEncoderCount) <= 5) {
+            if (Math.abs(getPincherEncoder() - GamePiece.CONE.pincherEncoderCount) <= 8) {
                 return GamePiece.CONE;
             }
 
-            if (Math.abs(getPincherEncoder() - GamePiece.CUBE.pincherEncoderCount) <= 5) {
+            if (Math.abs(getPincherEncoder() - GamePiece.CUBE.pincherEncoderCount) <= 8) {
                 return GamePiece.CUBE;
             }
 
