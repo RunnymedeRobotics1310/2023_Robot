@@ -156,7 +156,7 @@ public class ArmSubsystem extends SubsystemBase {
      */
     public double getArmLiftAngle() {
         return Math.round(
-            ((armLiftEncoder.getPosition() * ArmConstants.ARM_DEGREES_PER_ENCODER_COUNT)
+            ((getArmLiftEncoder() * ArmConstants.ARM_DEGREES_PER_ENCODER_COUNT)
                 + ArmConstants.ARM_DOWN_ANGLE_DEGREES) * 100)
             / 100d;
 

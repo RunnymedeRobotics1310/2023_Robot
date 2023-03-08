@@ -1752,7 +1752,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/Arm Down",
-              "_title": "/SmartDashboard/Arm Down",
+              "_title": "SmartDashboard/Arm Down",
               "_glyph": 148,
               "_showGlyph": false,
               "Colors/Color when true": "#7CFC00FF",
@@ -1767,7 +1767,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/Arm Extend Limit",
-              "_title": "/SmartDashboard/Arm Extend Limit",
+              "_title": "SmartDashboard/Arm Extend Limit",
               "_glyph": 148,
               "_showGlyph": false,
               "Colors/Color when true": "#7CFC00FF",
@@ -1818,7 +1818,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/Arm PID Enabled",
-              "_title": "/SmartDashboard/Arm PID Enabled",
+              "_title": "SmartDashboard/Arm PID Enabled",
               "_glyph": 148,
               "_showGlyph": false,
               "Colors/Color when true": "#7CFC00FF",
@@ -1852,7 +1852,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/Arm Retracted",
-              "_title": "/SmartDashboard/Arm Retracted",
+              "_title": "SmartDashboard/Arm Retracted",
               "_glyph": 148,
               "_showGlyph": false,
               "Colors/Color when true": "#7CFC00FF",
@@ -1867,7 +1867,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/Arm Up Limit",
-              "_title": "/SmartDashboard/Arm Up Limit",
+              "_title": "SmartDashboard/Arm Up Limit",
               "_glyph": 148,
               "_showGlyph": false,
               "Colors/Color when true": "#7CFC00FF",
@@ -1882,7 +1882,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Current Game Piece",
-              "_title": "/SmartDashboard/Current Game Piece",
+              "_title": "SmartDashboard/Current Game Piece",
               "_glyph": 148,
               "_showGlyph": false
             }
@@ -1931,7 +1931,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Lift Encoder",
-              "_title": "/SmartDashboard/Lift Encoder",
+              "_title": "SmartDashboard/Lift Encoder",
               "_glyph": 148,
               "_showGlyph": false
             }
@@ -1961,7 +1961,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/Pincher Closed",
-              "_title": "/SmartDashboard/Pincher Closed",
+              "_title": "SmartDashboard/Pincher Closed",
               "_glyph": 148,
               "_showGlyph": false,
               "Colors/Color when true": "#7CFC00FF",
@@ -1995,7 +1995,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/Pincher Open",
-              "_title": "/SmartDashboard/Pincher Open",
+              "_title": "SmartDashboard/Pincher Open",
               "_glyph": 148,
               "_showGlyph": false,
               "Colors/Color when true": "#7CFC00FF",
@@ -2010,7 +2010,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Raw Extend Encoder",
-              "_title": "/SmartDashboard/Raw Extend Encoder",
+              "_title": "SmartDashboard/Raw Extend Encoder",
               "_glyph": 148,
               "_showGlyph": false
             }
@@ -2023,7 +2023,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Raw Lift Encoder",
-              "_title": "/SmartDashboard/Raw Lift Encoder",
+              "_title": "SmartDashboard/Raw Lift Encoder",
               "_glyph": 148,
               "_showGlyph": false
             }
@@ -2036,7 +2036,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Raw Pincher Encoder",
-              "_title": "/SmartDashboard/Raw Pincher Encoder",
+              "_title": "SmartDashboard/Raw Pincher Encoder",
               "_glyph": 148,
               "_showGlyph": false
             }
