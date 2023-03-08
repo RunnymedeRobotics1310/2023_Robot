@@ -163,6 +163,10 @@ public class ArmSubsystem extends SubsystemBase {
 
     }
 
+    public double getArmLiftAngleSetpoint() {
+        return armLiftPidAngleSetpoint;
+    }
+
     /**
      * Gets the extend motor encoder.
      *
@@ -232,6 +236,21 @@ public class ArmSubsystem extends SubsystemBase {
     public boolean isAtExtendPosition(double position) {
 
         if (Math.abs(position - getArmExtendEncoder()) <= ArmConstants.ARM_EXTEND_POSITION_TOLERANCE) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * determine if the pincher is at the supplied position in encoder counts, within the pincher
+     * position tolerance
+     *
+     * @param position to compare
+     * @return {@code true} if at extension, {@code false} otherwise
+     */
+    public boolean isAtPincherPosition(double position) {
+
+        if (Math.abs(position - getPincherEncoder()) <= ArmConstants.PINCHER_POSITION_TOLERANCE) {
             return true;
         }
         return false;
@@ -332,7 +351,7 @@ public class ArmSubsystem extends SubsystemBase {
         return getPincherEncoder() > ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE;
     }
 
-    public void moveArmToAngle(double angle) {
+    public void moveArmLiftToAngle(double angle) {
 
         // if the arm lift pid is not enabled,
         // this routine does nothing
@@ -345,7 +364,6 @@ public class ArmSubsystem extends SubsystemBase {
         armLiftPidAngleSetpoint = angle;
 
         armTestMode             = false;
-        armLiftPidEnabled       = true;
     }
 
     /**
@@ -465,7 +483,7 @@ public class ArmSubsystem extends SubsystemBase {
     public void stopArm() {
         // The arm is controlled by a PID controller. Stop the arm by setting the angle to the current angle.
         setArmLiftPidEnabled(true);
-        moveArmToAngle(getArmLiftAngle());
+        moveArmLiftToAngle(getArmLiftAngle());
     }
 
     @Override
@@ -813,9 +831,5 @@ public class ArmSubsystem extends SubsystemBase {
          * and the angle and extension adjustments.
          */
         return baseCompensation * angleMultiplier * extendMultiplier;
-    }
-
-    public double getArmLiftAngleSetpoint() {
-        return armLiftPidAngleSetpoint;
     }
 }

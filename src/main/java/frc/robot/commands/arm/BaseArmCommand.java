@@ -5,6 +5,7 @@ import static frc.robot.Constants.ArmConstants.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.ArmSubsystem;
 
 abstract class BaseArmCommand extends CommandBase {
@@ -33,8 +34,7 @@ abstract class BaseArmCommand extends CommandBase {
      * @return true if at the desired location, false if still moving to that point
      */
     protected final boolean moveArmLiftToAngle(double targetAngle) {
-        armSubsystem.setArmLiftPidEnabled(true);
-        armSubsystem.moveArmToAngle(targetAngle);
+        armSubsystem.moveArmLiftToAngle(targetAngle);
         return armSubsystem.isArmAtLiftAngle(targetAngle);
     }
 
@@ -47,7 +47,7 @@ abstract class BaseArmCommand extends CommandBase {
      */
     protected final boolean moveArmExtendToEncoderCount(double targetCount, double speed) {
 
-        SmartDashboard.putBoolean("Arm Extension at target", armSubsystem.isAtExtendPosition(targetCount));
+        SmartDashboard.putBoolean("At Extension Position", armSubsystem.isAtExtendPosition(targetCount));
 
         if (armSubsystem.isAtExtendPosition(targetCount)) {
             armSubsystem.setArmExtendSpeed(0);
@@ -63,21 +63,42 @@ abstract class BaseArmCommand extends CommandBase {
     }
 
     /**
-     * Move the motor to a specified encoder count
+     * Move the pincher motor to a specified encoder count
      *
      * @param targetCount the count to get to
      * @return true if at the desired location, false if still moving to that point
      */
     protected final boolean movePincherToEncoderCount(double targetCount) {
-        double gap = armSubsystem.getPincherEncoder() - targetCount;
-        if (Math.abs(gap) > PINCHER_POSITION_TOLERANCE) {
-            armSubsystem.setPincherSpeed(gap > 0 ? -MAX_PINCHER_SPEED : MAX_PINCHER_SPEED);
-            return false;
-        }
-        else {
+
+        SmartDashboard.putBoolean("At Pincher Position", armSubsystem.isAtPincherPosition(targetCount));
+
+        if (armSubsystem.isAtPincherPosition(targetCount)) {
             armSubsystem.setPincherSpeed(0);
             return true;
         }
+
+        double gap   = targetCount - armSubsystem.getPincherEncoder();
+        double speed = MAX_PINCHER_SPEED;
+
+        // Determine whether to slow down because we are close to the target.
+        if (Math.abs(gap) < ArmConstants.PINCHER_SLOW_ZONE_ENCODER_VALUE) {
+
+            // If opening (-ve gap), then slow down when close to the target
+            if (gap < 0) {
+                speed = ArmConstants.MAX_PINCHER_SLOW_ZONE_SPEED;
+            }
+            else {
+                // If closing (+ve gap) and no game piece is detected, then slow down when
+                // close to the target
+                if (!armSubsystem.isGamePieceDetected()) {
+                    speed = ArmConstants.MAX_PINCHER_SLOW_ZONE_SPEED;
+                }
+            }
+        }
+
+        armSubsystem.setPincherSpeed(gap < 0 ? -speed : speed);
+
+        return false;
     }
 
     /**

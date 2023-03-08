@@ -265,7 +265,7 @@ public class SystemTestCommand extends CommandBase {
 
         case ARM_LIFT_PID:
             armSubsystem.setArmLiftPidEnabled(true);
-            armSubsystem.moveArmToAngle(ArmConstants.ARM_DOWN_ANGLE_DEGREES + motorSpeed * 100);
+            armSubsystem.moveArmLiftToAngle(ArmConstants.ARM_DOWN_ANGLE_DEGREES + motorSpeed * 100);
             SmartDashboard.putBoolean("Test Arm", true);
             break;
 

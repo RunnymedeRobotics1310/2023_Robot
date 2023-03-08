@@ -35,7 +35,7 @@ public class DefaultArmCommand extends CommandBase {
     public void execute() {
 
         double armAngleLiftIncrement = driverController.getArmLiftMotorSpeed() * ArmConstants.MAX_ARM_ANGLE_LIFT_LOOP_INCREMENT;
-        armSubsystem.moveArmToAngle(armSubsystem.getArmLiftAngleSetpoint() + armAngleLiftIncrement);
+        armSubsystem.moveArmLiftToAngle(armSubsystem.getArmLiftAngleSetpoint() + armAngleLiftIncrement);
 
         armSubsystem.setArmExtendSpeed(driverController.getArmExtendMotorSpeed());
         armSubsystem.setPincherSpeed(driverController.getPincherMotorSpeed());
