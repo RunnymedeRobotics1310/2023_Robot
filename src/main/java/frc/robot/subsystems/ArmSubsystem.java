@@ -699,8 +699,17 @@ public class ArmSubsystem extends SubsystemBase {
                 return 0;
             }
 
-            // NOTE: Do not slow down when closing the pincher because the power may be needed to
-            // close on a cone.
+            // NOTE: Do not slow down when closing the pincher on a cone because the power may be needed.
+            if (!isGamePieceDetected()) {
+
+                // Slow down if approaching the limit
+                if (Math.abs(getPincherEncoder()
+                    - ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE) < ArmConstants.PINCHER_SLOW_ZONE_ENCODER_VALUE) {
+
+                    return Math.min(inputSpeed, ArmConstants.MAX_PINCHER_SLOW_ZONE_SPEED);
+                }
+            }
+
         }
 
         /*
