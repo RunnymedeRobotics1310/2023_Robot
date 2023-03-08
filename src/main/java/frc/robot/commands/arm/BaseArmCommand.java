@@ -2,6 +2,7 @@ package frc.robot.commands.arm;
 
 import static frc.robot.Constants.ArmConstants.*;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.ArmSubsystem;
@@ -47,6 +48,8 @@ abstract class BaseArmCommand extends CommandBase {
      * @return true if at the desired location, false if still moving to that point
      */
     protected final boolean moveArmExtendToEncoderCount(double targetCount, double speed) {
+
+        SmartDashboard.putBoolean("Arm Extension at target", armSubsystem.isAtExtendPosition(targetCount));
 
         if (armSubsystem.isAtExtendPosition(targetCount)) {
             armSubsystem.setArmExtendSpeed(0);
@@ -104,7 +107,7 @@ abstract class BaseArmCommand extends CommandBase {
 
     protected final boolean isCompactPose() {
         return armSubsystem.isArmDown()
-            && armSubsystem.isArmRetracted() /*&& armSubsystem.isPincherAtCloseLimit()*/; // TODO: URGENT: FIXME - restore this
+            && armSubsystem.isArmRetracted() /* && armSubsystem.isPincherAtCloseLimit() */; // TODO: URGENT: FIXME - restore this
     }
 
     /**
@@ -163,7 +166,9 @@ abstract class BaseArmCommand extends CommandBase {
         return false;
     }
 
-    private enum DriveWithPieceState {PREPARING, RETRACTING, FINALIZING_ANGLE, FINALIZING_EXTENT, IN_POSITION;}
+    private enum DriveWithPieceState {
+        PREPARING, RETRACTING, FINALIZING_ANGLE, FINALIZING_EXTENT, IN_POSITION;
+    }
 
     private DriveWithPieceState driveWithPieceState = null;
 

@@ -381,7 +381,6 @@ public class ArmSubsystem extends SubsystemBase {
         }
 
         setArmLiftIdleMode(IdleMode.kBrake);
-
         armTestMode  = false;
 
         armLiftSpeed = checkArmLiftLimits(speed);

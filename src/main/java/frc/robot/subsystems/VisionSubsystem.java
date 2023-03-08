@@ -77,6 +77,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         // When the robot starts, the camera must be set to the high view (0)
         setCameraEncoderPosition(0);
+        isCameraPositionInitialized = false;
     }
 
     /**
@@ -272,17 +273,14 @@ public class VisionSubsystem extends SubsystemBase {
      */
     public void setCameraMotorSpeed(double speed) {
 
-        // Ignore
-        cameraMotor.set(0);
+        if (!isCameraPositionInitialized) {
+            initializeCameraPosition();
+            return;
+        }
 
-//        if (!isCameraPositionInitialized) {
-//            initializeCameraPosition();
-//            return;
-//        }
-//
-//        cameraMotorSpeed = checkCameraMotorLimits(speed);
-//
-//        cameraMotor.set(speed);
+        cameraMotorSpeed = checkCameraMotorLimits(speed);
+
+        cameraMotor.set(cameraMotorSpeed);
     }
 
     public void initializeCameraPosition() {
@@ -291,13 +289,13 @@ public class VisionSubsystem extends SubsystemBase {
             cameraInitializationStartTime = System.currentTimeMillis();
         }
 
-        cameraMotor.set(.4);
+        cameraMotor.set(.3);
 
         // End after 3 seconds
-        if (System.currentTimeMillis() - cameraInitializationStartTime > 3000) {
+        if ((System.currentTimeMillis() - cameraInitializationStartTime) > 3000) {
             cameraMotor.set(0);
             isCameraPositionInitialized = true;
-            cameraEncoder.setPosition(2);
+            cameraEncoder.setPosition(2); // Above the top limit.
         }
     }
 
