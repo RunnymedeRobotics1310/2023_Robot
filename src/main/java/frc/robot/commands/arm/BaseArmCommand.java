@@ -128,6 +128,8 @@ abstract class BaseArmCommand extends CommandBase {
                 boolean tooLow = armSubsystem.getArmLiftAngle() < CLEAR_FRAME_ARM_ANGLE;
                 compactState = tooLow ? CompactState.PREPARING : CompactState.RETRACTING;
             }
+
+            System.out.println("moveToCompactPose: initial state" + compactState);
         }
 
         // get into the compact pose
@@ -139,6 +141,9 @@ abstract class BaseArmCommand extends CommandBase {
             }
             boolean done = moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE);
             compactState = done ? CompactState.RETRACTING : CompactState.PREPARING;
+            if (compactState != CompactState.PREPARING) {
+                System.out.println("moveToCompactPose: change state from PREPARING to " + compactState);
+            }
             break;
         }
 
@@ -146,12 +151,18 @@ abstract class BaseArmCommand extends CommandBase {
             boolean done = movePincherToEncoderCount(PINCHER_CLOSE_LIMIT_ENCODER_VALUE);
             done         = moveArmExtendToEncoderCount(0, .3) && done;
             compactState = done ? CompactState.LOWERING : CompactState.RETRACTING;
+            if (compactState != CompactState.RETRACTING) {
+                System.out.println("moveToCompactPose: change state from RETRACTING to " + compactState);
+            }
             break;
         }
 
         case LOWERING: {
             boolean done = moveArmLiftToAngle(0);
             compactState = done ? CompactState.COMPACT_POSE : CompactState.LOWERING;
+            if (compactState != CompactState.LOWERING) {
+                System.out.println("moveToCompactPose: change state from LOWERING to " + compactState);
+            }
             break;
         }
 
@@ -196,24 +207,36 @@ abstract class BaseArmCommand extends CommandBase {
         case PREPARING: {
             boolean done = moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE);
             driveWithPieceState = done ? DriveWithPieceState.RETRACTING : DriveWithPieceState.PREPARING;
+            if (driveWithPieceState != DriveWithPieceState.PREPARING) {
+                System.out.println("moveToDriveWithPiece: change state from PREPARING to " + compactState);
+            }
             break;
         }
 
         case RETRACTING: {
             boolean done = moveArmExtendToEncoderCount(0, .5);
             driveWithPieceState = done ? DriveWithPieceState.FINALIZING_ANGLE : DriveWithPieceState.RETRACTING;
+            if (driveWithPieceState != DriveWithPieceState.RETRACTING) {
+                System.out.println("moveToDriveWithPiece: change state from RETRACTING to " + compactState);
+            }
             break;
         }
 
         case FINALIZING_ANGLE: {
             boolean done = moveArmLiftToAngle(target.angle);
             driveWithPieceState = done ? DriveWithPieceState.FINALIZING_EXTENT : DriveWithPieceState.FINALIZING_ANGLE;
+            if (driveWithPieceState != DriveWithPieceState.FINALIZING_ANGLE) {
+                System.out.println("moveToDriveWithPiece: change state from FINALIZE_ANGLE to " + compactState);
+            }
             break;
         }
 
         case FINALIZING_EXTENT: {
             boolean done = moveArmExtendToEncoderCount(target.extension, .5);
             driveWithPieceState = done ? DriveWithPieceState.IN_POSITION : DriveWithPieceState.FINALIZING_EXTENT;
+            if (driveWithPieceState != DriveWithPieceState.FINALIZING_EXTENT) {
+                System.out.println("moveToDriveWithPiece: change state from FINALIZING_EXTENT to " + compactState);
+            }
             break;
         }
 
