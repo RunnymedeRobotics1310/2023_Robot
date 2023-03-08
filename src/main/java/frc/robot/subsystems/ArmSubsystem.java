@@ -1,11 +1,9 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.*;
 import com.revrobotics.CANSparkMax.ExternalFollower;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxLimitSwitch.Type;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -332,7 +330,7 @@ public class ArmSubsystem extends SubsystemBase {
         // This sensor is not inverted because the CANLimitSwitch
         // is configured for a normally open switch.
 
-        return false;
+        return armExtendLimitDetector.isPressed();
     }
 
     /** Determine if a game piece is detected in the pincher */
