@@ -8,13 +8,13 @@ import frc.robot.subsystems.DriveSubsystem;
 public class BalanceCommand extends CommandBase {
 
     private final DriveSubsystem driveSubsystem;
-    long                         startTime     = 0;
+    long startTime = 0;
 
     // Track the gyro pitch.
-    double                       pitch         = 0;
-    double                       pitchRate     = 0;
-    double                       speed         = 0;
-    long                         prevLevelTime = 0;
+    double pitch         = 0;
+    double pitchRate     = 0;
+    double speed         = 0;
+    long   prevLevelTime = 0;
 
     /**
      * Drive on a specified compass heading (0-360 degrees) for the specified distance in cm.
@@ -37,17 +37,20 @@ public class BalanceCommand extends CommandBase {
 
     }
 
+    static final double ADJUST_SPEED = .02;
+
     @Override
     public void execute() {
 
         // Track the gyro pitch.
         pitch = driveSubsystem.getPitch();
 
+
         if (pitch > 1) {
-            speed = .0375;
+            speed = ADJUST_SPEED;
         }
         else if (pitch < -1) {
-            speed = -.0375;
+            speed = -ADJUST_SPEED;
         }
         else {
             speed = 0;
