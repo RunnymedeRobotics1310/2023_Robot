@@ -1,6 +1,9 @@
 package frc.robot.commands.arm;
 
-import static frc.robot.Constants.ArmConstants.*;
+import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_ARM_ANGLE;
+import static frc.robot.Constants.ArmConstants.MAX_EXTEND_SPEED;
+import static frc.robot.Constants.ArmConstants.MAX_PINCHER_SPEED;
+import static frc.robot.Constants.ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -54,7 +57,7 @@ abstract class BaseArmCommand extends CommandBase {
      * @return {@code true} if in frame, {@code false} otherwise
      */
     protected boolean retractArm() {
-        return moveArmExtendToEncoderCount(0, MAX_EXTEND_SPEED);
+        return moveArmExtendToEncoderCount(-4, MAX_EXTEND_SPEED);
     }
 
     /**
@@ -68,7 +71,7 @@ abstract class BaseArmCommand extends CommandBase {
 
         SmartDashboard.putBoolean("At Extension Position", armSubsystem.isAtExtendPosition(targetCount));
 
-        if (targetCount == 0) {
+        if (targetCount <= 0) {
             if (armSubsystem.isArmRetracted()) {
                 armSubsystem.setArmExtendSpeed(0);
                 return true;
@@ -181,7 +184,8 @@ abstract class BaseArmCommand extends CommandBase {
     }
 
     /**
-     * Safely move the arm from whatever position it is in to the compact pose, which has the arm down, retracted, and with
+     * Safely move the arm from whatever position it is in to the compact pose, which has the arm
+     * down, retracted, and with
      * pinchers closed.
      *
      * @return true if in the compact pose, false if still moving there
@@ -219,7 +223,7 @@ abstract class BaseArmCommand extends CommandBase {
 
         case RETRACTING: {
             boolean done = movePincherToEncoderCount(PINCHER_CLOSE_LIMIT_ENCODER_VALUE);
-            done         = moveArmExtendToEncoderCount(0, .3) && done;
+            done         = moveArmExtendToEncoderCount(0, ArmConstants.MAX_EXTEND_SPEED) && done;
             compactState = done ? CompactState.LOWERING : CompactState.RETRACTING;
             if (compactState != CompactState.RETRACTING) {
                 System.out.println("moveToCompactPose: change state from RETRACTING to " + compactState);

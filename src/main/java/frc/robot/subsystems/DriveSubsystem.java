@@ -380,16 +380,16 @@ public class DriveSubsystem extends SubsystemBase {
 
             // Limit each side to 0.25
 
-            leftSpeed  = Math.max(Math.abs(leftSpeed), .25) * Math.signum(leftSpeed);
-            rightSpeed = Math.max(Math.abs(rightSpeed), .25) * Math.signum(rightSpeed);
+            leftSpeed  = Math.max(Math.abs(leftSpeed), .35) * Math.signum(leftSpeed);
+            rightSpeed = Math.max(Math.abs(rightSpeed), .35) * Math.signum(rightSpeed);
 
             // Watch out for sharp turns
-            limitTurning(0.25);
+            limitTurning(0.35);
         }
         else if (!armInsideFrame) {
 
             // If the arm is not inside the frame, limit all turns to 0.5
-            limitTurning(.5);
+            limitTurning(.35);
         }
 
         else {

@@ -2002,7 +2002,7 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "9,2": {
+          "11,3": {
             "size": [
               1,
               1
@@ -2028,7 +2028,7 @@
               "_showGlyph": false
             }
           },
-          "9,0": {
+          "11,2": {
             "size": [
               1,
               1
@@ -2039,6 +2039,21 @@
               "_title": "SmartDashboard/Raw Pincher Encoder",
               "_glyph": 148,
               "_showGlyph": false
+            }
+          },
+          "11,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/At Extension Position",
+              "_title": "/SmartDashboard/At Extension Position",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
             }
           }
         }

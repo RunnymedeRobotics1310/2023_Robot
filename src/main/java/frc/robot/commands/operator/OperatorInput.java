@@ -157,6 +157,10 @@ public class OperatorInput {
         return operatorController.getPOV() == 0;
     }
 
+    public boolean balance() {
+        return operatorController.getPOV() == 180;
+    }
+
     /**
      * return the raw underlying {@link RunnymedeGameController}. ONLY FOR USE IN TEST MODE.
      */

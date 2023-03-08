@@ -24,6 +24,7 @@ import frc.robot.commands.arm.ReleaseCommand;
 import frc.robot.commands.arm.ScoreCommand;
 import frc.robot.commands.arm.StartIntakeCommand;
 import frc.robot.commands.auto.AutonomousCommand;
+import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DefaultDriveCommand;
 import frc.robot.commands.drive.DriveModeSelector;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
@@ -216,6 +217,9 @@ public class RobotContainer {
 
         new Trigger(() -> (operatorInput.driveForward()))
             .onTrue(new DriveOnHeadingCommand(0, 0.2, 300, driveSubsystem));
+
+        new Trigger(() -> (operatorInput.balance()))
+            .onTrue(new BalanceCommand(driveSubsystem));
 
     }
 

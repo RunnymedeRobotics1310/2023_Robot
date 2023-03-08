@@ -143,7 +143,7 @@ public final class Constants {
         public static final int         ARM_DOWN_LIMIT_SWITCH_DIO_PORT      = 0;
 
         /** The maximum speed to drive the arm lift - manually or automatically */
-        public static final double      MAX_LIFT_SPEED                      = .25;
+        public static final double      MAX_LIFT_SPEED                      = .15;
         public static final double      MAX_LIFT_SLOW_ZONE_SPEED            = .1;
 
         public static final double      ARM_LIFT_LIMIT_ENCODER_VALUE        = 16;
@@ -213,31 +213,31 @@ public final class Constants {
         public static final double      PINCHER_POSITION_TOLERANCE          = 2;
         public static final double      PINCHER_SLOW_ZONE_ENCODER_VALUE     = 12;
         public static final double      PINCHER_GAME_PIECE_RELEASE_DISTANCE = 30;
-        public static final double      MIN_PINCHER_INSIDE_FRAME_POSITION   = 90;
+        public static final double      MIN_PINCHER_INSIDE_FRAME_POSITION   = 100;
 
 
         /*
          * Scoring Constants
          */
-        public static final ArmPosition SCORE_TOP_CONE_POSITION             = new ArmPosition(100, 52);                   // Confirmed
-        public static final ArmPosition SCORE_TOP_CUBE_POSITION             = new ArmPosition(90, 50);                    // Confirmed
+        public static final ArmPosition SCORE_TOP_CONE_POSITION             = new ArmPosition(100, 52);                  // Confirmed
+        public static final ArmPosition SCORE_TOP_CUBE_POSITION             = new ArmPosition(90, 50);                   // Confirmed
 
-        public static final ArmPosition SCORE_MIDDLE_CONE_POSITION          = new ArmPosition(90, 7);                     // Confirmed
-        public static final ArmPosition SCORE_MIDDLE_CUBE_POSITION          = new ArmPosition(78, 13);                    // Confirmed
+        public static final ArmPosition SCORE_MIDDLE_CONE_POSITION          = new ArmPosition(90, 7);                    // Confirmed
+        public static final ArmPosition SCORE_MIDDLE_CUBE_POSITION          = new ArmPosition(78, 13);                   // Confirmed
 
-        public static final ArmPosition SCORE_BOTTOM_CONE_POSITION          = new ArmPosition(50, 0);                     // Confirmed
-        public static final ArmPosition SCORE_BOTTOM_CUBE_POSITION          = new ArmPosition(43, 7);                     // Confirmed
+        public static final ArmPosition SCORE_BOTTOM_CONE_POSITION          = new ArmPosition(42, 27);                   // Confirmed
+        public static final ArmPosition SCORE_BOTTOM_CUBE_POSITION          = new ArmPosition(43, 7);                    // Confirmed
 
         // Pickup constants
-        public static final ArmPosition GROUND_PICKUP_POSITION              = new ArmPosition(34, 14);                    // Confirmed
+        public static final ArmPosition GROUND_PICKUP_POSITION              = new ArmPosition(34, 14);                   // Confirmed
         public static final ArmPosition SUBSTATION_PICKUP_POSITION          = new ArmPosition(70, 10);
 
         // Drive with Piece constants
-        public static final ArmPosition DRIVE_WITH_CONE_POSITION            = new ArmPosition(45, 0);                     // todo:
-                                                                                                                          // fixme:
-                                                                                                                          // get
-                                                                                                                          // actuals
-        public static final ArmPosition DRIVE_WITH_CUBE_POSITION            = new ArmPosition(ARM_DOWN_ANGLE_DEGREES, 0); // Confirmed
+        public static final ArmPosition DRIVE_WITH_CONE_POSITION            = new ArmPosition(45, 0);                    // todo:
+                                                                                                                         // fixme:
+                                                                                                                         // get
+                                                                                                                         // actuals
+        public static final ArmPosition DRIVE_WITH_CUBE_POSITION            = new ArmPosition(CLEAR_FRAME_ARM_ANGLE, 0); // Confirmed
 
         public static ArmPosition getDrivePosition(GamePiece gamePiece) {
             if (gamePiece == GamePiece.CONE) {
