@@ -1716,6 +1716,19 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "10,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Current Game Piece",
+              "_title": "SmartDashboard/Current Game Piece",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
