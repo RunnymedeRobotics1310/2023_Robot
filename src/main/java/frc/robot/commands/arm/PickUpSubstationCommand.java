@@ -1,51 +1,155 @@
 package frc.robot.commands.arm;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.GameConstants.GamePiece;
+import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
 
-public class PickUpSubstationCommand extends CommandBase {
+public class PickUpSubstationCommand extends BaseArmCommand {
 
-    private final ArmSubsystem armSubsystem;
+    private final OperatorInput   operatorInput;
+    private final VisionSubsystem visionSubsystem;
 
-    // fixme: do everything - see table
-    // https://docs.google.com/document/d/1JzU-BzCXjGCwosouylmWGN83-x8lv-oPzklcXDqNN2U/edit#
+    private GamePiece gamePiece = null;
 
-    public PickUpSubstationCommand(ArmSubsystem armSubsystem) {
+    public PickUpSubstationCommand(GamePiece gamePiece, ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem) {
 
-        this.armSubsystem = armSubsystem;
+        super(armSubsystem);
 
-        addRequirements(armSubsystem);
+        this.gamePiece       = gamePiece;
+        this.operatorInput   = null;
+        this.visionSubsystem = visionSubsystem;
+    }
 
+    public PickUpSubstationCommand(OperatorInput operatorInput, ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem) {
+
+        super(armSubsystem);
+
+        this.operatorInput   = operatorInput;
+        this.visionSubsystem = visionSubsystem;
     }
 
     @Override
     public void initialize() {
 
-        System.out.println("PickUpSubstationCommand started");
+        // Resolve the game piece from the operator input.
+        if (operatorInput.isPickUpCube()) {
+            visionSubsystem.setVisionTargetType(VisionTargetType.CUBE);
+            gamePiece = GamePiece.CUBE;
+        }
+        else {
+            if (operatorInput.isPickUpCone()) {
+                visionSubsystem.setVisionTargetType(VisionTargetType.CONE);
+                gamePiece = GamePiece.CONE;
+            }
+        }
 
+        System.out.println("PickUp Substation started.  GamePiece " + gamePiece);
+
+        printArmState();
+        stopArmMotors();
     }
 
     @Override
     public void execute() {
 
-        // FIXME: do everything
-        // pose: substation pickup
-        // hoover
-        // grab if in sensor (update held item)
-        // DriveWithPieceCommand
+        // Resolve the game piece from the operator input.
+        if (operatorInput.isPickUpCube() && gamePiece != GamePiece.CUBE) {
+            System.out.println("PickUp Substation: Game Piece switched to CUBE.");
+            gamePiece = GamePiece.CUBE;
+            visionSubsystem.setVisionTargetType(VisionTargetType.CUBE);
+        }
+        else {
+            if (operatorInput.isPickUpCone()) {
+                System.out.println("PickUp Substation: Game Piece switched to CONE.");
+                gamePiece = GamePiece.CONE;
+                visionSubsystem.setVisionTargetType(VisionTargetType.CONE);
+            }
+        }
 
-        ;
+        double armAngle          = armSubsystem.getArmLiftAngle();
+        double armExtendPosition = armSubsystem.getArmExtendEncoder();
 
+        /*
+         * Special logic to make sure the arm comes up over the frame when extending.
+         */
+        if (armAngle < (ArmConstants.CLEAR_FRAME_ARM_ANGLE - ArmConstants.ARM_LIFT_ANGLE_TOLERANCE_DEGREES)
+            && armExtendPosition < ArmConstants.MAX_ARM_EXTEND_INSIDE_FRAME) {
+
+            // Retract the arm before lifting.
+            if (!retractArm()) {
+                return; // Wait for the retraction before lifting the arm
+            }
+
+            moveArmLiftToAngle(ArmConstants.CLEAR_FRAME_ARM_ANGLE + ArmConstants.ARM_LIFT_ANGLE_TOLERANCE_DEGREES + 2);
+            return;
+        }
+
+        /*
+         * Move the extension before lowering the arm below the frame.
+         */
+
+        // Always open the pincher, there is no point in waiting
+        openPincher();
+
+        if (moveArmExtendToEncoderCount(ArmConstants.SUBSTATION_PICKUP_POSITION.extension, ArmConstants.MAX_EXTEND_SPEED)) {
+
+            moveArmLiftToAngle(ArmConstants.SUBSTATION_PICKUP_POSITION.angle);
+        }
     }
 
     @Override
     public boolean isFinished() {
-        // FIXME: do everything
-        return true;
+
+        // If the user is no longer asking for pickup
+        if (operatorInput != null) {
+            if (!operatorInput.isPickUpCone() && !operatorInput.isPickUpCube()) {
+                return true;
+            }
+        }
+
+        // If at the target position, and a game piece is detected.
+        if (armSubsystem.isInPosition(ArmConstants.SUBSTATION_PICKUP_POSITION)) {
+
+            // If a game piece is detected
+            if (armSubsystem.isGamePieceDetected()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
     public void end(boolean interrupted) {
-        // FIXME: do everything
+
+        stopArmMotors();
+
+        if (interrupted) {
+            System.out.print("Pick Up Substation interrupted");
+        }
+        else {
+            System.out.print("Pick Up Substation ended");
+        }
+        printArmState();
+
+
+        // In Teleop, pick the next command
+        if (DriverStation.isTeleopEnabled()) {
+
+            if (armSubsystem.isGamePieceDetected()) {
+                CommandScheduler.getInstance().schedule(new PickupGamePieceCommand(gamePiece, armSubsystem));
+            }
+            else {
+                CommandScheduler.getInstance().schedule(new CompactCommand2(armSubsystem));
+            }
+
+        }
+
+
     }
 }
