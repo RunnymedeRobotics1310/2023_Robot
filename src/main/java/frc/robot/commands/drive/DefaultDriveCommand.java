@@ -46,11 +46,15 @@ public class DefaultDriveCommand extends CommandBase {
 
         double  turn      = rawTurn / 2;
         boolean boost     = driverController.isBoost();
+        boolean slow      = driverController.isSlowDown();
 
         double  leftSpeed = 0, rightSpeed = 0;
 
         if (!boost) {
             speed = speed / 2;
+        }
+        else if (slow) {
+            speed = speed / 5;
         }
         else {
             speed = Math.signum(speed);
