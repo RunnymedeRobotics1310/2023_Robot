@@ -166,7 +166,7 @@ public class RobotContainer {
         // NOTE: The SystemTestCommand uses the same button, so update the code in the
         // SystemTestCommand if this button changes
         new Trigger(() -> operatorInput.isCancel())
-            .onTrue(new CancelCommand(driveSubsystem, armSubsystem));
+            .onTrue(new CancelCommand(driveSubsystem, armSubsystem, visionSubsystem));
 
         // Enter Test Mode (Start and Back pressed at the same time)
         new Trigger(() -> (operatorInput.isToggleTestMode()))

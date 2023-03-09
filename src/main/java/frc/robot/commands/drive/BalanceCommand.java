@@ -8,23 +8,23 @@ import frc.robot.subsystems.DriveSubsystem;
 public class BalanceCommand extends CommandBase {
 
     private final DriveSubsystem driveSubsystem;
-    long                         startTime                  = 0;
-    long                         prevLevelTime              = -1;
+    long startTime     = 0;
+    long prevLevelTime = -1;
 
-    double                       startHeading               = 0;
-    double                       centeringSpeed             = 0;
-    long                         centeringDelayStartTime    = 0;
+    double startHeading            = 0;
+    double centeringSpeed          = 0;
+    long   centeringDelayStartTime = 0;
 
     // Track the max absolute value of the gyro pitch.
-    double                       maxClimbPitch              = 0;
+    double maxClimbPitch = 0;
 
-    static final double          ADJUST_SPEED               = .015;
-    static final double          CENTERING_SPEED            = .5;
-    static final double          CENTER_OF_GRAVITY_MOVEMENT = 40;   // cm
-    static final double          CENTERING_DELAY            = 1000; // ms
+    static final double ADJUST_SPEED               = .015;
+    static final double CENTERING_SPEED            = .5;
+    static final double CENTER_OF_GRAVITY_MOVEMENT = 20;   // cm
+    static final double CENTERING_DELAY            = 1000; // ms
 
-    static final double          LEVEL_THRESHOLD            = 2;
-    static final long            LEVEL_TIMEOUT              = 350;  // ms
+    static final double LEVEL_THRESHOLD = 2;
+    static final long   LEVEL_TIMEOUT   = 350;  // ms
 
 
 
@@ -51,7 +51,7 @@ public class BalanceCommand extends CommandBase {
     public void initialize() {
 
         System.out.println("BalanceCommand started at pitch " + driveSubsystem.getPitch() + ". CLIMB");
-        startTime    = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
 
         startHeading = driveSubsystem.getHeading();
 
@@ -189,7 +189,7 @@ public class BalanceCommand extends CommandBase {
         // Determine the error between the current heading and
         // the desired heading
 
-        double error          = startHeading - currentHeading;
+        double error = startHeading - currentHeading;
 
         if (error > 180) {
             error -= 360;
