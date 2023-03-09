@@ -213,7 +213,7 @@ public class RobotContainer {
             .onTrue(new BalanceCommand(driveSubsystem));
 
         new Trigger(() -> (operatorInput.isSubstationConePickup()))
-            .onTrue(new PickUpSubstationCommand(GamePiece.CONE, armSubsystem, visionSubsystem));
+            .onTrue(new PickUpSubstationCommand(armSubsystem, visionSubsystem));
     }
 
     /**
