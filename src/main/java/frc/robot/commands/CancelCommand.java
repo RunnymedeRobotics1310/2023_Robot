@@ -10,8 +10,9 @@ import frc.robot.subsystems.VisionSubsystem;
  */
 public class CancelCommand extends CommandBase {
 
-    private final DriveSubsystem driveSubsystem;
-    private final ArmSubsystem   armSubsystem;
+    private final DriveSubsystem  driveSubsystem;
+    private final ArmSubsystem    armSubsystem;
+    private final VisionSubsystem visionSubsystem;
 
     private long startTime = 0;
 
@@ -23,8 +24,9 @@ public class CancelCommand extends CommandBase {
      */
     public CancelCommand(DriveSubsystem driveSubsystem, ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem) {
 
-        this.driveSubsystem = driveSubsystem;
-        this.armSubsystem   = armSubsystem;
+        this.driveSubsystem  = driveSubsystem;
+        this.armSubsystem    = armSubsystem;
+        this.visionSubsystem = visionSubsystem;
 
         addRequirements(driveSubsystem, armSubsystem);
     }
@@ -36,6 +38,7 @@ public class CancelCommand extends CommandBase {
 
         driveSubsystem.stop();
         armSubsystem.stop();
+        visionSubsystem.stop();
 
         startTime = System.currentTimeMillis();
     }
