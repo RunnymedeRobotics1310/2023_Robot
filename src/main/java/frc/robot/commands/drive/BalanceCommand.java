@@ -61,7 +61,6 @@ public class BalanceCommand extends CommandBase {
     @Override
     public void execute() {
 
-        // Track the max absolute value of the gyro pitch.
         double pitch = driveSubsystem.getPitch();
 
         switch (currentState) {
