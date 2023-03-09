@@ -8,9 +8,9 @@ import frc.robot.subsystems.ArmSubsystem;
 
 public class ScoreCommand extends BaseArmCommand {
 
-    private final ScoringRow scoringRow;
-    private ArmPosition      scoringPosition = null;
-    private GamePiece        gamePiece       = null;
+    private final ScoringRow  scoringRow;
+    private       ArmPosition scoringPosition = null;
+    private       GamePiece   gamePiece       = null;
 
     public ScoreCommand(ScoringRow scoringRow, ArmSubsystem armSubsystem) {
         super(armSubsystem);
@@ -31,6 +31,10 @@ public class ScoreCommand extends BaseArmCommand {
 
     @Override
     public void execute() {
+
+        if (!armSubsystem.isGamePieceDetected()) {
+            return;
+        }
 
         // If the arm is starting inside the frame, then
         // retract before moving the arm.
