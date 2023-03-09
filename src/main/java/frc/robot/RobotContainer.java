@@ -176,7 +176,6 @@ public class RobotContainer {
                 .andThen(new ResetGyroPitchCommand(driveSubsystem)));
 
         // scoring (a/b/y/x)
-        // FIXME: Only try to score if there is a game piece?
         new Trigger(() -> (operatorInput.isHigh()))
             .onTrue(new ScoreCommand(ScoringRow.TOP, armSubsystem));
 
