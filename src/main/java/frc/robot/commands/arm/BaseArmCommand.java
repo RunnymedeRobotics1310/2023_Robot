@@ -1,9 +1,6 @@
 package frc.robot.commands.arm;
 
-import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_ARM_ANGLE;
-import static frc.robot.Constants.ArmConstants.MAX_EXTEND_SPEED;
-import static frc.robot.Constants.ArmConstants.MAX_PINCHER_SPEED;
-import static frc.robot.Constants.ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE;
+import static frc.robot.Constants.ArmConstants.*;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -72,7 +69,7 @@ abstract class BaseArmCommand extends CommandBase {
         SmartDashboard.putBoolean("At Extension Position", armSubsystem.isAtExtendPosition(targetCount));
 
         if (targetCount <= 0) {
-            targetCount = -4; // compensate for the encoder at zero not aligning with the limit switch
+            targetCount = -5; // compensate for the encoder at zero not aligning with the limit switch
             if (armSubsystem.isArmRetracted()) {
                 armSubsystem.setArmExtendSpeed(0);
                 return true;
@@ -88,10 +85,20 @@ abstract class BaseArmCommand extends CommandBase {
         double absSpd = Math.abs(speed);
         double gap    = targetCount - armSubsystem.getArmExtendEncoder();
 
-        // Determine whether to slow down because we are close to the target.
-        if (Math.abs(gap) < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
+        // Special logic for the slow zone when the target encoder count <=0
+        if (targetCount <= 0) {
 
-            absSpd = Math.min(absSpd, ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED);
+            if (armSubsystem.getArmExtendEncoder() < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
+
+                absSpd = Math.min(absSpd, ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED);
+            }
+        }
+        else {
+            // Determine whether to slow down because we are close to the target.
+            if (Math.abs(gap) < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
+
+                absSpd = Math.min(absSpd, ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED);
+            }
         }
 
         armSubsystem.setArmExtendSpeed(gap < 0 ? -absSpd : absSpd);

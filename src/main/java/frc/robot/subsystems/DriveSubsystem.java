@@ -77,9 +77,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     private enum GyroAxis {
         YAW, PITCH, ROLL
-    }
-
-    ;
+    };
 
     private final ArmSubsystem armSubsystem;
 

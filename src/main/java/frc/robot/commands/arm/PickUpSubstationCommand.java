@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.GameConstants.GamePiece;
+import frc.robot.Constants.VisionConstants.CameraView;
+import frc.robot.commands.vision.SetCameraViewCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
@@ -12,7 +14,7 @@ public class PickUpSubstationCommand extends BaseArmCommand {
 
     private final VisionSubsystem visionSubsystem;
 
-    private GamePiece gamePiece = GamePiece.CONE;
+    private GamePiece             gamePiece = GamePiece.CONE;
 
     public PickUpSubstationCommand(ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem) {
 
@@ -22,9 +24,11 @@ public class PickUpSubstationCommand extends BaseArmCommand {
 
     @Override
     public void initialize() {
-        visionSubsystem.setVisionTargetType(VisionTargetType.CONE);
 
         System.out.println("PickUp Substation started.  GamePiece " + gamePiece);
+
+        visionSubsystem.setVisionTargetType(VisionTargetType.CONE);
+        moveCameraToHighPosition();
 
         printArmState();
         stopArmMotors();
@@ -52,7 +56,7 @@ public class PickUpSubstationCommand extends BaseArmCommand {
         }
 
         /*
-         * Move the extension before lowering the arm below the frame.
+         * Move the arm to set up for an intake from the substation.
          */
 
         // Always open the pincher, there is no point in waiting
@@ -103,7 +107,13 @@ public class PickUpSubstationCommand extends BaseArmCommand {
             }
 
         }
+    }
 
+    private void moveCameraToHighPosition() {
 
+        if (DriverStation.isAutonomousEnabled() || DriverStation.isTeleopEnabled()) {
+
+            CommandScheduler.getInstance().schedule(new SetCameraViewCommand(CameraView.HIGH, visionSubsystem));
+        }
     }
 }
