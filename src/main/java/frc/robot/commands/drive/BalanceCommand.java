@@ -50,7 +50,7 @@ public class BalanceCommand extends CommandBase {
     @Override
     public void initialize() {
 
-        System.out.println("BalanceCommand started at " + driveSubsystem.getPitch());
+        System.out.println("BalanceCommand started at pitch " + driveSubsystem.getPitch() + ". CLIMB");
         startTime    = System.currentTimeMillis();
 
         startHeading = driveSubsystem.getHeading();
@@ -66,6 +66,7 @@ public class BalanceCommand extends CommandBase {
         switch (currentState) {
 
         case CLIMB:
+
             // When climbing, track the max pitch angle;
             maxClimbPitch = Math.max(maxClimbPitch, Math.abs(pitch));
 
@@ -77,6 +78,8 @@ public class BalanceCommand extends CommandBase {
 
                 // Move opposite to the climb direction
                 centeringSpeed = -CENTERING_SPEED * Math.signum(pitch);
+
+                System.out.println("Balance Command: CENTERING from pitch " + pitch);
             }
 
             setPitchSpeed(pitch);
@@ -94,6 +97,8 @@ public class BalanceCommand extends CommandBase {
             if (Math.abs(driveSubsystem.getEncoderDistanceCm()) > CENTER_OF_GRAVITY_MOVEMENT) {
                 currentState            = State.WAIT;
                 centeringDelayStartTime = System.currentTimeMillis();
+
+                System.out.println("Balance Command: WAITING at pitch " + pitch);
             }
 
             break;
@@ -103,6 +108,7 @@ public class BalanceCommand extends CommandBase {
 
             if (System.currentTimeMillis() - centeringDelayStartTime > CENTERING_DELAY) {
                 currentState = State.BALANCE;
+                System.out.println("Balance Command: BALANCING from pitch " + pitch);
             }
             break;
 

@@ -4,9 +4,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
@@ -275,11 +274,14 @@ public class VisionSubsystem extends SubsystemBase {
      */
     public void setCameraMotorSpeed(double speed) {
 
+        // Initialize the camera motor speed
+        if (!isCameraPositionInitialized) {
+            initializeCameraPosition();
+            return;
+        }
+
+        // FIXME: If the initialize works, then remove this return statement.
         return;
-        // if (!isCameraPositionInitialized) {
-        // initializeCameraPosition();
-        // return;
-        // }
 
         // cameraMotorSpeed = checkCameraMotorLimits(speed);
 
@@ -287,6 +289,11 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public void initializeCameraPosition() {
+
+        // Wait until the robot is enabled to initialize the camera
+        if (!DriverStation.isAutonomousEnabled() && !DriverStation.isTeleopEnabled()) {
+            return;
+        }
 
         if (cameraInitializationStartTime == 0) {
             cameraInitializationStartTime = System.currentTimeMillis();
