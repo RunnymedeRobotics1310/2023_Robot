@@ -37,7 +37,7 @@ public class BalanceCommand extends CommandBase {
 
     }
 
-    static final double ADJUST_SPEED = .02;
+    static final double ADJUST_SPEED = .01;
 
     @Override
     public void execute() {
