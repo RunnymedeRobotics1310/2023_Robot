@@ -51,15 +51,15 @@ public class OperatorInput {
     }
 
     public boolean isHigh() {
-        return driverController.getYButton() || operatorController.getYButton();
+        return operatorController.getYButton();
     }
 
     public boolean isMid() {
-        return driverController.getBButton() || operatorController.getBButton();
+        return operatorController.getBButton();
     }
 
     public boolean isLow() {
-        return driverController.getAButton() || operatorController.getAButton();
+        return operatorController.getAButton();
     }
 
     public boolean isDrop() {
@@ -121,7 +121,7 @@ public class OperatorInput {
     }
 
     public boolean isSubstationConePickup() {
-        return driverController.getPOV() == 270;
+        return driverController.getBButton();
     }
 
     public boolean isCameraViewHigh() {

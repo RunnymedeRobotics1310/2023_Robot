@@ -59,7 +59,11 @@ public class PickUpSubstationCommand extends BaseArmCommand {
         openPincher();
 
         if (moveArmLiftToAngle(ArmConstants.SUBSTATION_PICKUP_POSITION.angle)) {
-            moveArmExtendToEncoderCount(ArmConstants.SUBSTATION_PICKUP_POSITION.extension, ArmConstants.MAX_EXTEND_SPEED);
+            if (moveArmExtendToEncoderCount(ArmConstants.SUBSTATION_PICKUP_POSITION.extension, ArmConstants.MAX_EXTEND_SPEED)) {
+                if (armSubsystem.isGamePieceDetected()) {
+                    movePincherToEncoderCount(gamePiece.pincherEncoderCount);
+                }
+            }
         }
     }
 
@@ -68,13 +72,7 @@ public class PickUpSubstationCommand extends BaseArmCommand {
 
         // If at the target position, and a game piece is detected.
         if (armSubsystem.isInPosition(ArmConstants.SUBSTATION_PICKUP_POSITION)) {
-
-            // If a game piece is detected
-            if (armSubsystem.isGamePieceDetected()) {
-                if (movePincherToEncoderCount(gamePiece.pincherEncoderCount)) {
-                    return retractArm();
-                }
-            }
+            return armSubsystem.getHeldGamePiece() == GamePiece.CONE;
         }
 
         return false;
@@ -98,7 +96,7 @@ public class PickUpSubstationCommand extends BaseArmCommand {
         if (DriverStation.isTeleopEnabled()) {
 
             if (armSubsystem.isGamePieceDetected()) {
-                CommandScheduler.getInstance().schedule(new CompactCommand2(armSubsystem));
+                CommandScheduler.getInstance().schedule(new DriveWithPieceCommand(armSubsystem));
             }
             else {
                 CommandScheduler.getInstance().schedule(new CompactCommand2(armSubsystem));

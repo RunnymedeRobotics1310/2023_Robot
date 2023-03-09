@@ -57,7 +57,7 @@ abstract class BaseArmCommand extends CommandBase {
      * @return {@code true} if in frame, {@code false} otherwise
      */
     protected boolean retractArm() {
-        return moveArmExtendToEncoderCount(-4, MAX_EXTEND_SPEED);
+        return moveArmExtendToEncoderCount(0, MAX_EXTEND_SPEED);
     }
 
     /**
@@ -72,6 +72,7 @@ abstract class BaseArmCommand extends CommandBase {
         SmartDashboard.putBoolean("At Extension Position", armSubsystem.isAtExtendPosition(targetCount));
 
         if (targetCount <= 0) {
+            targetCount = -4; // compensate for the encoder at zero not aligning with the limit switch
             if (armSubsystem.isArmRetracted()) {
                 armSubsystem.setArmExtendSpeed(0);
                 return true;
@@ -184,8 +185,7 @@ abstract class BaseArmCommand extends CommandBase {
     }
 
     /**
-     * Safely move the arm from whatever position it is in to the compact pose, which has the arm
-     * down, retracted, and with
+     * Safely move the arm from whatever position it is in to the compact pose, which has the arm down, retracted, and with
      * pinchers closed.
      *
      * @return true if in the compact pose, false if still moving there
@@ -279,36 +279,32 @@ abstract class BaseArmCommand extends CommandBase {
         switch (driveWithPieceState) {
 
         case PREPARING: {
-            boolean done = moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE);
-            driveWithPieceState = done ? DriveWithPieceState.RETRACTING : DriveWithPieceState.PREPARING;
-            if (driveWithPieceState != DriveWithPieceState.PREPARING) {
+            if (moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE)) {
+                driveWithPieceState = DriveWithPieceState.RETRACTING;
                 System.out.println("moveToDriveWithPiece: change state from PREPARING to " + compactState);
             }
             break;
         }
 
         case RETRACTING: {
-            boolean done = moveArmExtendToEncoderCount(0, .5);
-            driveWithPieceState = done ? DriveWithPieceState.FINALIZING_ANGLE : DriveWithPieceState.RETRACTING;
-            if (driveWithPieceState != DriveWithPieceState.RETRACTING) {
+            if (retractArm()) {
+                driveWithPieceState = DriveWithPieceState.FINALIZING_ANGLE;
                 System.out.println("moveToDriveWithPiece: change state from RETRACTING to " + compactState);
             }
             break;
         }
 
         case FINALIZING_ANGLE: {
-            boolean done = moveArmLiftToAngle(target.angle);
-            driveWithPieceState = done ? DriveWithPieceState.FINALIZING_EXTENT : DriveWithPieceState.FINALIZING_ANGLE;
-            if (driveWithPieceState != DriveWithPieceState.FINALIZING_ANGLE) {
+            if (moveArmLiftToAngle(target.angle)) {
+                driveWithPieceState = DriveWithPieceState.FINALIZING_EXTENT;
                 System.out.println("moveToDriveWithPiece: change state from FINALIZE_ANGLE to " + compactState);
             }
             break;
         }
 
         case FINALIZING_EXTENT: {
-            boolean done = moveArmExtendToEncoderCount(target.extension, .5);
-            driveWithPieceState = done ? DriveWithPieceState.IN_POSITION : DriveWithPieceState.FINALIZING_EXTENT;
-            if (driveWithPieceState != DriveWithPieceState.FINALIZING_EXTENT) {
+            if (moveArmExtendToEncoderCount(target.extension, .5)) {
+                driveWithPieceState = DriveWithPieceState.IN_POSITION;
                 System.out.println("moveToDriveWithPiece: change state from FINALIZING_EXTENT to " + compactState);
             }
             break;
