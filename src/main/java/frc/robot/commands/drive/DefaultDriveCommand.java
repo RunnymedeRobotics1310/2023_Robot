@@ -2,7 +2,6 @@ package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.DriveConstants.DriveMode;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.operator.OperatorInput.Axis;
 import frc.robot.commands.operator.OperatorInput.Stick;
@@ -10,21 +9,18 @@ import frc.robot.subsystems.DriveSubsystem;
 
 public class DefaultDriveCommand extends CommandBase {
 
-    private final DriveSubsystem    driveSubsystem;
-    private final OperatorInput     driverController;
-    private final DriveModeSelector driveModeSelector;
+    private final DriveSubsystem driveSubsystem;
+    private final OperatorInput  driverController;
 
     /**
      * Creates a new ExampleCommand.
      *
      * @param driveSubsystem The subsystem used by this command.
      */
-    public DefaultDriveCommand(OperatorInput driverController, DriveSubsystem driveSubsystem,
-        DriveModeSelector driveModeSelector) {
+    public DefaultDriveCommand(OperatorInput driverController, DriveSubsystem driveSubsystem) {
 
-        this.driverController  = driverController;
-        this.driveSubsystem    = driveSubsystem;
-        this.driveModeSelector = driveModeSelector;
+        this.driverController = driverController;
+        this.driveSubsystem   = driveSubsystem;
 
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(driveSubsystem);
@@ -34,97 +30,24 @@ public class DefaultDriveCommand extends CommandBase {
     @Override
     public void initialize() {
         System.out.println("DefaultDriveCommand started.");
-        this.driverController.sayHello(); // FIXME: Kaelin remove this but see how you can talk to
-        // the custom controller.
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
 
-        DriveMode driveMode = driveModeSelector.getDriveMode();
-
-        switch (driveMode) {
-        case ARCADE:
-            setMotorSpeedsArcade();
-            break;
-        case TANK:
-            setMotorSpeedsTank();
-            break;
-        case QUENTIN:
-            setMotorSpeedsQuentin();
-            break;
-        default:
-            setMotorSpeedsQuentin();
-            break;
-        }
-
-    }
-
-    // Returns true when the command should end.
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
-
-    // Called once the command ends or is interrupted.
-    @Override
-    public void end(boolean interrupted) {
-        if (interrupted) {
-            System.out.println("DefaultDriveCommand interrupted.");
-        }
-        else {
-            System.out.println("DefaultDriveCommand ended.");
-        }
-    }
-
-    private void setMotorSpeedsArcade() {
-
-        // Filter out low input values to reduce drivetrain drift
-        double leftY = driverController.getDriverControllerAxis(Stick.LEFT, Axis.Y);
-        double leftX = driverController.getDriverControllerAxis(Stick.LEFT, Axis.X);
-
-        double leftSpeed = leftY + leftX / (leftY == 0 ? 1 : 2);        // less sensitive when
-        // moving
-        double rightSpeed = leftY - leftX / (leftY == 0 ? 1 : 2);
-
-        // Boost
-        if (driverController.isBoost()) {
-            driveSubsystem.setMotorSpeeds(leftSpeed, rightSpeed);
-        }
-        else {
-            driveSubsystem.setMotorSpeeds(leftSpeed / 2, rightSpeed / 2);
-        }
-    }
-
-    private void setMotorSpeedsTank() {
-
-        double leftSpeed  = driverController.getDriverControllerAxis(Stick.LEFT, Axis.Y);
-        double rightSpeed = driverController.getDriverControllerAxis(Stick.RIGHT, Axis.Y);
-
-        // Boost
-        if (driverController.isBoost()) {
-            driveSubsystem.setMotorSpeeds(leftSpeed, rightSpeed);
-        }
-        else {
-            driveSubsystem.setMotorSpeeds(leftSpeed / 2, rightSpeed / 2);
-        }
-    }
-
-    private void setMotorSpeedsQuentin() {
-
         // forwards/backwards speed
-        double speed = driverController.getDriverControllerAxis(Stick.LEFT, Axis.Y);
+        double       speed   = driverController.getDriverControllerAxis(Stick.LEFT, Axis.Y);
         // turn speed
         final double rawTurn = driverController.getDriverControllerAxis(Stick.RIGHT, Axis.X);
 
         SmartDashboard.putNumber("Speed", speed);
         SmartDashboard.putNumber("Turn", rawTurn);
 
-        double  turn  = rawTurn / 2;
-        boolean boost = driverController.isBoost();
+        double  turn      = rawTurn / 2;
+        boolean boost     = driverController.isBoost();
 
-        double leftSpeed = 0, rightSpeed = 0;
+        double  leftSpeed = 0, rightSpeed = 0;
 
         if (!boost) {
             speed = speed / 2;
@@ -177,5 +100,22 @@ public class DefaultDriveCommand extends CommandBase {
             }
         }
         driveSubsystem.setMotorSpeeds(leftSpeed, rightSpeed);
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        if (interrupted) {
+            System.out.println("DefaultDriveCommand interrupted.");
+        }
+        else {
+            System.out.println("DefaultDriveCommand ended.");
+        }
     }
 }
