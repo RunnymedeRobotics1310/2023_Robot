@@ -58,9 +58,8 @@ public class PickUpSubstationCommand extends BaseArmCommand {
         // Always open the pincher, there is no point in waiting
         openPincher();
 
-        if (moveArmExtendToEncoderCount(ArmConstants.SUBSTATION_PICKUP_POSITION.extension, ArmConstants.MAX_EXTEND_SPEED)) {
-
-            moveArmLiftToAngle(ArmConstants.SUBSTATION_PICKUP_POSITION.angle);
+        if (moveArmLiftToAngle(ArmConstants.SUBSTATION_PICKUP_POSITION.angle)) {
+            moveArmExtendToEncoderCount(ArmConstants.SUBSTATION_PICKUP_POSITION.extension, ArmConstants.MAX_EXTEND_SPEED);
         }
     }
 
@@ -72,7 +71,9 @@ public class PickUpSubstationCommand extends BaseArmCommand {
 
             // If a game piece is detected
             if (armSubsystem.isGamePieceDetected()) {
-                return true;
+                if (movePincherToEncoderCount(gamePiece.pincherEncoderCount)) {
+                    return retractArm();
+                }
             }
         }
 
@@ -97,7 +98,7 @@ public class PickUpSubstationCommand extends BaseArmCommand {
         if (DriverStation.isTeleopEnabled()) {
 
             if (armSubsystem.isGamePieceDetected()) {
-                CommandScheduler.getInstance().schedule(new PickupGamePieceCommand(gamePiece, armSubsystem));
+                CommandScheduler.getInstance().schedule(new CompactCommand2(armSubsystem));
             }
             else {
                 CommandScheduler.getInstance().schedule(new CompactCommand2(armSubsystem));

@@ -228,7 +228,7 @@ public final class Constants {
 
         // Pickup constants
         public static final ArmPosition GROUND_PICKUP_POSITION     = new ArmPosition(34, 14);                   // Confirmed
-        public static final ArmPosition SUBSTATION_PICKUP_POSITION = new ArmPosition(92, 10);
+        public static final ArmPosition SUBSTATION_PICKUP_POSITION = new ArmPosition(92, 30);
 
         // Drive with Piece constants
         public static final ArmPosition DRIVE_WITH_CONE_POSITION = new ArmPosition(45, 0);                    // todo:
