@@ -6,8 +6,6 @@ import frc.robot.subsystems.ArmSubsystem;
 
 public class ReleaseCommand extends BaseArmCommand {
 
-    private double targetPincherPosition = 0;
-
     public ReleaseCommand(ArmSubsystem armSubsystem) {
         super(armSubsystem);
     }
