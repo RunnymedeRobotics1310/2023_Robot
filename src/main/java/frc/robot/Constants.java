@@ -223,18 +223,15 @@ public final class Constants {
         public static final ArmPosition SCORE_MIDDLE_CONE_POSITION = new ArmPosition(90, 7);                    // Confirmed
         public static final ArmPosition SCORE_MIDDLE_CUBE_POSITION = new ArmPosition(78, 13);                   // Confirmed
 
-        public static final ArmPosition SCORE_BOTTOM_CONE_POSITION = new ArmPosition(42, 27);                   // Confirmed
-        public static final ArmPosition SCORE_BOTTOM_CUBE_POSITION = new ArmPosition(43, 7);                    // Confirmed
+        public static final ArmPosition SCORE_BOTTOM_CONE_POSITION = new ArmPosition(42, 27);                   // todo: confirm
+        public static final ArmPosition SCORE_BOTTOM_CUBE_POSITION = new ArmPosition(43, 7);                    // todo: confirm
 
         // Pickup constants
         public static final ArmPosition GROUND_PICKUP_POSITION     = new ArmPosition(34, 14);                   // Confirmed
         public static final ArmPosition SUBSTATION_PICKUP_POSITION = new ArmPosition(92, 30);
 
         // Drive with Piece constants
-        public static final ArmPosition DRIVE_WITH_CONE_POSITION = new ArmPosition(45, 0);                    // todo:
-        // fixme:
-        // get
-        // actuals
+        public static final ArmPosition DRIVE_WITH_CONE_POSITION = new ArmPosition(45, 0);                    // todo: confirm
         public static final ArmPosition DRIVE_WITH_CUBE_POSITION = new ArmPosition(CLEAR_FRAME_ARM_ANGLE, 0); // Confirmed
 
         public static ArmPosition getDrivePosition(GamePiece gamePiece) {
