@@ -18,10 +18,10 @@ public class BalanceCommand extends CommandBase {
     // Track the max absolute value of the gyro pitch.
     double maxClimbPitch = 0;
 
-    static final double ADJUST_SPEED               = .015;
-    static final double CENTERING_SPEED            = .5;
-    static final double CENTER_OF_GRAVITY_MOVEMENT = 20;   // cm
-    static final double CENTERING_DELAY            = 1000; // ms
+    static final double ADJUST_SPEED               = .01;
+    static final double CENTERING_SPEED            = .25;
+    static final double CENTER_OF_GRAVITY_MOVEMENT = 5;   // cm
+    static final double CENTERING_DELAY            = 2000; // ms
 
     static final double LEVEL_THRESHOLD = 2;
     static final long   LEVEL_TIMEOUT   = 350;  // ms
@@ -51,11 +51,13 @@ public class BalanceCommand extends CommandBase {
     public void initialize() {
 
         System.out.println("BalanceCommand started at pitch " + driveSubsystem.getPitch() + ". CLIMB");
-        startTime = System.currentTimeMillis();
-
-        startHeading = driveSubsystem.getHeading();
-
-        currentState = State.CLIMB;
+        startTime               = System.currentTimeMillis();
+        prevLevelTime           = -1;
+        startHeading            = driveSubsystem.getHeading();
+        centeringSpeed          = 0;
+        centeringDelayStartTime = 0;
+        maxClimbPitch           = 0;
+        currentState            = State.CLIMB;
     }
 
     @Override
