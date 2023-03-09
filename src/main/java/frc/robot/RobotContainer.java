@@ -214,6 +214,9 @@ public class RobotContainer {
 
         new Trigger(() -> (operatorInput.isSubstationConePickup()))
             .onTrue(new PickUpSubstationCommand(armSubsystem, visionSubsystem));
+
+        new Trigger(() -> (operatorInput.isVisionSubstationConePickup()))
+            .onTrue(new PickUpSubstationVisionCommand(armSubsystem, driveSubsystem, visionSubsystem));
     }
 
     /**

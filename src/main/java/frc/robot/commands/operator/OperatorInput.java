@@ -120,6 +120,10 @@ public class OperatorInput {
         return !shift() && driverController.getBackButton() && driverController.getStartButton();
     }
 
+    public boolean isVisionSubstationConePickup() {
+        return driverController.getAButton();
+    }
+
     public boolean isSubstationConePickup() {
         return driverController.getBButton();
     }
