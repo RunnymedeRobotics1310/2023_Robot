@@ -5,23 +5,16 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants.AutoConstants.AutoAction;
-import frc.robot.Constants.AutoConstants.AutoLane;
-import frc.robot.Constants.AutoConstants.Orientation;
+import frc.robot.Constants.AutoConstants.*;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.Zone;
 import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.commands.arm.DriveWithPieceCommand;
 import frc.robot.commands.arm.PickUpGroundCommand;
-import frc.robot.commands.drive.BalanceCommand;
-import frc.robot.commands.drive.DriveOnHeadingCommand;
-import frc.robot.commands.drive.DriveToTargetCommand;
-import frc.robot.commands.drive.SetGyroHeadingCommand;
+import frc.robot.commands.drive.*;
 import frc.robot.commands.vision.SetCameraViewCommand;
 import frc.robot.commands.vision.SwitchVisionTargetCommand;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.*;
 import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
 
 public class AutonomousCommand extends SequentialCommandGroup {
@@ -306,7 +299,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
             System.out.println("Balance Red/Top or Blue/Bottom");
             addCommands(new DriveOnHeadingCommand(180, -.3, 20, driveSubsystem));
             addCommands(new DriveOnHeadingCommand(90, -.3, 100, driveSubsystem));
-            addCommands(new DriveOnHeadingCommand(180, -.3, 150, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(180, -.5, 400, driveSubsystem));
         }
         else {
             System.out.println("Balance 'else'");
