@@ -99,6 +99,9 @@ public class ArmSubsystem extends SubsystemBase {
 
         setArmLiftEncoder(0);
 
+        armLiftPidAngleSetpoint = ArmConstants.ARM_DOWN_ANGLE_DEGREES;
+        setArmLiftPidEnabled(true);
+
         /*
          * Arm Extend
          */
@@ -154,10 +157,14 @@ public class ArmSubsystem extends SubsystemBase {
      */
     public double getArmLiftAngle() {
         return Math.round(
-            ((armLiftEncoder.getPosition() * ArmConstants.ARM_DEGREES_PER_ENCODER_COUNT)
+            ((getArmLiftEncoder() * ArmConstants.ARM_DEGREES_PER_ENCODER_COUNT)
                 + ArmConstants.ARM_DOWN_ANGLE_DEGREES) * 100)
             / 100d;
 
+    }
+
+    public double getArmLiftAngleSetpoint() {
+        return armLiftPidAngleSetpoint;
     }
 
     /**
@@ -180,14 +187,13 @@ public class ArmSubsystem extends SubsystemBase {
 
     public Constants.GameConstants.GamePiece getHeldGamePiece() {
 
-        // TODO: Determine the valid ranges for cone and cube.
         if (gamePieceDetector.isPressed()) {
 
-            if (Math.abs(getPincherEncoder() - GamePiece.CONE.pincherEncoderCount) <= 5) {
+            if (Math.abs(getPincherEncoder() - GamePiece.CONE.pincherEncoderCount) <= 8) {
                 return GamePiece.CONE;
             }
 
-            if (Math.abs(getPincherEncoder() - GamePiece.CUBE.pincherEncoderCount) <= 5) {
+            if (Math.abs(getPincherEncoder() - GamePiece.CUBE.pincherEncoderCount) <= 8) {
                 return GamePiece.CUBE;
             }
 
@@ -235,6 +241,36 @@ public class ArmSubsystem extends SubsystemBase {
         return false;
     }
 
+    /**
+     * determine if the pincher is at the supplied position in encoder counts, within the pincher
+     * position tolerance
+     *
+     * @param position to compare
+     * @return {@code true} if at position, {@code false} otherwise
+     */
+    public boolean isAtPincherPosition(double position) {
+
+        if (Math.abs(position - getPincherEncoder()) <= ArmConstants.PINCHER_POSITION_TOLERANCE) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Determine if the pincher is currently inside the frame and can be safely lowered
+     *
+     * @return {@code true} if inside frame, {@code false} otherwise
+     */
+    public boolean isPincherInsideFrame() {
+
+        // The pincher encoder must be higher than the min frame position (within tolerance)
+        if (getPincherEncoder() > (ArmConstants.MIN_PINCHER_INSIDE_FRAME_POSITION - ArmConstants.PINCHER_POSITION_TOLERANCE)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public boolean isInPosition(Constants.ArmPosition position) {
         return isAtExtendPosition(position.extension) && isArmAtLiftAngle(position.angle);
     }
@@ -246,7 +282,7 @@ public class ArmSubsystem extends SubsystemBase {
         // limit is a soft limit that uses the arm encoder counts
 
         // The upper limit is larger than the cone top scoring position
-        return armLiftEncoder.getPosition() > ArmConstants.ARM_LIFT_LIMIT_ENCODER_VALUE;
+        return getArmLiftEncoder() > ArmConstants.ARM_LIFT_LIMIT_ENCODER_VALUE;
     }
 
     /** Determine if the arm is fully extended. This safety mechanism keeps the arm to 4 ft. */
@@ -294,7 +330,7 @@ public class ArmSubsystem extends SubsystemBase {
         // This sensor is not inverted because the CANLimitSwitch
         // is configured for a normally open switch.
 
-        return false;
+        return armExtendLimitDetector.isPressed();
     }
 
     /** Determine if a game piece is detected in the pincher */
@@ -330,7 +366,7 @@ public class ArmSubsystem extends SubsystemBase {
         return getPincherEncoder() > ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE;
     }
 
-    public void moveArmToAngle(double angle) {
+    public void moveArmLiftToAngle(double angle) {
 
         // if the arm lift pid is not enabled,
         // this routine does nothing
@@ -340,10 +376,9 @@ public class ArmSubsystem extends SubsystemBase {
 
         setArmLiftIdleMode(IdleMode.kBrake);
 
-        armLiftPidAngleSetpoint = angle;
+        armLiftPidAngleSetpoint = Math.max(0, Math.min(angle, 110));
 
         armTestMode             = false;
-        armLiftPidEnabled       = true;
     }
 
     /**
@@ -381,7 +416,6 @@ public class ArmSubsystem extends SubsystemBase {
         }
 
         setArmLiftIdleMode(IdleMode.kBrake);
-
         armTestMode  = false;
 
         armLiftSpeed = checkArmLiftLimits(speed);
@@ -402,8 +436,19 @@ public class ArmSubsystem extends SubsystemBase {
         armTestMode       = true;
         armLiftPidEnabled = false;
 
-        armLiftMotor.set(armLiftMotorSpeed);
-        armLiftFollower.set(armLiftFollowerSpeed);
+        double motorSpeed = 0;
+
+        if (armLiftMotorSpeed != 0) {
+            motorSpeed = armLiftMotorSpeed + calcArmLiftHoldSpeed();
+            armLiftMotor.set(motorSpeed);
+            SmartDashboard.putNumber("Arm Lift output", motorSpeed);
+        }
+
+        if (armLiftFollowerSpeed != 0) {
+            motorSpeed = armLiftFollowerSpeed + calcArmLiftHoldSpeed();
+            armLiftFollower.set(motorSpeed);
+            SmartDashboard.putNumber("Arm Lift output", motorSpeed);
+        }
     }
 
     /**
@@ -445,10 +490,16 @@ public class ArmSubsystem extends SubsystemBase {
 
     /** Safely stop the all arm motors from moving */
     public void stop() {
-        setArmLiftPidEnabled(false);
-        setArmLiftSpeed(0);
+        stopArm();
         setArmExtendSpeed(0);
         setPincherSpeed(0);
+    }
+
+    public void stopArm() {
+        // The arm is controlled by a PID controller. Stop the arm by setting the angle to the
+        // current angle.
+        setArmLiftPidEnabled(true);
+        moveArmLiftToAngle(getArmLiftAngle());
     }
 
     @Override
@@ -682,8 +733,18 @@ public class ArmSubsystem extends SubsystemBase {
                 return 0;
             }
 
-            // NOTE: Do not slow down when closing the pincher because the power may be needed to
-            // close on a cone.
+            // NOTE: Do not slow down when closing the pincher on a cone because the power may be
+            // needed.
+            if (!isGamePieceDetected()) {
+
+                // Slow down if approaching the limit
+                if (Math.abs(getPincherEncoder()
+                    - ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE) < ArmConstants.PINCHER_SLOW_ZONE_ENCODER_VALUE) {
+
+                    return Math.min(inputSpeed, ArmConstants.MAX_PINCHER_SLOW_ZONE_SPEED);
+                }
+            }
+
         }
 
         /*

@@ -6,7 +6,6 @@ public class CompactCommand extends BaseArmCommand {
 
     public CompactCommand(ArmSubsystem armSubsystem) {
         super(armSubsystem);
-        addRequirements(armSubsystem);
     }
 
     private void printStatus(String msg) {

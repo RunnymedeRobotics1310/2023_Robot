@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
@@ -77,6 +78,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         // When the robot starts, the camera must be set to the high view (0)
         setCameraEncoderPosition(0);
+        isCameraPositionInitialized = false;
     }
 
     /**
@@ -272,32 +274,38 @@ public class VisionSubsystem extends SubsystemBase {
      */
     public void setCameraMotorSpeed(double speed) {
 
-        // Ignore
-        cameraMotor.set(0);
+        // Initialize the camera motor speed
+        if (!isCameraPositionInitialized) {
+            initializeCameraPosition();
+            return;
+        }
 
-//        if (!isCameraPositionInitialized) {
-//            initializeCameraPosition();
-//            return;
-//        }
-//
-//        cameraMotorSpeed = checkCameraMotorLimits(speed);
-//
-//        cameraMotor.set(speed);
+        // FIXME: If the initialize works, then remove this return statement.
+        return;
+
+        // cameraMotorSpeed = checkCameraMotorLimits(speed);
+
+        // cameraMotor.set(cameraMotorSpeed);
     }
 
     public void initializeCameraPosition() {
+
+        // Wait until the robot is enabled to initialize the camera
+        if (!DriverStation.isAutonomousEnabled() && !DriverStation.isTeleopEnabled()) {
+            return;
+        }
 
         if (cameraInitializationStartTime == 0) {
             cameraInitializationStartTime = System.currentTimeMillis();
         }
 
-        cameraMotor.set(.4);
+        cameraMotor.set(.3);
 
         // End after 3 seconds
-        if (System.currentTimeMillis() - cameraInitializationStartTime > 3000) {
+        if ((System.currentTimeMillis() - cameraInitializationStartTime) > 3000) {
             cameraMotor.set(0);
             isCameraPositionInitialized = true;
-            cameraEncoder.setPosition(2);
+            cameraEncoder.setPosition(2); // Above the top limit.
         }
     }
 

@@ -8,17 +8,12 @@ import frc.robot.subsystems.ArmSubsystem;
 
 public class ScoreCommand extends BaseArmCommand {
 
-    private final ArmSubsystem armSubsystem;
-    private final ScoringRow   scoringRow;
-    private       ArmPosition  scoringPosition = null;
-    private       GamePiece    gamePiece       = null;
+    private final ScoringRow scoringRow;
+    private ArmPosition      scoringPosition = null;
+    private GamePiece        gamePiece       = null;
 
     public ScoreCommand(ScoringRow scoringRow, ArmSubsystem armSubsystem) {
         super(armSubsystem);
-
-        this.armSubsystem = armSubsystem;
-
-        addRequirements(armSubsystem);
         this.scoringRow = scoringRow;
     }
 
@@ -37,14 +32,35 @@ public class ScoreCommand extends BaseArmCommand {
     @Override
     public void execute() {
 
-        // Reset extension
-        boolean reset = moveArmExtendToEncoderCount(0, .5);
-        if (reset) {
-            // Move arm to scoring position
-            boolean lift = moveArmLiftToAngle(scoringPosition.angle);
-            if (lift) {
+        // If the arm is starting inside the frame, then
+        // retract before moving the arm.
+        if (armSubsystem.getArmLiftAngle() < ArmConstants.CLEAR_FRAME_ARM_ANGLE) {
+
+            if (!moveArmExtendToEncoderCount(0, .5)) {
+                return;
+            }
+        }
+
+        // If higher than target, retract first
+        if (armSubsystem.getArmLiftAngle() > scoringPosition.angle) {
+
+            // Move the extender until it is in position
+            if (moveArmExtendToEncoderCount(scoringPosition.extension, .5)) {
+
+                // Then lift
+                moveArmLiftToAngle(scoringPosition.angle);
+            }
+
+        }
+        else {
+
+            // Lift the arm until in position
+            if (moveArmLiftToAngle(scoringPosition.angle)) {
+
+                // Then extend
                 moveArmExtendToEncoderCount(scoringPosition.extension, .5);
             }
+
         }
     }
 

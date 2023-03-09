@@ -242,14 +242,18 @@ public class SystemTestCommand extends CommandBase {
             break;
 
         case ARM_LIFT_1:
-            armSubsystem.setArmLiftPidEnabled(false);
-            armSubsystem.setArmLiftTestSpeed(motorSpeed, 0);
+            if (motorSpeed != 0) {
+                armSubsystem.setArmLiftPidEnabled(false);
+                armSubsystem.setArmLiftTestSpeed(motorSpeed, 0);
+            }
             SmartDashboard.putBoolean("Test Arm", true);
             break;
 
         case ARM_LIFT_2:
-            armSubsystem.setArmLiftPidEnabled(false);
-            armSubsystem.setArmLiftTestSpeed(0, motorSpeed);
+            if (motorSpeed != 0) {
+                armSubsystem.setArmLiftPidEnabled(false);
+                armSubsystem.setArmLiftTestSpeed(0, motorSpeed);
+            }
             SmartDashboard.putBoolean("Test Arm", true);
             break;
 
@@ -261,7 +265,7 @@ public class SystemTestCommand extends CommandBase {
 
         case ARM_LIFT_PID:
             armSubsystem.setArmLiftPidEnabled(true);
-            armSubsystem.moveArmToAngle(ArmConstants.ARM_DOWN_ANGLE_DEGREES + motorSpeed * 100);
+            armSubsystem.moveArmLiftToAngle(ArmConstants.ARM_DOWN_ANGLE_DEGREES + motorSpeed * 100);
             SmartDashboard.putBoolean("Test Arm", true);
             break;
 

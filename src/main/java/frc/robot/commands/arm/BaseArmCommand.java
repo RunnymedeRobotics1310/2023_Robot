@@ -2,16 +2,19 @@ package frc.robot.commands.arm;
 
 import static frc.robot.Constants.ArmConstants.*;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.ArmSubsystem;
 
 abstract class BaseArmCommand extends CommandBase {
 
-    private final ArmSubsystem armSubsystem;
+    protected final ArmSubsystem armSubsystem;
 
     protected BaseArmCommand(ArmSubsystem armSubsystem) {
         this.armSubsystem = armSubsystem;
+        addRequirements(armSubsystem);
     }
 
     protected final void printArmState() {
@@ -22,9 +25,16 @@ abstract class BaseArmCommand extends CommandBase {
     }
 
     protected final void stopArmMotors() {
-        armSubsystem.setArmExtendSpeed(0);
-        armSubsystem.setPincherSpeed(0);
-        armSubsystem.setArmLiftSpeed(0);
+        armSubsystem.stop();
+    }
+
+    /**
+     * Convenience method to move the arm to the bottom position (lowest arm angle).
+     *
+     * @return {@code true} if at the bottom, {@code false} otherwise
+     */
+    protected boolean lowerArmToBottom() {
+        return moveArmLiftToAngle(ArmConstants.ARM_DOWN_ANGLE_DEGREES);
     }
 
     /**
@@ -34,9 +44,17 @@ abstract class BaseArmCommand extends CommandBase {
      * @return true if at the desired location, false if still moving to that point
      */
     protected final boolean moveArmLiftToAngle(double targetAngle) {
-        armSubsystem.setArmLiftPidEnabled(true);
-        armSubsystem.moveArmToAngle(targetAngle);
+        armSubsystem.moveArmLiftToAngle(targetAngle);
         return armSubsystem.isArmAtLiftAngle(targetAngle);
+    }
+
+    /**
+     * Convenience method to fully retract the arm.
+     *
+     * @return {@code true} if in frame, {@code false} otherwise
+     */
+    protected boolean retractArm() {
+        return moveArmExtendToEncoderCount(0, MAX_EXTEND_SPEED);
     }
 
     /**
@@ -48,35 +66,101 @@ abstract class BaseArmCommand extends CommandBase {
      */
     protected final boolean moveArmExtendToEncoderCount(double targetCount, double speed) {
 
-        if (armSubsystem.isAtExtendPosition(targetCount)) {
-            armSubsystem.setArmExtendSpeed(0);
-            return true;
+        SmartDashboard.putBoolean("At Extension Position", armSubsystem.isAtExtendPosition(targetCount));
+
+        if (targetCount <= 0) {
+            targetCount = -5; // compensate for the encoder at zero not aligning with the limit switch
+            if (armSubsystem.isArmRetracted()) {
+                armSubsystem.setArmExtendSpeed(0);
+                return true;
+            }
+        }
+        else {
+            if (armSubsystem.isAtExtendPosition(targetCount)) {
+                armSubsystem.setArmExtendSpeed(0);
+                return true;
+            }
         }
 
         double absSpd = Math.abs(speed);
-        double gap    = armSubsystem.getArmExtendEncoder() - targetCount;
+        double gap    = targetCount - armSubsystem.getArmExtendEncoder();
 
-        armSubsystem.setArmExtendSpeed(gap > 0 ? -absSpd : absSpd);
+        // Special logic for the slow zone when the target encoder count <=0
+        if (targetCount <= 0) {
+
+            if (armSubsystem.getArmExtendEncoder() < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
+
+                absSpd = Math.min(absSpd, ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED);
+            }
+        }
+        else {
+            // Determine whether to slow down because we are close to the target.
+            if (Math.abs(gap) < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
+
+                absSpd = Math.min(absSpd, ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED);
+            }
+        }
+
+        armSubsystem.setArmExtendSpeed(gap < 0 ? -absSpd : absSpd);
 
         return false;
+
     }
 
     /**
-     * Move the motor to a specified encoder count
+     * Convenience method to set the pincher inside the frame for storage.
+     *
+     * @return {@code true} if in frame, {@code false} otherwise
+     */
+    protected boolean movePincherInsideFrame() {
+        return movePincherToEncoderCount(ArmConstants.MIN_PINCHER_INSIDE_FRAME_POSITION);
+    }
+
+    /**
+     * Move the pincher motor to a specified encoder count
      *
      * @param targetCount the count to get to
      * @return true if at the desired location, false if still moving to that point
      */
     protected final boolean movePincherToEncoderCount(double targetCount) {
-        double gap = armSubsystem.getPincherEncoder() - targetCount;
-        if (Math.abs(gap) > PINCHER_POSITION_TOLERANCE) {
-            armSubsystem.setPincherSpeed(gap > 0 ? -MAX_PINCHER_SPEED : MAX_PINCHER_SPEED);
-            return false;
+
+        SmartDashboard.putBoolean("At Pincher Position", armSubsystem.isAtPincherPosition(targetCount));
+
+        if (targetCount == 0) {
+            if (armSubsystem.isPincherOpen()) {
+                armSubsystem.setPincherSpeed(0);
+                return true;
+            }
         }
         else {
-            armSubsystem.setPincherSpeed(0);
-            return true;
+            if (armSubsystem.isAtPincherPosition(targetCount)) {
+                armSubsystem.setPincherSpeed(0);
+                return true;
+            }
         }
+
+        double gap   = targetCount - armSubsystem.getPincherEncoder();
+        double speed = MAX_PINCHER_SPEED;
+
+        // Determine whether to slow down because we are close to the target.
+        if (Math.abs(gap) < ArmConstants.PINCHER_SLOW_ZONE_ENCODER_VALUE) {
+
+            // If opening (-ve gap), then slow down when close to the target
+            if (gap < 0) {
+                speed = ArmConstants.MAX_PINCHER_SLOW_ZONE_SPEED;
+            }
+            else {
+                // If closing (+ve gap) and no game piece is detected, then slow down when
+                // close to the target
+                if (!armSubsystem.isGamePieceDetected()) {
+                    speed = ArmConstants.MAX_PINCHER_SLOW_ZONE_SPEED;
+                }
+            }
+        }
+
+        armSubsystem.setPincherSpeed(gap < 0 ? -speed : speed);
+
+        return false;
     }
 
     /**
@@ -104,7 +188,7 @@ abstract class BaseArmCommand extends CommandBase {
 
     protected final boolean isCompactPose() {
         return armSubsystem.isArmDown()
-            && armSubsystem.isArmRetracted() /*&& armSubsystem.isPincherAtCloseLimit()*/; // TODO: URGENT: FIXME - restore this
+            && armSubsystem.isArmRetracted() && armSubsystem.isPincherInsideFrame();
     }
 
     /**
@@ -125,6 +209,8 @@ abstract class BaseArmCommand extends CommandBase {
                 boolean tooLow = armSubsystem.getArmLiftAngle() < CLEAR_FRAME_ARM_ANGLE;
                 compactState = tooLow ? CompactState.PREPARING : CompactState.RETRACTING;
             }
+
+            System.out.println("moveToCompactPose: initial state" + compactState);
         }
 
         // get into the compact pose
@@ -136,19 +222,28 @@ abstract class BaseArmCommand extends CommandBase {
             }
             boolean done = moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE);
             compactState = done ? CompactState.RETRACTING : CompactState.PREPARING;
+            if (compactState != CompactState.PREPARING) {
+                System.out.println("moveToCompactPose: change state from PREPARING to " + compactState);
+            }
             break;
         }
 
         case RETRACTING: {
             boolean done = movePincherToEncoderCount(PINCHER_CLOSE_LIMIT_ENCODER_VALUE);
-            done         = moveArmExtendToEncoderCount(0, .3) && done;
+            done         = moveArmExtendToEncoderCount(0, ArmConstants.MAX_EXTEND_SPEED) && done;
             compactState = done ? CompactState.LOWERING : CompactState.RETRACTING;
+            if (compactState != CompactState.RETRACTING) {
+                System.out.println("moveToCompactPose: change state from RETRACTING to " + compactState);
+            }
             break;
         }
 
         case LOWERING: {
             boolean done = moveArmLiftToAngle(0);
             compactState = done ? CompactState.COMPACT_POSE : CompactState.LOWERING;
+            if (compactState != CompactState.LOWERING) {
+                System.out.println("moveToCompactPose: change state from LOWERING to " + compactState);
+            }
             break;
         }
 
@@ -163,7 +258,9 @@ abstract class BaseArmCommand extends CommandBase {
         return false;
     }
 
-    private enum DriveWithPieceState {PREPARING, RETRACTING, FINALIZING_ANGLE, FINALIZING_EXTENT, IN_POSITION;}
+    private enum DriveWithPieceState {
+        PREPARING, RETRACTING, FINALIZING_ANGLE, FINALIZING_EXTENT, IN_POSITION;
+    }
 
     private DriveWithPieceState driveWithPieceState = null;
 
@@ -189,26 +286,34 @@ abstract class BaseArmCommand extends CommandBase {
         switch (driveWithPieceState) {
 
         case PREPARING: {
-            boolean done = moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE);
-            driveWithPieceState = done ? DriveWithPieceState.RETRACTING : DriveWithPieceState.PREPARING;
+            if (moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE)) {
+                driveWithPieceState = DriveWithPieceState.RETRACTING;
+                System.out.println("moveToDriveWithPiece: change state from PREPARING to " + compactState);
+            }
             break;
         }
 
         case RETRACTING: {
-            boolean done = moveArmExtendToEncoderCount(0, .5);
-            driveWithPieceState = done ? DriveWithPieceState.FINALIZING_ANGLE : DriveWithPieceState.RETRACTING;
+            if (retractArm()) {
+                driveWithPieceState = DriveWithPieceState.FINALIZING_ANGLE;
+                System.out.println("moveToDriveWithPiece: change state from RETRACTING to " + compactState);
+            }
             break;
         }
 
         case FINALIZING_ANGLE: {
-            boolean done = moveArmLiftToAngle(target.angle);
-            driveWithPieceState = done ? DriveWithPieceState.FINALIZING_EXTENT : DriveWithPieceState.FINALIZING_ANGLE;
+            if (moveArmLiftToAngle(target.angle)) {
+                driveWithPieceState = DriveWithPieceState.FINALIZING_EXTENT;
+                System.out.println("moveToDriveWithPiece: change state from FINALIZE_ANGLE to " + compactState);
+            }
             break;
         }
 
         case FINALIZING_EXTENT: {
-            boolean done = moveArmExtendToEncoderCount(target.extension, .5);
-            driveWithPieceState = done ? DriveWithPieceState.IN_POSITION : DriveWithPieceState.FINALIZING_EXTENT;
+            if (moveArmExtendToEncoderCount(target.extension, .5)) {
+                driveWithPieceState = DriveWithPieceState.IN_POSITION;
+                System.out.println("moveToDriveWithPiece: change state from FINALIZING_EXTENT to " + compactState);
+            }
             break;
         }
 

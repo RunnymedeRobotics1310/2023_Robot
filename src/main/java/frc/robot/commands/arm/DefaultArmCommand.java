@@ -1,6 +1,7 @@
 package frc.robot.commands.arm;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.ArmSubsystem;
 
@@ -33,7 +34,9 @@ public class DefaultArmCommand extends CommandBase {
     @Override
     public void execute() {
 
-        armSubsystem.setArmLiftSpeed(driverController.getArmLiftMotorSpeed());
+        double armAngleLiftIncrement = driverController.getArmLiftMotorSpeed() * ArmConstants.MAX_ARM_ANGLE_LIFT_LOOP_INCREMENT;
+        armSubsystem.moveArmLiftToAngle(armSubsystem.getArmLiftAngleSetpoint() + armAngleLiftIncrement);
+
         armSubsystem.setArmExtendSpeed(driverController.getArmExtendMotorSpeed());
         armSubsystem.setPincherSpeed(driverController.getPincherMotorSpeed());
 

@@ -51,15 +51,15 @@ public class OperatorInput {
     }
 
     public boolean isHigh() {
-        return driverController.getYButton() || operatorController.getYButton();
+        return operatorController.getYButton();
     }
 
     public boolean isMid() {
-        return driverController.getBButton() || operatorController.getBButton();
+        return operatorController.getBButton();
     }
 
     public boolean isLow() {
-        return driverController.getAButton() || operatorController.getAButton();
+        return operatorController.getAButton();
     }
 
     public boolean isDrop() {
@@ -120,6 +120,10 @@ public class OperatorInput {
         return !shift() && driverController.getBackButton() && driverController.getStartButton();
     }
 
+    public boolean isSubstationConePickup() {
+        return driverController.getBButton();
+    }
+
     public boolean isCameraViewHigh() {
         return !shift() && driverController.getPOV() == 0;
     }
@@ -155,6 +159,10 @@ public class OperatorInput {
 
     public boolean driveForward() {
         return operatorController.getPOV() == 0;
+    }
+
+    public boolean balance() {
+        return operatorController.getPOV() == 180;
     }
 
     /**

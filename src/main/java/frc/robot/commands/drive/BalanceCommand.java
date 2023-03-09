@@ -8,13 +8,31 @@ import frc.robot.subsystems.DriveSubsystem;
 public class BalanceCommand extends CommandBase {
 
     private final DriveSubsystem driveSubsystem;
-    long                         startTime     = 0;
+    long startTime     = 0;
+    long prevLevelTime = -1;
 
-    // Track the gyro pitch.
-    double                       pitch         = 0;
-    double                       pitchRate     = 0;
-    double                       speed         = 0;
-    long                         prevLevelTime = 0;
+    double startHeading            = 0;
+    double centeringSpeed          = 0;
+    long   centeringDelayStartTime = 0;
+
+    // Track the max absolute value of the gyro pitch.
+    double maxClimbPitch = 0;
+
+    static final double ADJUST_SPEED               = .01;
+    static final double CENTERING_SPEED            = .25;
+    static final double CENTER_OF_GRAVITY_MOVEMENT = 5;   // cm
+    static final double CENTERING_DELAY            = 2000; // ms
+
+    static final double LEVEL_THRESHOLD = 2;
+    static final long   LEVEL_TIMEOUT   = 350;  // ms
+
+
+
+    private enum State {
+        CLIMB, CENTER, WAIT, BALANCE
+    }
+
+    private State currentState;
 
     /**
      * Drive on a specified compass heading (0-360 degrees) for the specified distance in cm.
@@ -32,55 +50,99 @@ public class BalanceCommand extends CommandBase {
     @Override
     public void initialize() {
 
-        System.out.println("BalanceCommand started at " + driveSubsystem.getPitch());
-        startTime = System.currentTimeMillis();
-
+        System.out.println("BalanceCommand started at pitch " + driveSubsystem.getPitch() + ". CLIMB");
+        startTime               = System.currentTimeMillis();
+        prevLevelTime           = -1;
+        startHeading            = driveSubsystem.getHeading();
+        centeringSpeed          = 0;
+        centeringDelayStartTime = 0;
+        maxClimbPitch           = 0;
+        currentState            = State.CLIMB;
     }
 
     @Override
     public void execute() {
 
-        // Track the gyro pitch.
-        pitch = driveSubsystem.getPitch();
+        double pitch = driveSubsystem.getPitch();
 
-        if (pitch > 1) {
-            speed = .0375;
-        }
-        else if (pitch < -1) {
-            speed = -.0375;
-        }
-        else {
-            speed = 0;
-        }
+        switch (currentState) {
 
-        // Feed forward balance \/
-        speed = speed + pitch / 130;
+        case CLIMB:
 
-        driveSubsystem.setMotorSpeeds(speed, speed);
+            // When climbing, track the max pitch angle;
+            maxClimbPitch = Math.max(maxClimbPitch, Math.abs(pitch));
+
+            // When the robot is falling, the pitch will be 3 degrees off of the max
+            if (maxClimbPitch - Math.abs(pitch) > 3) {
+
+                currentState = State.CENTER;
+                driveSubsystem.resetEncoders();
+
+                // Move opposite to the climb direction
+                centeringSpeed = -CENTERING_SPEED * Math.signum(pitch);
+
+                System.out.println("Balance Command: CENTERING from pitch " + pitch);
+            }
+
+            setPitchSpeed(pitch);
+
+            break;
+
+        case CENTER:
+
+            // Drive some number of cm down the ramp in order to move
+            // the center of gravity quickly over the center of the ramp
+            // once the ramp is moving.
+            trackInitialGyroHeading(centeringSpeed);
+
+            // Start trying to balance again after centering.
+            if (Math.abs(driveSubsystem.getEncoderDistanceCm()) > CENTER_OF_GRAVITY_MOVEMENT) {
+                currentState            = State.WAIT;
+                centeringDelayStartTime = System.currentTimeMillis();
+
+                System.out.println("Balance Command: WAITING at pitch " + pitch);
+            }
+
+            break;
+
+        case WAIT:
+            trackInitialGyroHeading(0);
+
+            if (System.currentTimeMillis() - centeringDelayStartTime > CENTERING_DELAY) {
+                currentState = State.BALANCE;
+                System.out.println("Balance Command: BALANCING from pitch " + pitch);
+            }
+            break;
+
+
+        case BALANCE:
+            // FIXME: try to balance after re-centering
+            setPitchSpeed(pitch);
+            break;
+        }
 
     }
 
     @Override
     public boolean isFinished() {
 
-        final double threshold        = 2;
-        final long   levelAfterMillis = 350;
-
         // Timeout
         if (System.currentTimeMillis() - startTime > 10000) {
             return true;
         }
+
         // Track the gyro pitch.
-        pitch = driveSubsystem.getPitch();
+        double pitch = driveSubsystem.getPitch();
 
         // FIXME: Only finish when it has been still for a couple of seconds. Instantaneous 0 is too
         // soon, because the charger may be in the middle of passing through 0 while rocking.
 
         // Not level
-        if (Math.abs(pitch) > threshold) {
+        if (Math.abs(pitch) > LEVEL_THRESHOLD) {
             prevLevelTime = -1;
             return false;
         }
+
         // it's level!
 
         // first time?
@@ -92,12 +154,57 @@ public class BalanceCommand extends CommandBase {
             // it's already level - nothing to do.
         }
 
-        if (System.currentTimeMillis() - prevLevelTime > levelAfterMillis) {
+        if (System.currentTimeMillis() - prevLevelTime > LEVEL_TIMEOUT) {
             // It's been level long enough!
             return true;
         }
+
         // Keep trying
         return false;
+    }
+
+    private void setPitchSpeed(double pitch) {
+
+        double speed = 0;
+
+        if (pitch > 1) {
+            speed = ADJUST_SPEED;
+        }
+        else if (pitch < -1) {
+            speed = -ADJUST_SPEED;
+        }
+
+        // Feed forward balance \/
+        speed = speed + pitch / 130;
+
+        trackInitialGyroHeading(speed);
+    }
+
+    private void trackInitialGyroHeading(double speed) {
+
+        /*
+         * Adjust the speed by the heading correction required to
+         * keep the robot straight.
+         */
+        double currentHeading = driveSubsystem.getHeading();
+
+        // Determine the error between the current heading and
+        // the desired heading
+
+        double error = startHeading - currentHeading;
+
+        if (error > 180) {
+            error -= 360;
+        }
+        else if (error < -180) {
+            error += 360;
+        }
+
+        double leftSpeed  = speed + error * .01;
+        double rightSpeed = speed - error * .01;
+
+        // In the end, set the speeds on the motors
+        driveSubsystem.setMotorSpeeds(leftSpeed, rightSpeed);
     }
 
     @Override

@@ -1,38 +1,34 @@
 package frc.robot.commands.arm;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.ArmSubsystem;
 
 public class ReleaseCommand extends BaseArmCommand {
 
-    private final ArmSubsystem armSubsystem;
+    private double targetPincherPosition = 0;
 
     public ReleaseCommand(ArmSubsystem armSubsystem) {
         super(armSubsystem);
-        this.armSubsystem = armSubsystem;
-        addRequirements(armSubsystem);
     }
 
     @Override
     public void initialize() {
         System.out.println("ReleaseCommand started");
         printArmState();
+
     }
 
     @Override
     public void execute() {
-        if (armSubsystem.isGamePieceDetected()) {
-            movePincherToEncoderCount(0);
-        }
-        else {
-            // as soon as the game piece is NO LONGER detected the pincher motor
-            // reverses direction to go into compact pose
-            moveToCompactPose();
-        }
+
+        // Open the pinchers by the release amount.
+        openPincher();
     }
 
     @Override
     public boolean isFinished() {
-        return !armSubsystem.isGamePieceDetected() && isCompactPose();
+        return !armSubsystem.isGamePieceDetected();
     }
 
     @Override
@@ -40,5 +36,10 @@ public class ReleaseCommand extends BaseArmCommand {
         System.out.println("ReleaseCommand end.  " + (interrupted ? "Interrupted." : "Not interrupted"));
         printArmState();
         stopArmMotors();
+
+        // If in teleop, then automatically schedule the robot move to compact state
+        if (DriverStation.isTeleopEnabled()) {
+            CommandScheduler.getInstance().schedule(new CompactCommand2(armSubsystem));
+        }
     }
 }

@@ -172,7 +172,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
             // reverse and deposit the starting piece
 
             double speed = -0.3;
-            addCommands(new DriveOnHeadingCommand(0, speed, 50, 0.25, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(0, speed, 20, driveSubsystem));
         }
 
         // Now that the game piece is scored, we do not have a game piece
@@ -205,7 +205,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
 
         // Drive out of the zone
         // This command may cause a rotation to heading 0.
-        addCommands(new DriveOnHeadingCommand(0, 0.6, 400, 2, driveSubsystem));
+        addCommands(new DriveOnHeadingCommand(0, 0.6, 330, driveSubsystem));
 
         currentZone        = Zone.FIELD;
         currentOrientation = Orientation.FACE_FIELD;
@@ -216,7 +216,8 @@ public class AutonomousCommand extends SequentialCommandGroup {
         if (exitZoneAction == AutoAction.PICK_UP_CUBE) {
 
             // Start the pickup, and at the same time, drive toward the vision target. This command
-            // will end when the PickupGroundCommand ends, canceling the DriveToVisionTarget if required.
+            // will end when the PickupGroundCommand ends, canceling the DriveToVisionTarget if
+            // required.
             addCommands(new PickUpGroundCommand(GamePiece.CUBE, armSubsystem)
                 .deadlineWith(new DriveToTargetCommand(VisionTargetType.CUBE, .2, driveSubsystem, visionSubsystem)));
 
@@ -255,8 +256,8 @@ public class AutonomousCommand extends SequentialCommandGroup {
         }
 
         // Turn around and go back to the grid
-        addCommands(new DriveOnHeadingCommand(270.0, 0.5, 5, 3, driveSubsystem));
-        addCommands(new DriveOnHeadingCommand(180.0, 0.5, 400, 3, driveSubsystem));
+        addCommands(new DriveOnHeadingCommand(270.0, 0.5, 5, driveSubsystem));
+        addCommands(new DriveOnHeadingCommand(180.0, 0.5, 300, driveSubsystem));
         addCommands(new DriveToTargetCommand(VisionTargetType.TAG, 0.3, driveSubsystem, visionSubsystem));
 
         // Vision subsystem to acquire the nearest scoring position marker (vision subsystem
@@ -288,17 +289,17 @@ public class AutonomousCommand extends SequentialCommandGroup {
             || (alliance == Alliance.Blue && startingLane == AutoLane.TOP)) {
 
             System.out.println("Balance Red/Bot or Blue/Top");
-            addCommands(new DriveOnHeadingCommand(180, -.3, 50, 0.25, driveSubsystem));
-            addCommands(new DriveOnHeadingCommand(270, -.3, 450, 1.25, driveSubsystem));
-            addCommands(new DriveOnHeadingCommand(180, -.5, 400, 1.25, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(180, -.3, 20, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(270, -.3, 100, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(180, -.5, 400, driveSubsystem));
         }
         else if ((alliance == Alliance.Red && startingLane == AutoLane.TOP)
             || (alliance == Alliance.Blue && startingLane == AutoLane.BOTTOM)) {
 
             System.out.println("Balance Red/Top or Blue/Bottom");
-            addCommands(new DriveOnHeadingCommand(180, -.3, 50, 0.25, driveSubsystem));
-            addCommands(new DriveOnHeadingCommand(90, -.3, 450, 1.25, driveSubsystem));
-            addCommands(new DriveOnHeadingCommand(180, -.3, 400, 1.25, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(180, -.3, 20, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(90, -.3, 100, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(180, -.5, 400, driveSubsystem));
         }
         else {
             System.out.println("Balance 'else'");
