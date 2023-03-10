@@ -16,62 +16,64 @@ public class VisionSubsystem extends SubsystemBase {
 
     public enum VisionTargetType {
         CUBE, CONE, TAG, CONE_POST, NONE
-    };
+    }
 
-    private static final long LED_MODE_PIPELINE             = 0;
-    private static final long LED_MODE_OFF                  = 1;
-    private static final long LED_MODE_BLINK                = 2;
-    private static final long LED_MODE_ON                   = 3;
+    ;
 
-    private static final long CAM_MODE_VISION               = 0;
-    private static final long CAM_MODE_DRIVER               = 1;
+    private static final long LED_MODE_PIPELINE = 0;
+    private static final long LED_MODE_OFF      = 1;
+    private static final long LED_MODE_BLINK    = 2;
+    private static final long LED_MODE_ON       = 3;
+
+    private static final long CAM_MODE_VISION = 0;
+    private static final long CAM_MODE_DRIVER = 1;
 
     // configure more pipelines here
-    private static final long PIPELINE_CONE_DETECT          = 0;
-    private static final long PIPELINE_CUBE_DETECT          = 1;
-    private static final long PIPELINE_APRIL_TAG_DETECT     = 3;
+    private static final long PIPELINE_CONE_DETECT      = 0;
+    private static final long PIPELINE_CUBE_DETECT      = 1;
+    private static final long PIPELINE_APRIL_TAG_DETECT = 3;
 
 
     // calibration data
-    private double[]          topLeft                       = new double[2];
-    private double[]          topRight                      = new double[2];
-    private double[]          bottomRight                   = new double[2];
-    private double[]          bottomLeft                    = new double[2];
+    private double[] topLeft     = new double[2];
+    private double[] topRight    = new double[2];
+    private double[] bottomRight = new double[2];
+    private double[] bottomLeft  = new double[2];
 
-    NetworkTable              table                         = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 
     // inputs/configs
-    NetworkTableEntry         ledMode                       = table.getEntry("ledMode");
-    NetworkTableEntry         camMode                       = table.getEntry("camMode");
-    NetworkTableEntry         pipeline                      = table.getEntry("pipeline");
+    NetworkTableEntry ledMode  = table.getEntry("ledMode");
+    NetworkTableEntry camMode  = table.getEntry("camMode");
+    NetworkTableEntry pipeline = table.getEntry("pipeline");
 
     // output
-    NetworkTableEntry         tv                            = table.getEntry("tv");
-    NetworkTableEntry         tx                            = table.getEntry("tx");
-    NetworkTableEntry         ty                            = table.getEntry("ty");
-    NetworkTableEntry         ta                            = table.getEntry("ta");
-    NetworkTableEntry         tl                            = table.getEntry("tl");
+    NetworkTableEntry tv = table.getEntry("tv");
+    NetworkTableEntry tx = table.getEntry("tx");
+    NetworkTableEntry ty = table.getEntry("ty");
+    NetworkTableEntry ta = table.getEntry("ta");
+    NetworkTableEntry tl = table.getEntry("tl");
 
-    private boolean           isCameraPositionInitialized   = false;
-    private long              cameraInitializationStartTime = 0;
+    private boolean isCameraPositionInitialized   = false;
+    private long    cameraInitializationStartTime = 0;
 
-    private VisionTargetType  currentVisionTargetType       = VisionTargetType.NONE;
+    private VisionTargetType currentVisionTargetType = VisionTargetType.NONE;
 
-    private LinearFilter      coneLowPassFilter             = LinearFilter.singlePoleIIR(.1, .02);
-    private double            filteredConeAngle             = 0;
+    private LinearFilter coneLowPassFilter = LinearFilter.singlePoleIIR(.1, .02);
+    private double       filteredConeAngle = 0;
 
     /*
      * Camera motor and encoder
      */
-    private final CANSparkMax cameraMotor                   = new CANSparkMax(VisionConstants.CAMERA_ANGLE_MOTOR_PORT,
+    private final CANSparkMax cameraMotor = new CANSparkMax(VisionConstants.CAMERA_ANGLE_MOTOR_PORT,
         MotorType.kBrushless);
 
-    private double            cameraMotorSpeed              = 0;
+    private double cameraMotorSpeed = 0;
 
     // Arm lift encoder
-    private RelativeEncoder   cameraEncoder                 = cameraMotor.getEncoder();
+    private RelativeEncoder cameraEncoder = cameraMotor.getEncoder();
 
-    private double            cameraEncoderOffset           = 0;
+    private double cameraEncoderOffset = 0;
 
     public VisionSubsystem() {
 
@@ -95,8 +97,7 @@ public class VisionSubsystem extends SubsystemBase {
      * {10, 10} corresponds to a location 10cm away from the front bumper of the robot, 10cm to the right of center
      * </pre>
      *
-     * etc.
-     * Using these values, set the four corners of the field of view of the limelight
+     * etc. Using these values, set the four corners of the field of view of the limelight
      *
      * @param topLeft
      * @param topRight
@@ -168,8 +169,7 @@ public class VisionSubsystem extends SubsystemBase {
      * <p>
      * Check whether a target is acquired using {@link #isVisionTargetFound()}
      *
-     * @return degrees in horizontal angle offset from the current crosshairs.
-     * or {@code 0} if no target is currently found.
+     * @return degrees in horizontal angle offset from the current crosshairs. or {@code 0} if no target is currently found.
      */
     public double getTargetAngleOffset() {
 
@@ -183,7 +183,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public double getTargetOffset() {
-        // todo: fixme: do proper trigonometry and compute the offset in
+        // fixme: do proper trigonometry and compute the offset in
         // degrees between the target and "straight ahead".
         // For now, the code will just return -10 if it's to the left of
         // center, +10 if it's to the right of center, but we should be
@@ -206,7 +206,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public boolean isConeTargetAcquired() {
-        // todo: fixme
+        // fixme: finish this
         if (PIPELINE_CONE_DETECT != pipeline.getInteger(-1)) {
             return false;
         }
@@ -221,12 +221,12 @@ public class VisionSubsystem extends SubsystemBase {
         if (tgt[0] < 0 || tgt[1] < 0)
             return false;
 
-        // todo: fixme: more checks
+        // fixme: more checks
         return true;
     }
 
     public boolean isCubeTargetAcquired() {
-        // todo: fixme
+        // fixme: finish this
         if (PIPELINE_CUBE_DETECT != pipeline.getInteger(-1)) {
             return false;
         }
@@ -246,7 +246,7 @@ public class VisionSubsystem extends SubsystemBase {
         if (tgt[0] < 0 || tgt[1] < 0)
             return false;
 
-        // todo: fixme: more checks
+        // fixme: more checks
         return true;
     }
 
@@ -260,7 +260,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public boolean isVisionTargetClose() {
-        // todo: fixme
+        // fixme: finish this
         if (PIPELINE_APRIL_TAG_DETECT != pipeline.getInteger(-1)) {
             return false;
         }
@@ -427,8 +427,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     /**
-     * Get the limelight coordinates for the target
-     * (i.e. with respect to the limelight origin, NOT the robot!!)
+     * Get the limelight coordinates for the target (i.e. with respect to the limelight origin, NOT the robot!!)
      *
      * @return limelight target coordinates
      */

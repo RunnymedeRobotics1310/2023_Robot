@@ -77,7 +77,9 @@ public class DriveSubsystem extends SubsystemBase {
 
     private enum GyroAxis {
         YAW, PITCH, ROLL
-    };
+    }
+
+    ;
 
     private final ArmSubsystem armSubsystem;
 
@@ -143,7 +145,7 @@ public class DriveSubsystem extends SubsystemBase {
         // compass on the dashboard appear at the correct heading.
         navXGyro.setAngleAdjustment(gyroHeadingOffset);
 
-        // FIXME: Hack
+        // FIXME: (low) Hack
         if (heading == 0) {
             resetEncoders();
         }

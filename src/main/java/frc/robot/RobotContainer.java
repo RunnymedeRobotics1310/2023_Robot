@@ -88,7 +88,7 @@ public class RobotContainer {
 
     private void initAutoSelectors() {
 
-        // FIXME: consider moving all of the choosers to their own classes.
+        // FIXME: (low) consider moving all of the choosers to their own classes.
 
         startingLaneChooser.setDefaultOption("Top", AutoLane.TOP);
         SmartDashboard.putData("Starting Lane", startingLaneChooser);

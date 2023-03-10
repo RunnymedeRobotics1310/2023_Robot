@@ -241,8 +241,7 @@ public final class Constants {
             if (gamePiece == GamePiece.CUBE) {
                 return DRIVE_WITH_CUBE_POSITION;
             }
-            return DRIVE_WITH_CONE_POSITION; // TODO: FIXME: THE DEFAULT SHOULD BE THE ONE THAT
-            // WORKS FOR BOTH
+            return DRIVE_WITH_CONE_POSITION; // FIXME (med): the default should be the value that works for both
         }
 
         // Helper routine to get a scoring position
