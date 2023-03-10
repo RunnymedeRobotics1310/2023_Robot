@@ -14,13 +14,9 @@ public class OperatorInput {
         LEFT, RIGHT
     }
 
-    ;
-
     public enum Axis {
         X, Y
     }
-
-    ;
 
     /**
      * Construct an OperatorInput class that is fed by a DriverController and an OperatorController.

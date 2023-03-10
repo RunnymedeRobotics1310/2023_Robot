@@ -11,20 +11,20 @@ import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
 
 public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
-    private static final double   MIN_PICKUP_DISTANCE  = 95;
-    private static final double   MAX_PICKUP_DISTANCE  = 115;
-    private static final double   TARGET_CAMERA_OFFSET = 5;
+    private static final double MIN_PICKUP_DISTANCE  = 95;
+    private static final double MAX_PICKUP_DISTANCE  = 115;
+    private static final double TARGET_CAMERA_OFFSET = 5;
 
     private final VisionSubsystem visionSubsystem;
     private final DriveSubsystem  driveSubsystem;
 
-    private GamePiece             gamePiece            = GamePiece.CONE;
+    private GamePiece gamePiece = GamePiece.CONE;
 
-    private double                visionTargetOffset   = 0;
+    private double visionTargetOffset = 0;
 
     private enum State {
         MOVE_CAMERA, ALIGN, PICKUP
-    };
+    }
 
     private State currentState = State.MOVE_CAMERA;
 

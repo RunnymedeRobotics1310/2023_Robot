@@ -22,20 +22,18 @@ public class SystemTestCommand extends CommandBase {
         CAMERA
     }
 
-    ;
-
     private final OperatorInput           driverController;
     private final RunnymedeGameController controller;
     private final DriveSubsystem          driveSubsystem;
     private final ArmSubsystem            armSubsystem;
     private final VisionSubsystem         visionSubsystem;
 
-    private long                          startTime           = 0;
-    private Motor                         selectedMotor       = Motor.NONE;
-    private double                        povMotorSpeed       = 0;
+    private long   startTime     = 0;
+    private Motor  selectedMotor = Motor.NONE;
+    private double povMotorSpeed = 0;
 
-    private boolean                       previousLeftBumper  = false;
-    private boolean                       previousRightBumper = false;
+    private boolean previousLeftBumper  = false;
+    private boolean previousRightBumper = false;
 
     /**
      * System Test Command
@@ -147,7 +145,7 @@ public class SystemTestCommand extends CommandBase {
         double leftTrigger  = controller.getLeftTriggerAxis();
         double rightTrigger = controller.getRightTriggerAxis();
 
-        double motorSpeed   = 0;
+        double motorSpeed = 0;
 
         if (leftTrigger > 0 && rightTrigger > 0) {
 

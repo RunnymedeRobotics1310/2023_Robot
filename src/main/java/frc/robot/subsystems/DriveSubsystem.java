@@ -79,8 +79,6 @@ public class DriveSubsystem extends SubsystemBase {
         YAW, PITCH, ROLL
     }
 
-    ;
-
     private final ArmSubsystem armSubsystem;
 
     /** Creates a new DriveSubsystem. */

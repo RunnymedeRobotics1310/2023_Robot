@@ -18,8 +18,6 @@ public class VisionSubsystem extends SubsystemBase {
         CUBE, CONE, TAG, CONE_POST, NONE
     }
 
-    ;
-
     private static final long LED_MODE_PIPELINE = 0;
     private static final long LED_MODE_OFF      = 1;
     private static final long LED_MODE_BLINK    = 2;
