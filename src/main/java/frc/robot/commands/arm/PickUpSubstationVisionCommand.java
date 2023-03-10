@@ -6,29 +6,32 @@ import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.commands.vision.SetCameraViewCommand;
-import frc.robot.subsystems.*;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
 
 public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
-    private static final double MIN_PICKUP_DISTANCE  = 95;
-    private static final double MAX_PICKUP_DISTANCE  = 115;
-    private static final double TARGET_CAMERA_OFFSET = 5;
+    private static final double   MIN_PICKUP_DISTANCE             = 95;
+    private static final double   MAX_PICKUP_DISTANCE             = 115;
+    private static final double   TARGET_CAMERA_OFFSET            = 5;
+    private static final double   VISION_TARGET_HEADING_TOLERANCE = 1;
 
     private final VisionSubsystem visionSubsystem;
     private final DriveSubsystem  driveSubsystem;
 
-    private double requiredExtensionEncoderPosition;
+    private double                requiredExtensionEncoderPosition;
 
-    private GamePiece gamePiece = GamePiece.CONE;
+    private GamePiece             gamePiece                       = GamePiece.CONE;
 
-    private double visionTargetOffset = 0;
+    private double                visionTargetHeadingError        = 0;
 
     private enum State {
-        MOVE_CAMERA, ALIGN, PICKUP
+        MOVE_CAMERA_AND_GET_WITHIN_RANGE, ALIGN, PICKUP
     }
 
-    private State currentState = State.MOVE_CAMERA;
+    private State currentState = State.MOVE_CAMERA_AND_GET_WITHIN_RANGE;
 
     public PickUpSubstationVisionCommand(ArmSubsystem armSubsystem, DriveSubsystem driveSubsystem,
         VisionSubsystem visionSubsystem) {
@@ -50,9 +53,12 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
         visionSubsystem.setVisionTargetType(VisionTargetType.CONE);
         moveCameraToHighPosition();
 
+        visionTargetHeadingError = 0;
+
         printArmState();
         stopArmMotors();
-        currentState = State.MOVE_CAMERA;
+
+        currentState = State.MOVE_CAMERA_AND_GET_WITHIN_RANGE;
     }
 
     @Override
@@ -64,48 +70,51 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
         switch (currentState) {
 
-        case MOVE_CAMERA:
+        case MOVE_CAMERA_AND_GET_WITHIN_RANGE: {
 
-            if (visionSubsystem.getCameraView() == CameraView.HIGH
-                && visionSubsystem.isVisionTargetFound()) {
-                currentState       = State.ALIGN;
-                visionTargetOffset = visionSubsystem.getTargetAngleOffset();
+            moveToScoringRange();
+
+            // Wait for the camera to get into position
+            if (visionSubsystem.getCameraView() == CameraView.HIGH) {
+
+                currentState = State.ALIGN;
+
+                // If there is a vision target, then update the error
+                if (visionSubsystem.isVisionTargetFound()) {
+                    visionTargetHeadingError = visionSubsystem.getTargetAngleOffset();
+                }
             }
-            // Wait for the camera to get into position;
+
             return;
+        }
 
-        case ALIGN:
+        case ALIGN: {
 
-            // Move forward or backwards until the distance is in range
-            // Scoring can only happen between 75 and 115
-
-            double driveSpeed = 0;
-
-            if (driveSubsystem.getUltrasonicDistanceCm() < MIN_PICKUP_DISTANCE) {
-                driveSpeed = -.1;
-            }
-
-            if (driveSubsystem.getUltrasonicDistanceCm() > MAX_PICKUP_DISTANCE) {
-                driveSpeed = .1;
-            }
-
+            // If there is a vision target, then update the error
             if (visionSubsystem.isVisionTargetFound()) {
-                visionTargetOffset = visionSubsystem.getTargetAngleOffset() - TARGET_CAMERA_OFFSET;
+                visionTargetHeadingError = visionSubsystem.getTargetAngleOffset();
             }
 
-            double turn = visionTargetOffset * .01;
+            double speed = moveToScoringRange();
 
-            driveSubsystem.setMotorSpeeds(driveSpeed + turn, driveSpeed - turn);
+            alignToVisionTarget(speed);
 
-            if (driveSpeed == 0
-                && Math.abs(visionTargetOffset) < 2) {
-                // The extension is based on the distance following the formula
-                requiredExtensionEncoderPosition = ultrasonicDistanceCm * .88 - 53.1;
+            if (speed == 0
+                && Math.abs(visionTargetHeadingError) < 2) {
+
+                // Stop the motors
                 driveSubsystem.setMotorSpeeds(0, 0);
-                currentState = State.PICKUP;
+
+                // Set the required extension distance based on the following formula
+                requiredExtensionEncoderPosition = ultrasonicDistanceCm * .88 - 53.1;
+
+                currentState                     = State.PICKUP;
             }
-            // Wait for target alignment
+
+            // Wait for target and distance alignment
             return;
+
+        }
 
         case PICKUP:
 
@@ -143,6 +152,43 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
             }
         }
 
+    }
+
+    private double moveToScoringRange() {
+
+        // Move forward or backwards until the distance is in range
+        // Scoring can only happen between 75 and 115
+        double driveSpeed = 0;
+
+        if (driveSubsystem.getUltrasonicDistanceCm() < MIN_PICKUP_DISTANCE) {
+            driveSpeed = -.1;
+        }
+
+        if (driveSubsystem.getUltrasonicDistanceCm() > MAX_PICKUP_DISTANCE) {
+            driveSpeed = .1;
+        }
+
+        // If there is no forward or backward movement, then the
+        // robot is within scoring range.
+        return driveSpeed;
+    }
+
+    private boolean alignToVisionTarget(double driveSpeed) {
+
+        // Update the vision target error only when the target is found.
+        if (visionSubsystem.isVisionTargetFound()) {
+            visionTargetHeadingError = visionSubsystem.getTargetAngleOffset() - TARGET_CAMERA_OFFSET;
+        }
+
+        double turn = visionTargetHeadingError * .01;
+
+        if (visionTargetHeadingError < VISION_TARGET_HEADING_TOLERANCE) {
+            turn = 0;
+        }
+
+        driveSubsystem.setMotorSpeeds(driveSpeed + turn, driveSpeed - turn);
+
+        return turn == 0;
     }
 
     @Override
