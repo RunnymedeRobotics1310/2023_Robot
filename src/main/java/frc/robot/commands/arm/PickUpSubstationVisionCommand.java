@@ -18,6 +18,8 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
     private final VisionSubsystem visionSubsystem;
     private final DriveSubsystem  driveSubsystem;
 
+    private double requiredExtensionEncoderPosition;
+
     private GamePiece gamePiece = GamePiece.CONE;
 
     private double visionTargetOffset = 0;
@@ -37,6 +39,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
         this.driveSubsystem  = driveSubsystem;
 
         addRequirements(driveSubsystem);
+        requiredExtensionEncoderPosition = 0;
     }
 
     @Override
@@ -49,6 +52,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
         printArmState();
         stopArmMotors();
+        currentState = State.MOVE_CAMERA;
     }
 
     @Override
@@ -95,6 +99,9 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
             if (driveSpeed == 0
                 && Math.abs(visionTargetOffset) < 2) {
+                // The extension is based on the distance following the formula
+                requiredExtensionEncoderPosition = ultrasonicDistanceCm * .88 - 53.1;
+                driveSubsystem.setMotorSpeeds(0, 0);
                 currentState = State.PICKUP;
             }
             // Wait for target alignment
@@ -126,9 +133,6 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
             if (moveArmLiftToAngle(ArmConstants.SUBSTATION_PICKUP_POSITION.angle)) {
 
-                // The extension is based on the distance following the formula
-
-                double requiredExtensionEncoderPosition = ultrasonicDistanceCm * .88 - 53.1;
 
                 if (moveArmExtendToEncoderCount(requiredExtensionEncoderPosition, ArmConstants.MAX_EXTEND_SPEED)) {
 
