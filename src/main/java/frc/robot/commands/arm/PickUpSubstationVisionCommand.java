@@ -11,8 +11,8 @@ import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
 
 public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
-    private static final double   MIN_PICKUP_DISTANCE  = 150;
-    private static final double   MAX_PICKUP_DISTANCE  = 220;
+    private static final double   MIN_PICKUP_DISTANCE  = 95;
+    private static final double   MAX_PICKUP_DISTANCE  = 115;
     private static final double   TARGET_CAMERA_OFFSET = 5;
 
     private final VisionSubsystem visionSubsystem;
@@ -54,8 +54,9 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
     @Override
     public void execute() {
 
-        double armAngle          = armSubsystem.getArmLiftAngle();
-        double armExtendPosition = armSubsystem.getArmExtendEncoder();
+        double armAngle             = armSubsystem.getArmLiftAngle();
+        double armExtendPosition    = armSubsystem.getArmExtendEncoder();
+        double ultrasonicDistanceCm = driveSubsystem.getUltrasonicDistanceCm();
 
         switch (currentState) {
 
@@ -72,6 +73,8 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
         case ALIGN:
 
             // Move forward or backwards until the distance is in range
+            // Scoring can only happen between 75 and 115
+
             double driveSpeed = 0;
 
             if (driveSubsystem.getUltrasonicDistanceCm() < MIN_PICKUP_DISTANCE) {
@@ -123,9 +126,12 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
             if (moveArmLiftToAngle(ArmConstants.SUBSTATION_PICKUP_POSITION.angle)) {
 
-                // FIXME: what is the extension
-                if (moveArmExtendToEncoderCount(ArmConstants.SUBSTATION_PICKUP_POSITION.extension,
-                    ArmConstants.MAX_EXTEND_SPEED)) {
+                // The extension is based on the distance following the formula
+
+                double requiredExtensionEncoderPosition = ultrasonicDistanceCm * .88 - 53.1;
+
+                if (moveArmExtendToEncoderCount(requiredExtensionEncoderPosition, ArmConstants.MAX_EXTEND_SPEED)) {
+
                     if (armSubsystem.isGamePieceDetected()) {
                         movePincherToEncoderCount(gamePiece.pincherEncoderCount);
                     }

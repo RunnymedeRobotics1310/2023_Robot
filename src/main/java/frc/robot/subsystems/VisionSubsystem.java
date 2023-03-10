@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -55,6 +56,9 @@ public class VisionSubsystem extends SubsystemBase {
     private long              cameraInitializationStartTime = 0;
 
     private VisionTargetType  currentVisionTargetType       = VisionTargetType.NONE;
+
+    private LinearFilter      coneLowPassFilter             = LinearFilter.singlePoleIIR(.1, .02);
+    private double            filteredConeAngle             = 0;
 
     /*
      * Camera motor and encoder
@@ -172,6 +176,8 @@ public class VisionSubsystem extends SubsystemBase {
         if (!isVisionTargetFound()) {
             return 0;
         }
+
+        // FIXME: return the filtered cone value if a cone.
 
         return tx.getDouble(0);
     }
@@ -378,6 +384,16 @@ public class VisionSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
+        if (currentVisionTargetType == VisionTargetType.CONE) {
+            if (isVisionTargetFound()) {
+                filteredConeAngle = coneLowPassFilter.calculate(getTargetAngleOffset());
+            }
+            else {
+                filteredConeAngle = 0;
+                coneLowPassFilter.reset();
+            }
+        }
+
         // Call the safety code on the camera motor movement
         setCameraMotorSpeed(cameraMotorSpeed);
 
@@ -400,6 +416,8 @@ public class VisionSubsystem extends SubsystemBase {
         SmartDashboard.putString("Camera view", getCameraView().toString());
         SmartDashboard.putNumber("Camera Motor Speed", getCameraMotorSpeed());
         SmartDashboard.putNumber("Camera Encoder", Math.round(getCameraEncoder() * 100) / 100d);
+
+        SmartDashboard.putNumber("Cone Angle Filtered", filteredConeAngle);
     }
 
     public void stop() {
