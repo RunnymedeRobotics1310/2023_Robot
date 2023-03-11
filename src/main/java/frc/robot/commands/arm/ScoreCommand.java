@@ -8,9 +8,9 @@ import frc.robot.subsystems.ArmSubsystem;
 
 public class ScoreCommand extends BaseArmCommand {
 
-    private final ScoringRow  scoringRow;
-    private       ArmPosition scoringPosition = null;
-    private       GamePiece   gamePiece       = null;
+    private final ScoringRow scoringRow;
+    private ArmPosition      scoringPosition = null;
+    private GamePiece        gamePiece       = null;
 
     public ScoreCommand(ScoringRow scoringRow, ArmSubsystem armSubsystem) {
         super(armSubsystem);
@@ -40,7 +40,7 @@ public class ScoreCommand extends BaseArmCommand {
         // retract before moving the arm.
         if (armSubsystem.getArmLiftAngle() < ArmConstants.CLEAR_FRAME_ARM_ANGLE) {
 
-            if (!moveArmExtendToEncoderCount(0, .5)) {
+            if (!moveArmExtendToEncoderCount(0, 1)) {
                 return;
             }
         }
@@ -49,7 +49,7 @@ public class ScoreCommand extends BaseArmCommand {
         if (armSubsystem.getArmLiftAngle() > scoringPosition.angle) {
 
             // Move the extender until it is in position
-            if (moveArmExtendToEncoderCount(scoringPosition.extension, .5)) {
+            if (moveArmExtendToEncoderCount(scoringPosition.extension, 1)) {
 
                 // Then lift
                 moveArmLiftToAngle(scoringPosition.angle);

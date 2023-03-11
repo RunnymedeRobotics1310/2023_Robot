@@ -20,8 +20,8 @@ public class BalanceCommand extends CommandBase {
 
     static final double          ADJUST_SPEED               = .01;
     static final double          CENTERING_SPEED            = .25;
-    static final double          CENTER_OF_GRAVITY_MOVEMENT = 5;    // cm
-    static final double          CENTERING_DELAY            = 2000; // ms
+    static final double          CENTER_OF_GRAVITY_MOVEMENT = 4;    // cm
+    static final double          CENTERING_DELAY            = 1000; // ms
 
     static final double          LEVEL_THRESHOLD            = 2;
     static final long            LEVEL_TIMEOUT              = 350;  // ms
@@ -196,9 +196,12 @@ public class BalanceCommand extends CommandBase {
         else if (pitch < -1) {
             speed = -ADJUST_SPEED;
         }
+        double feedForward = pitch / 180;
 
-        // Feed forward balance \/
-        speed = speed + pitch / 130;
+        feedForward = Math.min(.15, Math.abs(feedForward)) * Math.signum(feedForward);
+
+        // Feed forward balance
+        speed       = speed + feedForward;
 
         trackInitialGyroHeading(speed);
     }
