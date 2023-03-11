@@ -685,6 +685,11 @@ public class ArmSubsystem extends SubsystemBase {
                 return 0;
             }
 
+            // do not extend the arm if it's already as far as it can go, and it's in the frame
+            if (isArmInsideFrame() && getArmExtendEncoder() >= ArmConstants.MAX_ARM_EXTEND_INSIDE_FRAME) {
+                return 0;
+            }
+
             // Slow down if approaching the limit
             if (Math.abs(getArmExtendEncoder()
                 - ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE) < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
@@ -766,6 +771,11 @@ public class ArmSubsystem extends SubsystemBase {
         if (inputSpeed < 0) {
 
             if (isPincherOpen()) {
+                return 0;
+            }
+
+            // if we are in the frame, don't open the pincher beyond the limit.
+            if (isArmInsideFrame() && pincherEncoder.getPosition() <= ArmConstants.MIN_PINCHER_INSIDE_FRAME_POSITION) {
                 return 0;
             }
 

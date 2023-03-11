@@ -193,7 +193,7 @@ public final class Constants {
 
         // If the arm is below the frame clearance, and the arm extension is greater
         // than the max inside frame extension, then the robot is outside the frame.
-        public static final double      MAX_ARM_EXTEND_INSIDE_FRAME         = 4;
+        public static final double MAX_ARM_EXTEND_INSIDE_FRAME = 6;
 
 
         /*
