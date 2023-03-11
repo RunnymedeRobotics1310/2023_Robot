@@ -1,8 +1,14 @@
 package frc.robot.commands.arm;
 
-import static frc.robot.Constants.ArmConstants.*;
-import static frc.robot.Constants.GameConstants.GamePiece.*;
+import static frc.robot.Constants.ArmConstants.ARM_EXTEND_POSITION_TOLERANCE;
+import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_ARM_ANGLE;
+import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_POSITION;
+import static frc.robot.Constants.ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED;
+import static frc.robot.Constants.GameConstants.GamePiece.CONE;
+import static frc.robot.Constants.GameConstants.GamePiece.CUBE;
+import static frc.robot.Constants.GameConstants.GamePiece.NONE;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.commands.operator.OperatorInput;
@@ -25,7 +31,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
     private enum State {
 
-        MOVING_TO_COMPACT_POSE,
+        ARM_RETRACTING,
         SAFE_TO_MOVE, // raise arm to safe height
         ARM_MOVING, // extend arm, open pincher and raise arm
         ARM_IN_POSITION, // arm is in the proper position for hoovering
@@ -36,7 +42,7 @@ public class PickUpGroundCommand extends BaseArmCommand {
         CANCELLED // aborted
     }
 
-    private State state = State.MOVING_TO_COMPACT_POSE;
+    private State state = State.ARM_RETRACTING;
 
     /**
      * Pick up a piece from the ground in auto.
@@ -78,26 +84,19 @@ public class PickUpGroundCommand extends BaseArmCommand {
     public void initialize() {
         printStatus("initialize");
         // Try to figure out the right state to start
-        if (isCompactPose()) {
-            state = State.SAFE_TO_MOVE;
-            stopArmMotors();
-        }
-        else if (isGroundPickupPose()) {
+        if (isGroundPickupPose()) {
             state = State.ARM_IN_POSITION;
             stopArmMotors();
         }
-        else if (armSubsystem.getArmLiftAngle() > CLEAR_FRAME_ARM_ANGLE && GROUND_PICKUP_POSITION.angle > CLEAR_FRAME_ARM_ANGLE) {
+        else if (armSubsystem.isArmRetracted()) {
             state = State.SAFE_TO_MOVE;
             stopArmMotors();
         }
-        else if (armSubsystem.getArmLiftAngle() > CLEAR_FRAME_ARM_ANGLE && GROUND_PICKUP_POSITION.angle < CLEAR_FRAME_ARM_ANGLE) {
-            state = State.MOVING_TO_COMPACT_POSE;
-            stopArmMotors();
+        else if (armSubsystem.isArmInsideFrame()) {
+            state = State.ARM_RETRACTING;
         }
         else {
-            armSubsystem.setPincherSpeed(MAX_PINCHER_SPEED);
-            armSubsystem.setArmExtendSpeed(0);
-            state = State.MOVING_TO_COMPACT_POSE;
+            state = State.ARM_MOVING;
         }
 
         setVisionTarget(pickupTarget);
@@ -135,8 +134,8 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
         switch (state) {
 
-        case MOVING_TO_COMPACT_POSE: {
-            boolean compactDone = moveToCompactPose();
+        case ARM_RETRACTING: {
+            boolean compactDone = moveArmExtendToEncoderCount(0, MAX_EXTEND_SLOW_ZONE_SPEED);
             if (compactDone) {
                 printStatus("Changing state");
                 state = State.SAFE_TO_MOVE;
@@ -155,15 +154,17 @@ public class PickUpGroundCommand extends BaseArmCommand {
         }
 
         case ARM_MOVING: {
-            // if ground pickup location is too low, override it with the location that will ensure
-            // that we clear the frame.
-            boolean liftDone  = moveArmLiftToAngle(
-                Double.max(CLEAR_FRAME_ARM_ANGLE, GROUND_PICKUP_POSITION.angle));
-            boolean extDone   = moveArmExtendToEncoderCount(GROUND_PICKUP_POSITION.extension, .5);
+            // Always open the pincher
             boolean pinchDone = openPincher();
-            if (liftDone && extDone && pinchDone) {
-                printStatus("Changing state");
-                state = State.ARM_IN_POSITION;
+            // The arm is already lifted to a safe angle,
+            // so set the extension before lowering the arm.
+            if (moveArmExtendToEncoderCount(GROUND_PICKUP_POSITION.extension, .5)) {
+                boolean liftDone = moveArmLiftToAngle(
+                    Double.max(CLEAR_FRAME_ARM_ANGLE, GROUND_PICKUP_POSITION.angle));
+                if (liftDone && pinchDone) {
+                    printStatus("Changing state");
+                    state = State.ARM_IN_POSITION;
+                }
             }
             break;
         }
@@ -185,9 +186,9 @@ public class PickUpGroundCommand extends BaseArmCommand {
         }
 
         case PIECE_GRABBED:
-            boolean armInPositionDOne = moveToDriveWithPiecePose();
+            boolean armInPositionDone = moveToDriveWithPiecePose();
             printStatus("Changing state");
-            state = armInPositionDOne ? State.DRIVING_POSITION : State.PIECE_GRABBED;
+            state = armInPositionDone ? State.DRIVING_POSITION : State.PIECE_GRABBED;
             break;
 
         case CANCELLED: {
@@ -203,13 +204,22 @@ public class PickUpGroundCommand extends BaseArmCommand {
 
     @Override
     public boolean isFinished() {
-        return state == State.CANCELLED || (state == State.DRIVING_POSITION && armSubsystem.getHeldGamePiece() != NONE);
+        return state == State.CANCELLED
+            || (state == State.DRIVING_POSITION && armSubsystem.getHeldGamePiece() != NONE);
     }
 
     @Override
     public void end(boolean interrupted) {
+
         printStatus("end. Interrupted? " + interrupted);
         stopArmMotors();
+
+        // If in teleop and the game piece is dropped or the command is cancelled, go to compact pose
+        if (armSubsystem.getHeldGamePiece() == GamePiece.NONE
+            && DriverStation.isTeleopEnabled()) {
+
+            CommandScheduler.getInstance().schedule(new CompactCommand(armSubsystem));
+        }
     }
 
     private boolean isGroundPickupPose() {

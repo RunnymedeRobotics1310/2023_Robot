@@ -3,12 +3,12 @@ package frc.robot.commands.arm;
 import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_ARM_ANGLE;
 import static frc.robot.Constants.ArmConstants.MAX_EXTEND_SPEED;
 import static frc.robot.Constants.ArmConstants.MAX_PINCHER_SPEED;
-import static frc.robot.Constants.ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.subsystems.ArmSubsystem;
 
 abstract class BaseArmCommand extends CommandBase {
@@ -201,83 +201,11 @@ abstract class BaseArmCommand extends CommandBase {
     }
 
 
-    private enum CompactState {
-        PREPARING, RETRACTING, LOWERING, COMPACT_POSE;
-    }
-
-    private CompactState compactState = null;
-
     protected final boolean isCompactPose() {
         return armSubsystem.isArmDown()
             && armSubsystem.isArmRetracted() && armSubsystem.isPincherInsideFrame();
     }
 
-    /**
-     * Safely move the arm from whatever position it is in to the compact pose, which has the arm down, retracted, and with
-     * pinchers closed.
-     *
-     * @return true if in the compact pose, false if still moving there
-     */
-    protected final boolean moveToCompactPose() {
-
-        // Figure out initial state
-        if (compactState == null) {
-            stopArmMotors();
-            if (isCompactPose()) {
-                compactState = CompactState.COMPACT_POSE;
-            }
-            else {
-                boolean tooLow = armSubsystem.getArmLiftAngle() < CLEAR_FRAME_ARM_ANGLE;
-                compactState = tooLow ? CompactState.PREPARING : CompactState.RETRACTING;
-            }
-
-            System.out.println("moveToCompactPose: initial state" + compactState);
-        }
-
-        // get into the compact pose
-        switch (compactState) {
-
-        case PREPARING: {
-            if (!armSubsystem.isPincherAtCloseLimit()) {
-                armSubsystem.setPincherSpeed(MAX_PINCHER_SPEED);
-            }
-            boolean done = moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE);
-            compactState = done ? CompactState.RETRACTING : CompactState.PREPARING;
-            if (compactState != CompactState.PREPARING) {
-                System.out.println("moveToCompactPose: change state from PREPARING to " + compactState);
-            }
-            break;
-        }
-
-        case RETRACTING: {
-            boolean done = movePincherToEncoderCount(PINCHER_CLOSE_LIMIT_ENCODER_VALUE);
-            done         = moveArmExtendToEncoderCount(0, ArmConstants.MAX_EXTEND_SPEED) && done;
-            compactState = done ? CompactState.LOWERING : CompactState.RETRACTING;
-            if (compactState != CompactState.RETRACTING) {
-                System.out.println("moveToCompactPose: change state from RETRACTING to " + compactState);
-            }
-            break;
-        }
-
-        case LOWERING: {
-            boolean done = moveArmLiftToAngle(0);
-            compactState = done ? CompactState.COMPACT_POSE : CompactState.LOWERING;
-            if (compactState != CompactState.LOWERING) {
-                System.out.println("moveToCompactPose: change state from LOWERING to " + compactState);
-            }
-            break;
-        }
-
-        case COMPACT_POSE: {
-            // done!
-            System.out.println("Compact pose achieved");
-            stopArmMotors();
-            compactState = null; // ready to go again
-            return true;
-        }
-        }
-        return false;
-    }
 
     private enum DriveWithPieceState {
         PREPARING, RETRACTING, FINALIZING_ANGLE, FINALIZING_EXTENT, IN_POSITION;
@@ -287,10 +215,11 @@ abstract class BaseArmCommand extends CommandBase {
 
     protected final boolean moveToDriveWithPiecePose() {
 
-        final Constants.GameConstants.GamePiece heldGamePiece = armSubsystem.getHeldGamePiece();
-        if (heldGamePiece == Constants.GameConstants.GamePiece.NONE) {
-            System.out.println("Attempting to move to a drive with game piece position but not holding a piece. Compacting.");
-            return moveToCompactPose();
+        final GamePiece heldGamePiece = armSubsystem.getHeldGamePiece();
+
+        if (heldGamePiece == GamePiece.NONE) {
+            System.out.println("Attempting to move to a drive with game piece position but not holding a piece. Complete.");
+            return true;
         }
 
         final Constants.ArmPosition target = Constants.ArmConstants.getDrivePosition(heldGamePiece);
@@ -303,13 +232,12 @@ abstract class BaseArmCommand extends CommandBase {
             driveWithPieceState = tooLow ? DriveWithPieceState.PREPARING : DriveWithPieceState.RETRACTING;
         }
 
-        // get into the compact pose
         switch (driveWithPieceState) {
 
         case PREPARING: {
             if (moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE)) {
                 driveWithPieceState = DriveWithPieceState.RETRACTING;
-                System.out.println("moveToDriveWithPiece: change state from PREPARING to " + compactState);
+                System.out.println("moveToDriveWithPiece: change state from PREPARING to " + driveWithPieceState);
             }
             break;
         }
@@ -317,7 +245,7 @@ abstract class BaseArmCommand extends CommandBase {
         case RETRACTING: {
             if (retractArm()) {
                 driveWithPieceState = DriveWithPieceState.FINALIZING_ANGLE;
-                System.out.println("moveToDriveWithPiece: change state from RETRACTING to " + compactState);
+                System.out.println("moveToDriveWithPiece: change state from RETRACTING to " + driveWithPieceState);
             }
             break;
         }
@@ -325,7 +253,7 @@ abstract class BaseArmCommand extends CommandBase {
         case FINALIZING_ANGLE: {
             if (moveArmLiftToAngle(target.angle)) {
                 driveWithPieceState = DriveWithPieceState.FINALIZING_EXTENT;
-                System.out.println("moveToDriveWithPiece: change state from FINALIZE_ANGLE to " + compactState);
+                System.out.println("moveToDriveWithPiece: change state from FINALIZE_ANGLE to " + driveWithPieceState);
             }
             break;
         }
@@ -333,7 +261,7 @@ abstract class BaseArmCommand extends CommandBase {
         case FINALIZING_EXTENT: {
             if (moveArmExtendToEncoderCount(target.extension, .5)) {
                 driveWithPieceState = DriveWithPieceState.IN_POSITION;
-                System.out.println("moveToDriveWithPiece: change state from FINALIZING_EXTENT to " + compactState);
+                System.out.println("moveToDriveWithPiece: change state from FINALIZING_EXTENT to " + driveWithPieceState);
             }
             break;
         }

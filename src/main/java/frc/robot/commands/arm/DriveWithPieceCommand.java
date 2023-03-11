@@ -1,5 +1,8 @@
 package frc.robot.commands.arm;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.subsystems.ArmSubsystem;
 
 public class DriveWithPieceCommand extends BaseArmCommand {
@@ -24,7 +27,7 @@ public class DriveWithPieceCommand extends BaseArmCommand {
 
     @Override
     public void execute() {
-        moveToDriveWithPiecePose();
+        // Nothing to do here (the execute loop happens in isFinished
     }
 
     @Override
@@ -34,6 +37,17 @@ public class DriveWithPieceCommand extends BaseArmCommand {
 
     @Override
     public void end(boolean interrupted) {
+
         System.out.println("DriveWithPiece Command end. " + (interrupted ? "INTERRUPTED" : "NOT INTERRUPTED"));
+        printArmState();
+
+        // If there is no game piece, and the system is in teleop, then
+        // go back to compact pose.
+        if (armSubsystem.getHeldGamePiece() == GamePiece.NONE
+            && DriverStation.isTeleopEnabled()) {
+
+            CommandScheduler.getInstance().schedule(new CompactCommand(armSubsystem));
+        }
+
     }
 }

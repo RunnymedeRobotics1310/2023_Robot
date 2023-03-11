@@ -312,18 +312,20 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     /**
-     * Determine if the arm is safely inside the frame
+     * Determine if the arm is inside the frame
      *
      * @return {@code true} if inside the frame, {@code false} otherwise
      */
     public boolean isArmInsideFrame() {
 
-        // FIXME: measure the conditions where the arm is inside the frame.
-        // make some constants.
-
-        if (getArmLiftAngle() > 30) {
+        if (getArmLiftAngle() > ArmConstants.CLEAR_FRAME_ARM_ANGLE) {
             return false;
         }
+
+        if (getArmExtendEncoder() > ArmConstants.MAX_ARM_EXTEND_INSIDE_FRAME) {
+            return false;
+        }
+
         return true;
     }
 
