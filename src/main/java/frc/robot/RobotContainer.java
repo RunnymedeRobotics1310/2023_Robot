@@ -49,7 +49,6 @@ public class RobotContainer {
     private final DriveSubsystem  driveSubsystem                = new DriveSubsystem(armSubsystem);
 
     // A set of choosers for autonomous patterns
-
     SendableChooser<AutoLane>     startingLaneChooser           = new SendableChooser<>();
     SendableChooser<GamePiece>    startingGamePieceChooser      = new SendableChooser<>();
     SendableChooser<Orientation>  startingOrientationChooser    = new SendableChooser<>();
@@ -57,6 +56,7 @@ public class RobotContainer {
     SendableChooser<AutoAction>   exitZoneActionChooser         = new SendableChooser<>();
     SendableChooser<AutoAction>   secondGamePieceScoringChooser = new SendableChooser<>();
     SendableChooser<AutoAction>   balanceChooser                = new SendableChooser<>();
+
     // The driver's controller
     private final OperatorInput   operatorInput                 = new OperatorInput(
         OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
