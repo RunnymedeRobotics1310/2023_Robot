@@ -2,31 +2,28 @@ package frc.robot.commands.arm;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.VisionConstants.CameraView;
-import frc.robot.commands.vision.ConfigureCameraCommand;
+import frc.robot.commands.vision.SetCameraViewCommand;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
 
 public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
-    private static final double MIN_PICKUP_DISTANCE             = 95;
-    private static final double MAX_PICKUP_DISTANCE             = 115;
-    private static final double TARGET_CAMERA_OFFSET            = 5;
-    private static final double VISION_TARGET_HEADING_TOLERANCE = 1;
+    private static final double   MIN_PICKUP_DISTANCE             = 95;
+    private static final double   MAX_PICKUP_DISTANCE             = 115;
+    private static final double   TARGET_CAMERA_OFFSET            = 5;
+    private static final double   VISION_TARGET_HEADING_TOLERANCE = 1;
 
     private final VisionSubsystem visionSubsystem;
     private final DriveSubsystem  driveSubsystem;
 
-    private double requiredExtensionEncoderPosition;
+    private double                requiredExtensionEncoderPosition;
 
-    /**
-     * Only cone is supported for now.
-     */
-    private GamePiece gamePiece = GamePiece.CONE;
+    private GamePiece             gamePiece                       = GamePiece.CONE;
 
-    private double visionTargetHeadingError = 0;
+    private double                visionTargetHeadingError        = 0;
 
     private enum State {
         MOVE_CAMERA_AND_GET_WITHIN_RANGE, ALIGN, PICKUP
@@ -51,7 +48,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
         System.out.println("PickUp Substation started.  GamePiece " + gamePiece);
 
-        visionSubsystem.setVisionTarget(Constants.VisionConstants.VisionTarget.CONE_SUBSTATION);
+        visionSubsystem.setVisionTargetType(VisionTargetType.CONE);
         moveCameraToHighPosition();
 
         visionTargetHeadingError = 0;
@@ -109,7 +106,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
                 // Set the required extension distance based on the following formula
                 requiredExtensionEncoderPosition = ultrasonicDistanceCm * .88 - 53.1;
 
-                currentState = State.PICKUP;
+                currentState                     = State.PICKUP;
             }
 
             // Wait for target and distance alignment
@@ -231,20 +228,9 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
     private void moveCameraToHighPosition() {
 
-        Constants.VisionConstants.VisionTarget visionTarget = Constants.VisionConstants.VisionTarget.NONE;
-        if (gamePiece == GamePiece.CONE) {
-            visionTarget = Constants.VisionConstants.VisionTarget.CONE_SUBSTATION;
-        }
-        else if (gamePiece == GamePiece.CUBE) {
-            visionTarget = Constants.VisionConstants.VisionTarget.CUBE_SUBSTATION;
-        }
-        else {
-            System.out.println("UNSUPPORTED GAME PIECE: " + gamePiece);
-        }
-
         if (DriverStation.isAutonomousEnabled() || DriverStation.isTeleopEnabled()) {
 
-            CommandScheduler.getInstance().schedule(new ConfigureCameraCommand(visionTarget, visionSubsystem));
+            CommandScheduler.getInstance().schedule(new SetCameraViewCommand(CameraView.HIGH, visionSubsystem));
         }
     }
 }

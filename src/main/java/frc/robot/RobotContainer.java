@@ -44,21 +44,21 @@ import frc.robot.subsystems.VisionSubsystem;
 public class RobotContainer {
 
     // The robot's subsystems and commands are defined here...
-    private final ArmSubsystem    armSubsystem    = new ArmSubsystem();
-    private final VisionSubsystem visionSubsystem = new VisionSubsystem();
-    private final DriveSubsystem  driveSubsystem  = new DriveSubsystem(armSubsystem);
+    private final ArmSubsystem    armSubsystem                  = new ArmSubsystem();
+    private final VisionSubsystem visionSubsystem               = new VisionSubsystem();
+    private final DriveSubsystem  driveSubsystem                = new DriveSubsystem(armSubsystem);
 
     // A set of choosers for autonomous patterns
-    SendableChooser<AutoLane>    startingLaneChooser           = new SendableChooser<>();
-    SendableChooser<GamePiece>   startingGamePieceChooser      = new SendableChooser<>();
-    SendableChooser<Orientation> startingOrientationChooser    = new SendableChooser<>();
-    SendableChooser<AutoAction>  firstGamePieceScoringChooser  = new SendableChooser<>();
-    SendableChooser<AutoAction>  exitZoneActionChooser         = new SendableChooser<>();
-    SendableChooser<AutoAction>  secondGamePieceScoringChooser = new SendableChooser<>();
-    SendableChooser<AutoAction>  balanceChooser                = new SendableChooser<>();
+    SendableChooser<AutoLane>     startingLaneChooser           = new SendableChooser<>();
+    SendableChooser<GamePiece>    startingGamePieceChooser      = new SendableChooser<>();
+    SendableChooser<Orientation>  startingOrientationChooser    = new SendableChooser<>();
+    SendableChooser<AutoAction>   firstGamePieceScoringChooser  = new SendableChooser<>();
+    SendableChooser<AutoAction>   exitZoneActionChooser         = new SendableChooser<>();
+    SendableChooser<AutoAction>   secondGamePieceScoringChooser = new SendableChooser<>();
+    SendableChooser<AutoAction>   balanceChooser                = new SendableChooser<>();
 
     // The driver's controller
-    private final OperatorInput operatorInput = new OperatorInput(
+    private final OperatorInput   operatorInput                 = new OperatorInput(
         OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
 
     /**
@@ -75,6 +75,9 @@ public class RobotContainer {
 
         visionSubsystem.setDefaultCommand(
             new DefaultVisionCommand(operatorInput, visionSubsystem));
+
+        // calibrate subsystems
+        calibrateVision();
 
         // Initialize the autonomous choosers
         initAutoSelectors();
@@ -124,6 +127,31 @@ public class RobotContainer {
         SmartDashboard.putData("Balance", balanceChooser);
         balanceChooser.addOption("Do not balance", AutoAction.DO_NOTHING);
 
+    }
+
+
+    /**
+     * Tell the vision subsystem the coordinates that it can see (on the floor).
+     *
+     * <pre>
+     * {0, 0} corresponds to the ground directly at the front bumper in the center of the robot
+     * {-10, 0} corresponds to a location against the front bumper 10cm to the left of the robot center
+     * {10, 0} corresponds to a location against the front bumper 10cm to the right of the robot center
+     * {10, 10} corresponds to a location 10cm away from the front bumper of the robot, 10cm to the right of center
+     * </pre>
+     *
+     * etc. These values are hard-coded in this call for now. If in the future the camera moves, they'll have to be
+     * re-calibrated,
+     */
+    private void calibrateVision() {
+        // these values calibrated manually on 2023-02-02. Note - we're ignoring the top half of the
+        // field of view for now.
+        final double[] topLeft     = { -42.0, 78.5 };
+        final double[] topRight    = { 43, 84 };
+        final double[] bottomLeft  = { 13, 25 };
+        final double[] bottomRight = { -13, 22.5 };
+
+        visionSubsystem.calibrateVision(topLeft, topRight, bottomLeft, bottomRight);
     }
 
     /**
