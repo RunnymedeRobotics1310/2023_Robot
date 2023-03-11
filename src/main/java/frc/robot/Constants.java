@@ -76,12 +76,14 @@ public final class Constants {
 
         public static final int     LEFT_MOTOR_PORT      = 10;
         public static final int     RIGHT_MOTOR_PORT     = 20;
+
         public static final boolean LEFT_MOTOR_REVERSED  = false;
         public static final boolean RIGHT_MOTOR_REVERSED = true;
 
         public static final double  CM_PER_ENCODER_COUNT = 3.503;
 
-        public static final boolean GYRO_REVERSED        = false;    }
+        public static final boolean GYRO_REVERSED        = false;
+    }
 
     public static final class OiConstants {
 
@@ -144,8 +146,11 @@ public final class Constants {
         public static final double CAMERA_POSITION_TOLERANCE       = 3;
         public static final double CAMERA_POSITION_SLOW_ZONE       = 15;
     }
+
     public static class ArmPosition {
+
         public final double angle, extension;
+
         ArmPosition(double angle, double extension) {
             this.angle     = angle;
             this.extension = extension;
