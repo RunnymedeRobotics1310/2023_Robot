@@ -103,7 +103,7 @@ public class PickUpSubstationCommand extends BaseArmCommand {
                 CommandScheduler.getInstance().schedule(new DriveWithPieceCommand(armSubsystem));
             }
             else {
-                CommandScheduler.getInstance().schedule(new CompactCommand2(armSubsystem));
+                CommandScheduler.getInstance().schedule(new CompactCommand(armSubsystem));
             }
 
         }

@@ -1,9 +1,11 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.*;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ExternalFollower;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxLimitSwitch.Type;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -117,7 +119,8 @@ public class ArmSubsystem extends SubsystemBase {
         // will have one magnet and two limit switches.
         armExtendLimitDetector.enableLimitSwitch(false);
 
-        setArmExtendEncoder(0);
+        // Set the arm as slightly extended on power up.
+        setArmExtendEncoder(2);
 
         /*
          * Pincher
@@ -138,7 +141,9 @@ public class ArmSubsystem extends SubsystemBase {
         // used to detect a game piece instead
         gamePieceDetector.enableLimitSwitch(false);
 
-        setPincherEncoder(0);
+        // Set the pincher to the minimum inside the frame distance
+        // on power up
+        setPincherEncoder(ArmConstants.MIN_PINCHER_INSIDE_FRAME_POSITION);
     }
 
     /**

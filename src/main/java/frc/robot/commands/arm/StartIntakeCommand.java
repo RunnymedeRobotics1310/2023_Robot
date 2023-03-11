@@ -153,7 +153,7 @@ public class StartIntakeCommand extends BaseArmCommand {
                 CommandScheduler.getInstance().schedule(new PickupGamePieceCommand(gamePiece, armSubsystem));
             }
             else {
-                CommandScheduler.getInstance().schedule(new CompactCommand2(armSubsystem));
+                CommandScheduler.getInstance().schedule(new CompactCommand(armSubsystem));
             }
 
         }

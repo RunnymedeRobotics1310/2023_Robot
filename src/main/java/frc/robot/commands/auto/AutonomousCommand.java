@@ -5,16 +5,23 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants.AutoConstants.*;
+import frc.robot.Constants.AutoConstants.AutoAction;
+import frc.robot.Constants.AutoConstants.AutoLane;
+import frc.robot.Constants.AutoConstants.Orientation;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.Zone;
 import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.commands.arm.DriveWithPieceCommand;
 import frc.robot.commands.arm.PickUpGroundCommand;
-import frc.robot.commands.drive.*;
+import frc.robot.commands.drive.BalanceCommand;
+import frc.robot.commands.drive.DriveOnHeadingCommand;
+import frc.robot.commands.drive.DriveToTargetCommand;
+import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.commands.vision.SetCameraViewCommand;
 import frc.robot.commands.vision.SwitchVisionTargetCommand;
-import frc.robot.subsystems.*;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
 
 public class AutonomousCommand extends SequentialCommandGroup {
@@ -143,16 +150,26 @@ public class AutonomousCommand extends SequentialCommandGroup {
 
         if (currentOrientation == Orientation.FACE_GRID) {
 
-            switch (currentGamePiece) {
-            case CUBE:
-                break;
-            case CONE:
-                break;
-            }
             // FIXME:
             // Set the arm position (different positions required for cone or cube
             // Drive forward?
             // Drop the piece
+            switch (currentGamePiece) {
+            case CUBE:
+                // Robot is holding a cube in the gripper, set pincher to CUBE distance
+                addCommands(new InstantCommand(() -> {
+                    armSubsystem.setPincherEncoder(GamePiece.CUBE.pincherEncoderCount);
+                }));
+                break;
+            case CONE:
+                addCommands(new InstantCommand(() -> {
+                    armSubsystem.setPincherEncoder(GamePiece.CONE.pincherEncoderCount);
+                }));
+                break;
+
+            default:
+                break;
+            }
 
         }
         else {
