@@ -31,14 +31,12 @@ import static frc.robot.Constants.VisionConstants.VisionTarget.*;
 
 public class AutonomousCommand extends SequentialCommandGroup {
 
-
     private AutoLane              startingLane           = null;
     private GamePiece             currentGamePiece       = null;
     private Orientation           currentOrientation     = null;
     private Zone                  currentZone            = null;
 
     private Alliance              alliance               = null;
-
 
     private AutoAction            firstGamePieceScoring  = null;
     private AutoAction            exitZoneAction         = null;
