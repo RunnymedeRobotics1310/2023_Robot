@@ -141,7 +141,7 @@ public final class Constants {
         public static final int         ARM_DOWN_LIMIT_SWITCH_DIO_PORT      = 0;
 
         /** The maximum speed to drive the arm lift - manually or automatically */
-        public static final double      MAX_LIFT_SPEED                      = .15;
+        public static final double      MAX_LIFT_SPEED                      = .2;
         public static final double      MAX_LIFT_SLOW_ZONE_SPEED            = .1;
 
         public static final double      ARM_LIFT_LIMIT_ENCODER_VALUE        = 16;
@@ -217,7 +217,7 @@ public final class Constants {
         /*
          * Scoring Constants
          */
-        public static final ArmPosition SCORE_TOP_CONE_POSITION             = new ArmPosition(100, 52);                  // Confirmed
+        public static final ArmPosition SCORE_TOP_CONE_POSITION             = new ArmPosition(100, 54);                  // Confirmed
         public static final ArmPosition SCORE_TOP_CUBE_POSITION             = new ArmPosition(90, 50);                   // Confirmed
 
         public static final ArmPosition SCORE_MIDDLE_CONE_POSITION          = new ArmPosition(90, 7);                    // Confirmed

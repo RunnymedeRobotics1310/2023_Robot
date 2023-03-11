@@ -5,13 +5,18 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.AutoConstants.AutoAction;
 import frc.robot.Constants.AutoConstants.AutoLane;
 import frc.robot.Constants.AutoConstants.Orientation;
 import frc.robot.Constants.GameConstants.GamePiece;
+import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.GameConstants.Zone;
 import frc.robot.Constants.VisionConstants.CameraView;
+import frc.robot.commands.arm.CompactCommand;
 import frc.robot.commands.arm.PickupGamePieceCommand;
+import frc.robot.commands.arm.ReleaseCommand;
+import frc.robot.commands.arm.ScoreCommand;
 import frc.robot.commands.arm.StartIntakeCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
@@ -171,6 +176,21 @@ public class AutonomousCommand extends SequentialCommandGroup {
                 break;
             }
 
+            ScoringRow scoringRow = null;
+            switch (firstGamePieceScoring) {
+            case SCORE_BOTTOM:
+                scoringRow = ScoringRow.BOTTOM;
+                break;
+            case SCORE_MIDDLE:
+                scoringRow = ScoringRow.MIDDLE;
+                break;
+            case SCORE_TOP:
+                scoringRow = ScoringRow.TOP;
+                break;
+
+            }
+            addCommands(new ScoreCommand(scoringRow, armSubsystem));
+            addCommands(new ReleaseCommand(armSubsystem));
         }
         else {
             // Currently facing the field
@@ -222,7 +242,14 @@ public class AutonomousCommand extends SequentialCommandGroup {
 
         // Drive out of the zone
         // This command may cause a rotation to heading 0.
-        addCommands(new DriveOnHeadingCommand(0, 0.6, 330, driveSubsystem));
+        if (currentOrientation == Orientation.FACE_FIELD) {
+            addCommands(new DriveOnHeadingCommand(0, 0.6, 330, driveSubsystem));
+        }
+        else {
+            addCommands(new DriveOnHeadingCommand(180, -0.6, 330, driveSubsystem)
+                .deadlineWith(new CompactCommand(armSubsystem)));
+
+        }
 
         currentZone        = Zone.FIELD;
         currentOrientation = Orientation.FACE_FIELD;
@@ -329,23 +356,45 @@ public class AutonomousCommand extends SequentialCommandGroup {
                 || (alliance == Alliance.Blue && startingLane == AutoLane.TOP)) {
 
                 System.out.println("Balance Red/Bot or Blue/Top");
-                addCommands(new DriveOnHeadingCommand(90, .5, 125, driveSubsystem));
-                addCommands(new DriveOnHeadingCommand(180, .5, 250, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(90, .3, 180, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 180, driveSubsystem));
             }
             else if ((alliance == Alliance.Red && startingLane == AutoLane.TOP)
                 || (alliance == Alliance.Blue && startingLane == AutoLane.BOTTOM)) {
 
                 System.out.println("Balance Red/Top or Blue/Bottom");
-                addCommands(new DriveOnHeadingCommand(270, .5, 125, driveSubsystem));
-                addCommands(new DriveOnHeadingCommand(180, .5, 250, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(270, .3, 180, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 180, driveSubsystem));
             }
             else {
                 System.out.println("Balance Mid");
-                addCommands(new DriveOnHeadingCommand(180, .5, 250, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 180, driveSubsystem));
+            }
+        }
+        else if (currentZone == Zone.FIELD && currentOrientation == Orientation.FACE_GRID) {
+            if ((alliance == Alliance.Red && startingLane == AutoLane.BOTTOM)
+                || (alliance == Alliance.Blue && startingLane == AutoLane.TOP)) {
+
+                System.out.println("Balance Red/Bot or Blue/Top");
+                addCommands(new DriveOnHeadingCommand(0, 0, 0, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(90, .3, 180, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 180, driveSubsystem));
+            }
+            else if ((alliance == Alliance.Red && startingLane == AutoLane.TOP)
+                || (alliance == Alliance.Blue && startingLane == AutoLane.BOTTOM)) {
+
+                System.out.println("Balance Red/Top or Blue/Bottom");
+                addCommands(new DriveOnHeadingCommand(270, .3, 180, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 180, driveSubsystem));
+            }
+            else {
+                System.out.println("Balance Mid");
+                addCommands(new DriveOnHeadingCommand(180, .3, 180, driveSubsystem));
             }
         }
 
         // Balance on the platform
+        addCommands(new WaitCommand(.5));
         addCommands(new BalanceCommand(driveSubsystem));
     }
 }
