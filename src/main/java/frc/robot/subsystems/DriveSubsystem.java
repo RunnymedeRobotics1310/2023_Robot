@@ -9,6 +9,7 @@ import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
@@ -375,7 +376,7 @@ public class DriveSubsystem extends SubsystemBase {
         // Determine if the arm is inside the robot
         boolean armInsideFrame = armSubsystem.isArmInsideFrame();
 
-        if (!armSubsystem.isArmRetracted() && !armInsideFrame) {
+        if (!armSubsystem.isArmRetracted() && !armInsideFrame && DriverStation.isTeleopEnabled()) {
 
             // Limit each side to 0.25
 
