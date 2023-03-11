@@ -2261,6 +2261,19 @@
               "imageWidth": 0,
               "imageHeight": 0
             }
+          },
+          "4,4": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Ultrasonic Distance (cm)",
+              "_title": "SmartDashboard/Ultrasonic Distance (cm)",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
