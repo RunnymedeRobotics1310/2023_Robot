@@ -16,10 +16,14 @@ import frc.robot.Constants.AutoConstants.Orientation;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.OiConstants;
-import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.SystemTestCommand;
-import frc.robot.commands.arm.*;
+import frc.robot.commands.arm.DefaultArmCommand;
+import frc.robot.commands.arm.PickUpSubstationCommand;
+import frc.robot.commands.arm.PickUpSubstationVisionCommand;
+import frc.robot.commands.arm.ReleaseCommand;
+import frc.robot.commands.arm.ScoreCommand;
+import frc.robot.commands.arm.StartIntakeCommand;
 import frc.robot.commands.auto.AutonomousCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DefaultDriveCommand;
@@ -28,7 +32,6 @@ import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.vision.DefaultVisionCommand;
-import frc.robot.commands.vision.SetCameraViewCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -41,21 +44,21 @@ import frc.robot.subsystems.VisionSubsystem;
 public class RobotContainer {
 
     // The robot's subsystems and commands are defined here...
-    private final ArmSubsystem    armSubsystem    = new ArmSubsystem();
-    private final VisionSubsystem visionSubsystem = new VisionSubsystem();
-    private final DriveSubsystem  driveSubsystem  = new DriveSubsystem(armSubsystem);
+    private final ArmSubsystem    armSubsystem                  = new ArmSubsystem();
+    private final VisionSubsystem visionSubsystem               = new VisionSubsystem();
+    private final DriveSubsystem  driveSubsystem                = new DriveSubsystem(armSubsystem);
 
     // A set of choosers for autonomous patterns
-    SendableChooser<AutoLane>    startingLaneChooser           = new SendableChooser<>();
-    SendableChooser<GamePiece>   startingGamePieceChooser      = new SendableChooser<>();
-    SendableChooser<Orientation> startingOrientationChooser    = new SendableChooser<>();
-    SendableChooser<AutoAction>  firstGamePieceScoringChooser  = new SendableChooser<>();
-    SendableChooser<AutoAction>  exitZoneActionChooser         = new SendableChooser<>();
-    SendableChooser<AutoAction>  secondGamePieceScoringChooser = new SendableChooser<>();
-    SendableChooser<AutoAction>  balanceChooser                = new SendableChooser<>();
+    SendableChooser<AutoLane>     startingLaneChooser           = new SendableChooser<>();
+    SendableChooser<GamePiece>    startingGamePieceChooser      = new SendableChooser<>();
+    SendableChooser<Orientation>  startingOrientationChooser    = new SendableChooser<>();
+    SendableChooser<AutoAction>   firstGamePieceScoringChooser  = new SendableChooser<>();
+    SendableChooser<AutoAction>   exitZoneActionChooser         = new SendableChooser<>();
+    SendableChooser<AutoAction>   secondGamePieceScoringChooser = new SendableChooser<>();
+    SendableChooser<AutoAction>   balanceChooser                = new SendableChooser<>();
 
     // The driver's controller
-    private final OperatorInput operatorInput = new OperatorInput(
+    private final OperatorInput   operatorInput                 = new OperatorInput(
         OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
 
     /**
@@ -194,12 +197,6 @@ public class RobotContainer {
 
         new Trigger(() -> (operatorInput.isPickUpCube()))
             .onTrue(new StartIntakeCommand(operatorInput, armSubsystem, visionSubsystem));
-
-        new Trigger(() -> (operatorInput.isCameraViewHigh()))
-            .onTrue(new SetCameraViewCommand(CameraView.HIGH, visionSubsystem));
-
-        new Trigger(() -> (operatorInput.isCameraViewLow()))
-            .onTrue(new SetCameraViewCommand(CameraView.LOW, visionSubsystem));
 
         new Trigger(() -> (operatorInput.driveForward()))
             .onTrue(new DriveOnHeadingCommand(0, 0.2, 300, driveSubsystem));
