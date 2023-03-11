@@ -24,7 +24,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
     /**
      * Only cone is supported for now.
      */
-    private GamePiece gamePiece = GamePiece.CONE;
+    private GamePiece             gamePiece = GamePiece.CONE;
 
     private double visionTargetHeadingError = 0;
 
