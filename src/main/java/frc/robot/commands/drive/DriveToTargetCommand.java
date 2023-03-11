@@ -12,7 +12,7 @@ public class DriveToTargetCommand extends CommandBase {
 
     final double                   factor                 = 0.01;
 
-    private final double speed, timeoutSeconds;
+    private final double           speed, timeoutSeconds;
 
     private final DriveSubsystem   driveSubsystem;
     private final VisionSubsystem  visionSubsystem;
@@ -30,11 +30,9 @@ public class DriveToTargetCommand extends CommandBase {
     /**
      * Drive to a cube vision target. If this command does not find a cube vision target,
      * then the command ends after 1 second.
-     * Drive to a cube vision target. If this command does not find a cube vision target, then the command ends after 1 second.
      * <p>
      * This constructor uses the {@link Constants#DEFAULT_COMMAND_TIMEOUT_SECONDS} for the command
      * timeout
-     * This constructor uses the {@link Constants#DEFAULT_COMMAND_TIMEOUT_SECONDS} for the command timeout
      *
      * @param speed in the range 0-1.0
      * @param driveSubsystem
