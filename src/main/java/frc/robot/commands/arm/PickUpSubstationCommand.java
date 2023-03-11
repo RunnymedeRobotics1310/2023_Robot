@@ -100,7 +100,7 @@ public class PickUpSubstationCommand extends BaseArmCommand {
         if (DriverStation.isTeleopEnabled()) {
 
             if (armSubsystem.isGamePieceDetected()) {
-                CommandScheduler.getInstance().schedule(new DriveWithPieceCommand(armSubsystem));
+                CommandScheduler.getInstance().schedule(new PickupGamePieceCommand(gamePiece, armSubsystem));
             }
             else {
                 CommandScheduler.getInstance().schedule(new CompactCommand(armSubsystem));

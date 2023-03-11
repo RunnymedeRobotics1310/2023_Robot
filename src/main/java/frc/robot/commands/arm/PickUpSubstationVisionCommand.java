@@ -6,9 +6,7 @@ import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.commands.vision.SetCameraViewCommand;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.*;
 import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
 
 public class PickUpSubstationVisionCommand extends BaseArmCommand {
@@ -154,6 +152,43 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
     }
 
+    @Override
+    public boolean isFinished() {
+
+        // If holding the required piece
+        if (armSubsystem.getHeldGamePiece() == gamePiece) {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+
+        stopArmMotors();
+
+        if (interrupted) {
+            System.out.print("Pick Up Substation interrupted");
+        }
+        else {
+            System.out.print("Pick Up Substation ended");
+        }
+        printArmState();
+
+        // In Teleop, pick the next command
+        if (DriverStation.isTeleopEnabled()) {
+
+            if (armSubsystem.isGamePieceDetected()) {
+                CommandScheduler.getInstance().schedule(new PickupGamePieceCommand(gamePiece, armSubsystem));
+            }
+            else {
+                CommandScheduler.getInstance().schedule(new CompactCommand(armSubsystem));
+            }
+
+        }
+    }
+
     private double moveToScoringRange() {
 
         // Move forward or backwards until the distance is in range
@@ -189,44 +224,6 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
         driveSubsystem.setMotorSpeeds(driveSpeed + turn, driveSpeed - turn);
 
         return turn == 0;
-    }
-
-    @Override
-    public boolean isFinished() {
-
-        // If at the target position, and a game piece is detected.
-        if (armSubsystem.isInPosition(ArmConstants.SUBSTATION_PICKUP_POSITION)) {
-            return armSubsystem.getHeldGamePiece() == GamePiece.CONE;
-        }
-
-        return false;
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-
-        stopArmMotors();
-
-        if (interrupted) {
-            System.out.print("Pick Up Substation interrupted");
-        }
-        else {
-            System.out.print("Pick Up Substation ended");
-        }
-        printArmState();
-
-
-        // In Teleop, pick the next command
-        if (DriverStation.isTeleopEnabled()) {
-
-            if (armSubsystem.isGamePieceDetected()) {
-                CommandScheduler.getInstance().schedule(new DriveWithPieceCommand(armSubsystem));
-            }
-            else {
-                CommandScheduler.getInstance().schedule(new CompactCommand(armSubsystem));
-            }
-
-        }
     }
 
     private void moveCameraToHighPosition() {

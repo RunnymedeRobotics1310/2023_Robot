@@ -44,11 +44,22 @@ public class PickupGamePieceCommand extends BaseArmCommand {
         // Close on the game piece first
         if (movePincherToEncoderCount(targetPincherEncoderCount)) {
 
-            // Move to angle
-            if (moveArmLiftToAngle(targetArmPosition.angle)) {
+            // If above the target, then retract first
+            if (armSubsystem.getArmLiftAngle() > targetArmPosition.angle) {
 
-                // Retract arm
-                moveArmExtendToEncoderCount(targetArmPosition.extension, 0.5);
+                if (moveArmExtendToEncoderCount(targetArmPosition.extension, 0.5)) {
+                    moveArmLiftToAngle(targetArmPosition.angle);
+                }
+
+            }
+            else {
+                // When below the target, lift first.
+                if (moveArmLiftToAngle(targetArmPosition.angle)) {
+
+                    // Retract arm
+                    moveArmExtendToEncoderCount(targetArmPosition.extension, 0.5);
+                }
+
             }
         }
     }

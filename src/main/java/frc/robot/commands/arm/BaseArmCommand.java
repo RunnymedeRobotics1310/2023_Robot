@@ -1,14 +1,11 @@
 package frc.robot.commands.arm;
 
-import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_ARM_ANGLE;
 import static frc.robot.Constants.ArmConstants.MAX_EXTEND_SPEED;
 import static frc.robot.Constants.ArmConstants.MAX_PINCHER_SPEED;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.subsystems.ArmSubsystem;
 
 abstract class BaseArmCommand extends CommandBase {
@@ -207,74 +204,5 @@ abstract class BaseArmCommand extends CommandBase {
     }
 
 
-    private enum DriveWithPieceState {
-        PREPARING, RETRACTING, FINALIZING_ANGLE, FINALIZING_EXTENT, IN_POSITION;
-    }
-
-    private DriveWithPieceState driveWithPieceState = null;
-
-    protected final boolean moveToDriveWithPiecePose() {
-
-        final GamePiece heldGamePiece = armSubsystem.getHeldGamePiece();
-
-        if (heldGamePiece == GamePiece.NONE) {
-            System.out.println("Attempting to move to a drive with game piece position but not holding a piece. Complete.");
-            return true;
-        }
-
-        final Constants.ArmPosition target = Constants.ArmConstants.getDrivePosition(heldGamePiece);
-        if (armSubsystem.isInPosition(target)) {
-            stopArmMotors();
-            return true;
-        }
-        else if (driveWithPieceState == null) {
-            boolean tooLow = armSubsystem.getArmLiftAngle() < CLEAR_FRAME_ARM_ANGLE;
-            driveWithPieceState = tooLow ? DriveWithPieceState.PREPARING : DriveWithPieceState.RETRACTING;
-        }
-
-        switch (driveWithPieceState) {
-
-        case PREPARING: {
-            if (moveArmLiftToAngle(CLEAR_FRAME_ARM_ANGLE)) {
-                driveWithPieceState = DriveWithPieceState.RETRACTING;
-                System.out.println("moveToDriveWithPiece: change state from PREPARING to " + driveWithPieceState);
-            }
-            break;
-        }
-
-        case RETRACTING: {
-            if (retractArm()) {
-                driveWithPieceState = DriveWithPieceState.FINALIZING_ANGLE;
-                System.out.println("moveToDriveWithPiece: change state from RETRACTING to " + driveWithPieceState);
-            }
-            break;
-        }
-
-        case FINALIZING_ANGLE: {
-            if (moveArmLiftToAngle(target.angle)) {
-                driveWithPieceState = DriveWithPieceState.FINALIZING_EXTENT;
-                System.out.println("moveToDriveWithPiece: change state from FINALIZE_ANGLE to " + driveWithPieceState);
-            }
-            break;
-        }
-
-        case FINALIZING_EXTENT: {
-            if (moveArmExtendToEncoderCount(target.extension, .5)) {
-                driveWithPieceState = DriveWithPieceState.IN_POSITION;
-                System.out.println("moveToDriveWithPiece: change state from FINALIZING_EXTENT to " + driveWithPieceState);
-            }
-            break;
-        }
-
-        case IN_POSITION: {
-            // done!
-            System.out.println("Drive with piece pose achieved");
-            stopArmMotors();
-            driveWithPieceState = null; // ready to go again
-            return true;
-        }
-        }
-        return false;
-    }
 }
 
