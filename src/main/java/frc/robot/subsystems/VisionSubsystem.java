@@ -49,7 +49,7 @@ public class VisionSubsystem extends SubsystemBase {
     private boolean isCameraPositionInitialized   = false;
     private long    cameraInitializationStartTime = 0;
 
-    private VisionConstants.VisionTarget currentVisionTarget = VisionConstants.VisionTarget.NONE;
+    private VisionConstants.VisionTarget currentVisionTarget = NONE;
 
     private double filteredConeAngle = 0;
 
@@ -111,21 +111,21 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     /**
-     * Return true if the camera is in position for its current vision target.
-     *
-     * @return true if the camera is in the right position for the specified target.
-     */
-    public boolean isCameraInPositionForTarget() {
-        return getCameraView() == currentVisionTarget.getCameraView();
-    }
-
-    /**
      * Get the current camera encoder position
      *
      * @return double encoder position
      */
     public double getCameraEncoder() {
         return cameraEncoder.getPosition() + cameraEncoderOffset;
+    }
+
+    /**
+     * Return true if the camera is in position for its current vision target.
+     *
+     * @return true if the camera is in the right position for the specified target.
+     */
+    public boolean isCameraInPositionForTarget() {
+        return getCameraView() == currentVisionTarget.getCameraView();
     }
 
     /**
