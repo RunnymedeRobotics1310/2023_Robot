@@ -376,7 +376,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
                 || (alliance == Alliance.Blue && startingLane == AutoLane.TOP)) {
 
                 System.out.println("Balance Red/Bot or Blue/Top");
-                addCommands(new DriveOnHeadingCommand(0, 0, 0, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(135, .1, 1, driveSubsystem));
                 addCommands(new DriveOnHeadingCommand(90, .3, 180, driveSubsystem));
                 addCommands(new DriveOnHeadingCommand(180, .3, 180, driveSubsystem));
             }
@@ -384,6 +384,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
                 || (alliance == Alliance.Blue && startingLane == AutoLane.BOTTOM)) {
 
                 System.out.println("Balance Red/Top or Blue/Bottom");
+                addCommands(new DriveOnHeadingCommand(135, .1, 1, driveSubsystem));
                 addCommands(new DriveOnHeadingCommand(270, .3, 180, driveSubsystem));
                 addCommands(new DriveOnHeadingCommand(180, .3, 180, driveSubsystem));
             }
