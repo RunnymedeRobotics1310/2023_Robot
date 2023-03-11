@@ -8,23 +8,23 @@ import frc.robot.subsystems.DriveSubsystem;
 public class BalanceCommand extends CommandBase {
 
     private final DriveSubsystem driveSubsystem;
-    long startTime     = 0;
-    long prevLevelTime = -1;
+    long                         startTime                  = 0;
+    long                         prevLevelTime              = -1;
 
-    double startHeading            = 0;
-    double centeringSpeed          = 0;
-    long   centeringDelayStartTime = 0;
+    double                       startHeading               = 0;
+    double                       centeringSpeed             = 0;
+    long                         centeringDelayStartTime    = 0;
 
     // Track the max absolute value of the gyro pitch.
-    double maxClimbPitch = 0;
+    double                       maxClimbPitch              = 0;
 
-    static final double ADJUST_SPEED               = .01;
-    static final double CENTERING_SPEED            = .25;
-    static final double CENTER_OF_GRAVITY_MOVEMENT = 5;   // cm
-    static final double CENTERING_DELAY            = 2000; // ms
+    static final double          ADJUST_SPEED               = .01;
+    static final double          CENTERING_SPEED            = .25;
+    static final double          CENTER_OF_GRAVITY_MOVEMENT = 5;    // cm
+    static final double          CENTERING_DELAY            = 2000; // ms
 
-    static final double LEVEL_THRESHOLD = 2;
-    static final long   LEVEL_TIMEOUT   = 350;  // ms
+    static final double          LEVEL_THRESHOLD            = 2;
+    static final long            LEVEL_TIMEOUT              = 350;  // ms
 
 
 
@@ -51,13 +51,33 @@ public class BalanceCommand extends CommandBase {
     public void initialize() {
 
         System.out.println("BalanceCommand started at pitch " + driveSubsystem.getPitch() + ". CLIMB");
+
         startTime               = System.currentTimeMillis();
         prevLevelTime           = -1;
+
         startHeading            = driveSubsystem.getHeading();
+
         centeringSpeed          = 0;
         centeringDelayStartTime = 0;
+
         maxClimbPitch           = 0;
-        currentState            = State.CLIMB;
+
+        /*
+         * The current state should either be climb or balance
+         * based on whether the current angle is near to the balance point.
+         * If close to the balance state, then just go to the balancing
+         * routine. This will allow the balance to be re-started when
+         * previously balanced and just a bit off.
+         */
+        double pitch = driveSubsystem.getPitch();
+
+        // Balance if within 4 degrees. FIXME: 4 deg may not be the right number?
+        if (Math.abs(pitch) > 4) {
+            currentState = State.CLIMB;
+        }
+        else {
+            currentState = State.BALANCE;
+        }
     }
 
     @Override
@@ -96,7 +116,9 @@ public class BalanceCommand extends CommandBase {
             trackInitialGyroHeading(centeringSpeed);
 
             // Start trying to balance again after centering.
+            // Stop after getting to the centering distance.
             if (Math.abs(driveSubsystem.getEncoderDistanceCm()) > CENTER_OF_GRAVITY_MOVEMENT) {
+
                 currentState            = State.WAIT;
                 centeringDelayStartTime = System.currentTimeMillis();
 
@@ -106,6 +128,7 @@ public class BalanceCommand extends CommandBase {
             break;
 
         case WAIT:
+
             trackInitialGyroHeading(0);
 
             if (System.currentTimeMillis() - centeringDelayStartTime > CENTERING_DELAY) {
@@ -191,7 +214,7 @@ public class BalanceCommand extends CommandBase {
         // Determine the error between the current heading and
         // the desired heading
 
-        double error = startHeading - currentHeading;
+        double error          = startHeading - currentHeading;
 
         if (error > 180) {
             error -= 360;
