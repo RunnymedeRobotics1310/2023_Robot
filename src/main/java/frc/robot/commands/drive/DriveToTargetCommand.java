@@ -7,41 +7,38 @@ import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
-import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
 
 public class DriveToTargetCommand extends CommandBase {
 
-    final double                   factor                 = 0.01;
+    final double factor = 0.01;
 
-    private final double           speed, timeoutSeconds;
+    private final double speed, timeoutSeconds;
 
-    private final DriveSubsystem   driveSubsystem;
-    private final VisionSubsystem  visionSubsystem;
+    private final DriveSubsystem  driveSubsystem;
+    private final VisionSubsystem visionSubsystem;
 
-    private final VisionTargetType targetType;
+    private final VisionConstants.VisionTarget target;
 
-    private long                   initializeTime         = 0;
+    private long initializeTime = 0;
 
-    private double                 targetDelaySec         = 0;
+    private double targetDelaySec = 0;
 
-    private boolean                targetFound            = false;
+    private boolean targetFound = false;
 
-    private double                 lastKnownTargetHeading = 0;
+    private double lastKnownTargetHeading = 0;
 
     /**
-     * Drive to a cube vision target. If this command does not find a cube vision target,
-     * then the command ends after 1 second.
+     * Drive to a cube vision target. If this command does not find a cube vision target, then the command ends after 1 second.
      * <p>
-     * This constructor uses the {@link Constants#DEFAULT_COMMAND_TIMEOUT_SECONDS} for the command
-     * timeout
+     * This constructor uses the {@link Constants#DEFAULT_COMMAND_TIMEOUT_SECONDS} for the command timeout
      *
      * @param speed in the range 0-1.0
      * @param driveSubsystem
      * @param visionSubsystem
      */
-    public DriveToTargetCommand(VisionTargetType targetType, double speed,
+    public DriveToTargetCommand(VisionConstants.VisionTarget target, double speed,
         DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
-        this(targetType, speed, Constants.DEFAULT_COMMAND_TIMEOUT_SECONDS, driveSubsystem, visionSubsystem);
+        this(target, speed, Constants.DEFAULT_COMMAND_TIMEOUT_SECONDS, driveSubsystem, visionSubsystem);
     }
 
     /**
@@ -52,10 +49,10 @@ public class DriveToTargetCommand extends CommandBase {
      * @param driveSubsystem
      * @param visionSubsystem
      */
-    public DriveToTargetCommand(VisionTargetType targetType, double speed, double timeoutSeconds,
+    public DriveToTargetCommand(VisionConstants.VisionTarget target, double speed, double timeoutSeconds,
         DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
 
-        this.targetType      = targetType;
+        this.target          = target;
         this.speed           = speed;
         this.timeoutSeconds  = timeoutSeconds;
         this.driveSubsystem  = driveSubsystem;
@@ -69,15 +66,15 @@ public class DriveToTargetCommand extends CommandBase {
     public void initialize() {
 
         System.out.println("DriveToTargetCommand started."
-            + " Target " + targetType
+            + " Target " + target
             + " Speed " + speed
             + ", timeout " + timeoutSeconds);
 
         initializeTime = System.currentTimeMillis();
 
-        if (visionSubsystem.getCurrentVisionTargetType() != targetType) {
+        if (visionSubsystem.getCurrentVisionTarget() != target) {
             targetDelaySec = VisionConstants.VISION_SWITCH_TIME_SEC;
-            visionSubsystem.setVisionTargetType(targetType);
+            visionSubsystem.setVisionTarget(target);
         }
         else {
             targetDelaySec = 0;
@@ -102,7 +99,7 @@ public class DriveToTargetCommand extends CommandBase {
         if (visionSubsystem.isVisionTargetFound()) {
 
             // FIXME: Is this correct - how do we get the angle to the target?
-            lastKnownTargetHeading  = driveSubsystem.getHeading() + visionSubsystem.getTargetAngleOffset();
+            lastKnownTargetHeading = driveSubsystem.getHeading() + visionSubsystem.getTargetAngleOffset();
 
             lastKnownTargetHeading %= 360.0d;
 
@@ -130,7 +127,7 @@ public class DriveToTargetCommand extends CommandBase {
 
         double currentHeading = driveSubsystem.getHeading();
 
-        double error          = lastKnownTargetHeading - currentHeading;
+        double error = lastKnownTargetHeading - currentHeading;
 
         if (error > 180) {
             error -= 360;
@@ -166,24 +163,26 @@ public class DriveToTargetCommand extends CommandBase {
         // }
 
         double targetArea = visionSubsystem.getTargetAreaPercent();
-        switch (targetType) {
-        case CONE:
+        switch (target) {
+        case CONE_GROUND:
+        case CONE_SUBSTATION:
             if (targetArea >= 20) {
                 return true;
             }
             break;
-        case CUBE:
+        case CUBE_GROUND:
+        case CUBE_SUBSTATION:
             if (targetArea >= 60) {
                 return true;
             }
             break;
-        case TAG:
+        case APRILTAG_GRID:
             if (targetArea >= 5) {
                 return true;
             }
             break;
         default:
-            // ???
+            System.out.println("Don't know how to drive to target " + target);
             break;
         }
 

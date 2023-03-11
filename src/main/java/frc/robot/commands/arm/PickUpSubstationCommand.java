@@ -2,19 +2,18 @@ package frc.robot.commands.arm;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.GameConstants.GamePiece;
-import frc.robot.Constants.VisionConstants.CameraView;
-import frc.robot.commands.vision.SetCameraViewCommand;
+import frc.robot.commands.vision.ConfigureCameraCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
-import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
 
 public class PickUpSubstationCommand extends BaseArmCommand {
 
     private final VisionSubsystem visionSubsystem;
 
-    private GamePiece             gamePiece = GamePiece.CONE;
+    private GamePiece gamePiece = GamePiece.CONE;
 
     public PickUpSubstationCommand(ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem) {
 
@@ -27,7 +26,7 @@ public class PickUpSubstationCommand extends BaseArmCommand {
 
         System.out.println("PickUp Substation started.  GamePiece " + gamePiece);
 
-        visionSubsystem.setVisionTargetType(VisionTargetType.CONE);
+        visionSubsystem.setVisionTarget(Constants.VisionConstants.VisionTarget.CONE_SUBSTATION);
         moveCameraToHighPosition();
 
         printArmState();
@@ -111,9 +110,20 @@ public class PickUpSubstationCommand extends BaseArmCommand {
 
     private void moveCameraToHighPosition() {
 
+        Constants.VisionConstants.VisionTarget visionTarget = Constants.VisionConstants.VisionTarget.NONE;
+        if (gamePiece == GamePiece.CONE) {
+            visionTarget = Constants.VisionConstants.VisionTarget.CONE_SUBSTATION;
+        }
+        else if (gamePiece == GamePiece.CUBE) {
+            visionTarget = Constants.VisionConstants.VisionTarget.CUBE_SUBSTATION;
+        }
+        else {
+            System.out.println("UNSUPPORTED GAME PIECE: " + gamePiece);
+        }
+
         if (DriverStation.isAutonomousEnabled() || DriverStation.isTeleopEnabled()) {
 
-            CommandScheduler.getInstance().schedule(new SetCameraViewCommand(CameraView.HIGH, visionSubsystem));
+            CommandScheduler.getInstance().schedule(new ConfigureCameraCommand(visionTarget, visionSubsystem));
         }
     }
 }

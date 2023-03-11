@@ -12,11 +12,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.CameraView;
 
-public class VisionSubsystem extends SubsystemBase {
+import static frc.robot.Constants.VisionConstants.VisionTarget.*;
 
-    public enum VisionTargetType {
-        CUBE, CONE, TAG, CONE_POST_LOW, CONE_POST_HIGH, NONE
-    }
+public class VisionSubsystem extends SubsystemBase {
 
     private static final long LED_MODE_PIPELINE = 0;
     private static final long LED_MODE_OFF      = 1;
@@ -30,15 +28,9 @@ public class VisionSubsystem extends SubsystemBase {
     private static final long PIPELINE_CONE_DETECT      = 0;
     private static final long PIPELINE_CUBE_DETECT      = 1;
     private static final long PIPELINE_APRIL_TAG_DETECT = 3;
+    private static final long PIPELINE_POST_DETECT      = 4;
 
     private static final LinearFilter CONE_LOW_PASS_FILTER = LinearFilter.singlePoleIIR(.1, .02);
-
-    // calibration data
-    private double[] topLeft     = new double[2];
-    private double[] topRight    = new double[2];
-    private double[] bottomRight = new double[2];
-    private double[] bottomLeft  = new double[2];
-
 
     NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 
@@ -57,7 +49,7 @@ public class VisionSubsystem extends SubsystemBase {
     private boolean isCameraPositionInitialized   = false;
     private long    cameraInitializationStartTime = 0;
 
-    private VisionTargetType currentVisionTargetType = VisionTargetType.NONE;
+    private VisionConstants.VisionTarget currentVisionTarget = VisionConstants.VisionTarget.NONE;
 
     private double filteredConeAngle = 0;
 
@@ -66,8 +58,6 @@ public class VisionSubsystem extends SubsystemBase {
      */
     private final CANSparkMax cameraMotor = new CANSparkMax(VisionConstants.CAMERA_ANGLE_MOTOR_PORT,
         MotorType.kBrushless);
-
-    private double cameraMotorSpeed = 0; // todo: used?
 
     // Arm lift encoder
     private final RelativeEncoder cameraEncoder = cameraMotor.getEncoder();
@@ -86,31 +76,12 @@ public class VisionSubsystem extends SubsystemBase {
         isCameraPositionInitialized = false;
     }
 
-    /**
-     * Tell the vision subsystem the coordinates that it can see (on the floor).
-     *
-     * <pre>
-     * {0, 0} corresponds to the ground directly at the front bumper in the center of the robot
-     * {-10, 0} corresponds to a location against the front bumper 10cm to the left of the robot center
-     * {10, 0} corresponds to a location against the front bumper 10cm to the right of the robot center
-     * {10, 10} corresponds to a location 10cm away from the front bumper of the robot, 10cm to the right of center
-     * </pre>
-     *
-     * etc. Using these values, set the four corners of the field of view of the limelight
-     */
-    public void calibrateVision(double[] topLeft, double[] topRight, double[] bottomRight, double[] bottomLeft) {
-        this.topLeft     = topLeft;
-        this.topRight    = topRight;
-        this.bottomRight = bottomRight;
-        this.bottomLeft  = bottomLeft;
-    }
-
     public double getTargetAreaPercent() {
         return ta.getDouble(-1.0);
     }
 
-    public VisionTargetType getCurrentVisionTargetType() {
-        return currentVisionTargetType;
+    public VisionConstants.VisionTarget getCurrentVisionTarget() {
+        return currentVisionTarget;
     }
 
     public CameraView getCameraView() {
@@ -140,11 +111,12 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     /**
-     * Get the camera motor speed
+     * Return true if the camera is in position for its current vision target.
+     *
+     * @return true if the camera is in the right position for the specified target.
      */
-    public double getCameraMotorSpeed() {
-
-        return cameraMotorSpeed;
+    public boolean isCameraInPositionForTarget() {
+        return getCameraView() == currentVisionTarget.getCameraView();
     }
 
     /**
@@ -171,7 +143,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         // FIXME: return the filtered cone value if a cone.
 
-        return tx.getDouble(0);
+        return getTarget()[0];
     }
 
     public double getTargetOffset() {
@@ -245,7 +217,7 @@ public class VisionSubsystem extends SubsystemBase {
     /**
      * Determine if a vision target of the current type is found.
      * <p>
-     * Use {@link #setVisionTargetType(VisionTargetType)} to set the vision target type
+     * Use {@link #setVisionTarget(VisionConstants.VisionTarget)} to set the vision target type
      */
     public boolean isVisionTargetFound() {
         return tv.getDouble(-1) == 1;
@@ -276,12 +248,8 @@ public class VisionSubsystem extends SubsystemBase {
             return;
         }
 
-        // FIXME: If the initialize works, then remove this return statement.
-        return;
-
-        // cameraMotorSpeed = checkCameraMotorLimits(speed);
-
-        // cameraMotor.set(cameraMotorSpeed);
+        double safeSpeed = checkCameraMotorLimits(speed);
+        cameraMotor.set(safeSpeed);
     }
 
     public void initializeCameraPosition() {
@@ -312,71 +280,45 @@ public class VisionSubsystem extends SubsystemBase {
         cameraEncoderOffset = -cameraEncoder.getPosition();
     }
 
-    public void setModeConeAcquisition() {
-        this.pipeline.setNumber(PIPELINE_CONE_DETECT);
-        this.camMode.setNumber(CAM_MODE_VISION);
-        this.ledMode.setNumber(LED_MODE_PIPELINE);
-    }
-
-    public void setModeCubeAcquisition() {
-        this.pipeline.setNumber(PIPELINE_CUBE_DETECT);
-        this.camMode.setNumber(CAM_MODE_VISION);
-        this.ledMode.setNumber(LED_MODE_PIPELINE);
-    }
-
-    public void setModeAprilTags() {
-        this.pipeline.setNumber(PIPELINE_APRIL_TAG_DETECT);
-        this.camMode.setNumber(CAM_MODE_VISION);
-        this.ledMode.setNumber(LED_MODE_PIPELINE);
-    }
-
-    public void setModeDriver() {
-        this.camMode.setInteger(CAM_MODE_DRIVER);
-        this.ledMode.setInteger(LED_MODE_OFF);
-    }
-
-    /**
-     * Set the current vision target type
-     *
-     * @param visionTargetType
-     */
-    public void setVisionTargetType(VisionTargetType visionTargetType) {
-
-        currentVisionTargetType = visionTargetType;
-
-        switch (visionTargetType) {
-        case CONE:
-            setModeConeAcquisition();
+    public void setVisionTarget(VisionConstants.VisionTarget visionTarget) {
+        this.currentVisionTarget = visionTarget;
+        switch (visionTarget) {
+        case CONE_GROUND:
+        case CONE_SUBSTATION:
+            this.pipeline.setNumber(PIPELINE_CONE_DETECT);
+            this.camMode.setNumber(CAM_MODE_VISION);
+            this.ledMode.setNumber(LED_MODE_PIPELINE);
             break;
-
-        case CUBE:
-            setModeCubeAcquisition();
+        case CUBE_GROUND:
+        case CUBE_SUBSTATION:
+            this.pipeline.setNumber(PIPELINE_CUBE_DETECT);
+            this.camMode.setNumber(CAM_MODE_VISION);
+            this.ledMode.setNumber(LED_MODE_PIPELINE);
             break;
-
-        case TAG:
-            setModeAprilTags();
+        case APRILTAG_GRID:
+            this.pipeline.setNumber(PIPELINE_APRIL_TAG_DETECT);
+            this.camMode.setNumber(CAM_MODE_VISION);
+            this.ledMode.setNumber(LED_MODE_PIPELINE);
             break;
-
-        case CONE_POST_LOW:
-            // FIXME: Implement low post detection pipe
+        case POST_LOW:
+        case POST_HIGH:
+            this.pipeline.setNumber(PIPELINE_POST_DETECT);
+            this.camMode.setNumber(CAM_MODE_VISION);
+            this.ledMode.setNumber(LED_MODE_PIPELINE);
             break;
-
-        case CONE_POST_HIGH:
-            // FIXME: Implement high post detection pipe
-            break;
-
+        case FIELD:
+        case NONE:
         default:
-            System.out.println("Invalid value used for "
-                + "VisionSubsystem.setVisionTargetType("
-                + visionTargetType + ")");
+            this.camMode.setInteger(CAM_MODE_DRIVER);
+            this.ledMode.setInteger(LED_MODE_OFF);
+            break;
         }
-
     }
 
     @Override
     public void periodic() {
 
-        if (currentVisionTargetType == VisionTargetType.CONE) {
+        if (currentVisionTarget == CONE_GROUND || currentVisionTarget == CONE_SUBSTATION) {
             if (isVisionTargetFound()) {
                 filteredConeAngle = CONE_LOW_PASS_FILTER.calculate(getTargetAngleOffset());
             }
@@ -387,16 +329,17 @@ public class VisionSubsystem extends SubsystemBase {
         }
 
         // Call the safety code on the camera motor movement
-        setCameraMotorSpeed(cameraMotorSpeed);
+        setCameraMotorSpeed(cameraMotor.get());
 
         // read values periodically and post to smart dashboard periodically
         SmartDashboard.putBoolean("Limelight Target Found", isVisionTargetFound());
-        SmartDashboard.putBoolean("Cube", currentVisionTargetType == VisionTargetType.CUBE && isVisionTargetFound());
-        SmartDashboard.putBoolean("Cone", currentVisionTargetType == VisionTargetType.CONE && isVisionTargetFound());
-        SmartDashboard.putBoolean("Post Low", currentVisionTargetType == VisionTargetType.CONE_POST_LOW && isVisionTargetFound());
-        SmartDashboard.putBoolean("Post High",
-            currentVisionTargetType == VisionTargetType.CONE_POST_HIGH && isVisionTargetFound());
-        SmartDashboard.putBoolean("Tag", currentVisionTargetType == VisionTargetType.TAG && isVisionTargetFound());
+        SmartDashboard.putBoolean("Cube",
+            (currentVisionTarget == CUBE_GROUND || currentVisionTarget == CUBE_SUBSTATION) && isVisionTargetFound());
+        SmartDashboard.putBoolean("Cone",
+            (currentVisionTarget == CONE_GROUND || currentVisionTarget == CONE_SUBSTATION) && isVisionTargetFound());
+        SmartDashboard.putBoolean("Post Low", currentVisionTarget == POST_LOW && isVisionTargetFound());
+        SmartDashboard.putBoolean("Post High", currentVisionTarget == POST_HIGH && isVisionTargetFound());
+        SmartDashboard.putBoolean("Tag", currentVisionTarget == APRILTAG_GRID && isVisionTargetFound());
         SmartDashboard.putNumber("Limelight tx-value", tx.getDouble(-1.0));
         SmartDashboard.putNumber("Limelight ty-value", ty.getDouble(-1.0));
         SmartDashboard.putNumber("Limelight ta-value", ta.getDouble(-1.0));
@@ -408,7 +351,7 @@ public class VisionSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Cube Targed Acquired", isCubeTargetAcquired());
 
         SmartDashboard.putString("Camera view", getCameraView().toString());
-        SmartDashboard.putNumber("Camera Motor Speed", getCameraMotorSpeed());
+        SmartDashboard.putNumber("Camera Motor Speed", cameraMotor.get());
         SmartDashboard.putNumber("Camera Encoder", Math.round(getCameraEncoder() * 100) / 100d);
 
         SmartDashboard.putNumber("Cone Angle Filtered", filteredConeAngle);
