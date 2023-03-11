@@ -11,8 +11,8 @@ import frc.robot.Constants.AutoConstants.Orientation;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.Zone;
 import frc.robot.Constants.VisionConstants.CameraView;
-import frc.robot.commands.arm.DriveWithPieceCommand;
-import frc.robot.commands.arm.PickUpGroundCommand;
+import frc.robot.commands.arm.PickupGamePieceCommand;
+import frc.robot.commands.arm.StartIntakeCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
 import frc.robot.commands.drive.DriveToTargetCommand;
@@ -235,18 +235,18 @@ public class AutonomousCommand extends SequentialCommandGroup {
             // Start the pickup, and at the same time, drive toward the vision target. This command
             // will end when the PickupGroundCommand ends, canceling the DriveToVisionTarget if
             // required.
-            addCommands(new PickUpGroundCommand(GamePiece.CUBE, armSubsystem)
+            addCommands(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem)
                 .deadlineWith(new DriveToTargetCommand(VisionTargetType.CUBE, .2, driveSubsystem, visionSubsystem)));
 
-            addCommands(new DriveWithPieceCommand(armSubsystem));
+            addCommands(new PickupGamePieceCommand(GamePiece.CUBE, armSubsystem));
 
         }
         if (exitZoneAction == AutoAction.PICK_UP_CONE) {
 
-            addCommands(new PickUpGroundCommand(GamePiece.CONE, armSubsystem)
+            addCommands(new StartIntakeCommand(GamePiece.CONE, armSubsystem, visionSubsystem)
                 .deadlineWith(new DriveToTargetCommand(VisionTargetType.CONE, .2, driveSubsystem, visionSubsystem)));
 
-            addCommands(new DriveWithPieceCommand(armSubsystem));
+            addCommands(new PickupGamePieceCommand(GamePiece.CONE, armSubsystem));
         }
     }
 
@@ -301,26 +301,48 @@ public class AutonomousCommand extends SequentialCommandGroup {
             return;
         }
 
-        // Drive to the platform
-        if ((alliance == Alliance.Red && startingLane == AutoLane.BOTTOM)
-            || (alliance == Alliance.Blue && startingLane == AutoLane.TOP)) {
+        // Drive to the platform from community
+        if (currentZone == Zone.COMMUNITY && currentOrientation == Orientation.FACE_GRID) {
+            if ((alliance == Alliance.Red && startingLane == AutoLane.BOTTOM)
+                || (alliance == Alliance.Blue && startingLane == AutoLane.TOP)) {
 
-            System.out.println("Balance Red/Bot or Blue/Top");
-            addCommands(new DriveOnHeadingCommand(180, -.3, 20, driveSubsystem));
-            addCommands(new DriveOnHeadingCommand(270, -.3, 100, driveSubsystem));
-            addCommands(new DriveOnHeadingCommand(180, -.5, 400, driveSubsystem));
-        }
-        else if ((alliance == Alliance.Red && startingLane == AutoLane.TOP)
-            || (alliance == Alliance.Blue && startingLane == AutoLane.BOTTOM)) {
+                System.out.println("Balance Red/Bot or Blue/Top");
+                addCommands(new DriveOnHeadingCommand(180, -.3, 20, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(270, -.3, 100, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, -.5, 160, driveSubsystem));
+            }
+            else if ((alliance == Alliance.Red && startingLane == AutoLane.TOP)
+                || (alliance == Alliance.Blue && startingLane == AutoLane.BOTTOM)) {
 
-            System.out.println("Balance Red/Top or Blue/Bottom");
-            addCommands(new DriveOnHeadingCommand(180, -.3, 20, driveSubsystem));
-            addCommands(new DriveOnHeadingCommand(90, -.3, 100, driveSubsystem));
-            addCommands(new DriveOnHeadingCommand(180, -.5, 400, driveSubsystem));
+                System.out.println("Balance Red/Top or Blue/Bottom");
+                addCommands(new DriveOnHeadingCommand(180, -.3, 20, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(90, -.3, 100, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, -.5, 160, driveSubsystem));
+            }
+            else {
+                System.out.println("Balance Mid");
+                addCommands(new DriveOnHeadingCommand(180, -.3, 160, driveSubsystem));
+            }
         }
-        else {
-            System.out.println("Balance 'else'");
-            addCommands(new DriveOnHeadingCommand(180, -.3, 400, 1.75, driveSubsystem));
+        else if (currentZone == Zone.FIELD && currentOrientation == Orientation.FACE_FIELD) { // Drive to the platform from field
+            if ((alliance == Alliance.Red && startingLane == AutoLane.BOTTOM)
+                || (alliance == Alliance.Blue && startingLane == AutoLane.TOP)) {
+
+                System.out.println("Balance Red/Bot or Blue/Top");
+                addCommands(new DriveOnHeadingCommand(90, .5, 125, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .5, 250, driveSubsystem));
+            }
+            else if ((alliance == Alliance.Red && startingLane == AutoLane.TOP)
+                || (alliance == Alliance.Blue && startingLane == AutoLane.BOTTOM)) {
+
+                System.out.println("Balance Red/Top or Blue/Bottom");
+                addCommands(new DriveOnHeadingCommand(270, .5, 125, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .5, 250, driveSubsystem));
+            }
+            else {
+                System.out.println("Balance Mid");
+                addCommands(new DriveOnHeadingCommand(180, .5, 250, driveSubsystem));
+            }
         }
 
         // Balance on the platform

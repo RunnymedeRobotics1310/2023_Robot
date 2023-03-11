@@ -155,9 +155,6 @@ public class StartIntakeCommand extends BaseArmCommand {
             else {
                 CommandScheduler.getInstance().schedule(new CompactCommand(armSubsystem));
             }
-
         }
-
-
     }
 }
