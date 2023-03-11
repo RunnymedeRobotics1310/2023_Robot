@@ -44,21 +44,21 @@ import frc.robot.subsystems.VisionSubsystem;
 public class RobotContainer {
 
     // The robot's subsystems and commands are defined here...
-    private final ArmSubsystem    armSubsystem    = new ArmSubsystem();
-    private final VisionSubsystem visionSubsystem = new VisionSubsystem();
-    private final DriveSubsystem  driveSubsystem  = new DriveSubsystem(armSubsystem);
+    private final ArmSubsystem    armSubsystem                  = new ArmSubsystem();
+    private final VisionSubsystem visionSubsystem               = new VisionSubsystem();
+    private final DriveSubsystem  driveSubsystem                = new DriveSubsystem(armSubsystem);
 
     // A set of choosers for autonomous patterns
-    SendableChooser<AutoLane>    startingLaneChooser           = new SendableChooser<>();
-    SendableChooser<GamePiece>   startingGamePieceChooser      = new SendableChooser<>();
-    SendableChooser<Orientation> startingOrientationChooser    = new SendableChooser<>();
-    SendableChooser<AutoAction>  firstGamePieceScoringChooser  = new SendableChooser<>();
-    SendableChooser<AutoAction>  exitZoneActionChooser         = new SendableChooser<>();
-    SendableChooser<AutoAction>  secondGamePieceScoringChooser = new SendableChooser<>();
-    SendableChooser<AutoAction>  balanceChooser                = new SendableChooser<>();
 
+    SendableChooser<AutoLane>     startingLaneChooser           = new SendableChooser<>();
+    SendableChooser<GamePiece>    startingGamePieceChooser      = new SendableChooser<>();
+    SendableChooser<Orientation>  startingOrientationChooser    = new SendableChooser<>();
+    SendableChooser<AutoAction>   firstGamePieceScoringChooser  = new SendableChooser<>();
+    SendableChooser<AutoAction>   exitZoneActionChooser         = new SendableChooser<>();
+    SendableChooser<AutoAction>   secondGamePieceScoringChooser = new SendableChooser<>();
+    SendableChooser<AutoAction>   balanceChooser                = new SendableChooser<>();
     // The driver's controller
-    private final OperatorInput operatorInput = new OperatorInput(
+    private final OperatorInput   operatorInput                 = new OperatorInput(
         OiConstants.DRIVER_CONTROLLER_PORT, OiConstants.OPERATOR_CONTROLLER_PORT);
 
     /**
