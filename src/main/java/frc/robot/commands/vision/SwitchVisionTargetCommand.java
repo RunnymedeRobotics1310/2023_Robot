@@ -13,7 +13,7 @@ public class SwitchVisionTargetCommand extends InstantCommand {
      * Switch the vision target to the specified {@link VisionTargetType}.
      *
      * @param visionTargetType requested vision target type
-     * @param visionSubsystem
+     * @param visionSubsystem the vision subsystem
      */
     public SwitchVisionTargetCommand(VisionTargetType visionTargetType, VisionSubsystem visionSubsystem) {
 
@@ -63,7 +63,8 @@ public class SwitchVisionTargetCommand extends InstantCommand {
                     }
                     break;
 
-                case CONE_POST:
+                case CONE_POST_LOW:
+                case CONE_POST_HIGH:
                 case TAG:
                     if (visionSubsystem.getCameraView() != CameraView.HIGH) {
                         CommandScheduler.getInstance()
