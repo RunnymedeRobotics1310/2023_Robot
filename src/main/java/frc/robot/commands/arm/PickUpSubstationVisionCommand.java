@@ -11,22 +11,22 @@ import frc.robot.subsystems.*;
 
 public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
-    private static final double MIN_PICKUP_DISTANCE             = 95;
-    private static final double MAX_PICKUP_DISTANCE             = 115;
-    private static final double TARGET_CAMERA_OFFSET            = 5;
-    private static final double VISION_TARGET_HEADING_TOLERANCE = 1;
+    private static final double   MIN_PICKUP_DISTANCE             = 95;
+    private static final double   MAX_PICKUP_DISTANCE             = 115;
+    private static final double   TARGET_CAMERA_OFFSET            = 5;
+    private static final double   VISION_TARGET_HEADING_TOLERANCE = 1;
 
     private final VisionSubsystem visionSubsystem;
     private final DriveSubsystem  driveSubsystem;
 
-    private double requiredExtensionEncoderPosition;
+    private double                requiredExtensionEncoderPosition;
 
     /**
      * Only cone is supported for now.
      */
-    private GamePiece             gamePiece = GamePiece.CONE;
+    private GamePiece             gamePiece                       = GamePiece.CONE;
 
-    private double visionTargetHeadingError = 0;
+    private double                visionTargetHeadingError        = 0;
 
     private enum State {
         MOVE_CAMERA_AND_GET_WITHIN_RANGE, ALIGN, PICKUP
@@ -109,7 +109,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
                 // Set the required extension distance based on the following formula
                 requiredExtensionEncoderPosition = ultrasonicDistanceCm * .88 - 53.1;
 
-                currentState = State.PICKUP;
+                currentState                     = State.PICKUP;
             }
 
             // Wait for target and distance alignment

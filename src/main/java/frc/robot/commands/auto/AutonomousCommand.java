@@ -31,17 +31,19 @@ import static frc.robot.Constants.VisionConstants.VisionTarget.*;
 
 public class AutonomousCommand extends SequentialCommandGroup {
 
-    private AutoLane    startingLane       = null;
-    private GamePiece   currentGamePiece   = null;
-    private Orientation currentOrientation = null;
-    private Zone        currentZone        = null;
 
-    private Alliance alliance = null;
+    private AutoLane              startingLane           = null;
+    private GamePiece             currentGamePiece       = null;
+    private Orientation           currentOrientation     = null;
+    private Zone                  currentZone            = null;
 
-    private AutoAction firstGamePieceScoring  = null;
-    private AutoAction exitZoneAction         = null;
-    private AutoAction secondGamePieceScoring = null;
-    private AutoAction balanceAction          = null;
+    private Alliance              alliance               = null;
+
+
+    private AutoAction            firstGamePieceScoring  = null;
+    private AutoAction            exitZoneAction         = null;
+    private AutoAction            secondGamePieceScoring = null;
+    private AutoAction            balanceAction          = null;
 
     private final ArmSubsystem    armSubsystem;
     private final DriveSubsystem  driveSubsystem;
@@ -66,16 +68,16 @@ public class AutonomousCommand extends SequentialCommandGroup {
         // the next command will be executed.
         addCommands(new InstantCommand());
 
-        startingLane       = startingLaneChooser.getSelected();
-        currentGamePiece   = loadedGamePieceChooser.getSelected();
-        currentOrientation = startingOrientationChooser.getSelected();
+        startingLane           = startingLaneChooser.getSelected();
+        currentGamePiece       = loadedGamePieceChooser.getSelected();
+        currentOrientation     = startingOrientationChooser.getSelected();
 
         firstGamePieceScoring  = firstGamePieceScoringChooser.getSelected();
         exitZoneAction         = exitZoneActionChooser.getSelected();
         secondGamePieceScoring = secondGamePieceScoringChooser.getSelected();
         balanceAction          = balanceChooser.getSelected();
 
-        alliance = DriverStation.getAlliance();
+        alliance               = DriverStation.getAlliance();
 
         StringBuilder sb = new StringBuilder();
         sb.append("Auto Selections");

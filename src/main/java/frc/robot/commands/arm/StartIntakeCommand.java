@@ -14,7 +14,7 @@ public class StartIntakeCommand extends BaseArmCommand {
     private final OperatorInput   operatorInput;
     private final VisionSubsystem visionSubsystem;
 
-    private GamePiece gamePiece = null;
+    private GamePiece             gamePiece = null;
 
     public StartIntakeCommand(GamePiece gamePiece, ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem) {
 

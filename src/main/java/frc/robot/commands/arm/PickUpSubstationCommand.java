@@ -13,7 +13,7 @@ public class PickUpSubstationCommand extends BaseArmCommand {
 
     private final VisionSubsystem visionSubsystem;
 
-    private GamePiece gamePiece = GamePiece.CONE;
+    private GamePiece             gamePiece = GamePiece.CONE;
 
     public PickUpSubstationCommand(ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem) {
 
