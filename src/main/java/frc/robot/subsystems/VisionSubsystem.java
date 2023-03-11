@@ -15,7 +15,7 @@ import frc.robot.Constants.VisionConstants.CameraView;
 public class VisionSubsystem extends SubsystemBase {
 
     public enum VisionTargetType {
-        CUBE, CONE, TAG, CONE_POST, NONE
+        CUBE, CONE, TAG, CONE_POST_LOW, CONE_POST_HIGH, NONE
     }
 
     private static final long LED_MODE_PIPELINE = 0;
@@ -31,12 +31,14 @@ public class VisionSubsystem extends SubsystemBase {
     private static final long PIPELINE_CUBE_DETECT      = 1;
     private static final long PIPELINE_APRIL_TAG_DETECT = 3;
 
+    private static final LinearFilter CONE_LOW_PASS_FILTER = LinearFilter.singlePoleIIR(.1, .02);
 
     // calibration data
     private double[] topLeft     = new double[2];
     private double[] topRight    = new double[2];
     private double[] bottomRight = new double[2];
     private double[] bottomLeft  = new double[2];
+
 
     NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 
@@ -57,8 +59,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     private VisionTargetType currentVisionTargetType = VisionTargetType.NONE;
 
-    private LinearFilter coneLowPassFilter = LinearFilter.singlePoleIIR(.1, .02);
-    private double       filteredConeAngle = 0;
+    private double filteredConeAngle = 0;
 
     /*
      * Camera motor and encoder
@@ -66,10 +67,10 @@ public class VisionSubsystem extends SubsystemBase {
     private final CANSparkMax cameraMotor = new CANSparkMax(VisionConstants.CAMERA_ANGLE_MOTOR_PORT,
         MotorType.kBrushless);
 
-    private double cameraMotorSpeed = 0;
+    private double cameraMotorSpeed = 0; // todo: used?
 
     // Arm lift encoder
-    private RelativeEncoder cameraEncoder = cameraMotor.getEncoder();
+    private final RelativeEncoder cameraEncoder = cameraMotor.getEncoder();
 
     private double cameraEncoderOffset = 0;
 
@@ -96,11 +97,6 @@ public class VisionSubsystem extends SubsystemBase {
      * </pre>
      *
      * etc. Using these values, set the four corners of the field of view of the limelight
-     *
-     * @param topLeft
-     * @param topRight
-     * @param bottomRight
-     * @param bottomLeft
      */
     public void calibrateVision(double[] topLeft, double[] topRight, double[] bottomRight, double[] bottomLeft) {
         this.topLeft     = topLeft;
@@ -120,7 +116,7 @@ public class VisionSubsystem extends SubsystemBase {
     public CameraView getCameraView() {
 
         // NOTE: The camera encoder position will be a negative number because the
-        // the positive direction is a higher camera angle and the negative direction
+        // positive direction is a higher camera angle and the negative direction
         // is a lower camera angle. The max camera angle is 0, so this encoder always
         // has a negative value.
 
@@ -145,8 +141,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     /**
      * Get the camera motor speed
-     *
-     * @param speed
      */
     public double getCameraMotorSpeed() {
 
@@ -273,8 +267,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     /**
      * Set the camera motor speed
-     *
-     * @param speed
      */
     public void setCameraMotorSpeed(double speed) {
 
@@ -315,8 +307,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     /**
      * Set the camera encoder to the supplied position
-     *
-     * @param cameraEncoderPosition
      */
     public void setCameraEncoderPosition(double cameraEncoderPosition) {
         cameraEncoderOffset = -cameraEncoder.getPosition();
@@ -367,8 +357,12 @@ public class VisionSubsystem extends SubsystemBase {
             setModeAprilTags();
             break;
 
-        case CONE_POST:
-            // FIXME: Implement a post detection pipe
+        case CONE_POST_LOW:
+            // FIXME: Implement low post detection pipe
+            break;
+
+        case CONE_POST_HIGH:
+            // FIXME: Implement high post detection pipe
             break;
 
         default:
@@ -384,11 +378,11 @@ public class VisionSubsystem extends SubsystemBase {
 
         if (currentVisionTargetType == VisionTargetType.CONE) {
             if (isVisionTargetFound()) {
-                filteredConeAngle = coneLowPassFilter.calculate(getTargetAngleOffset());
+                filteredConeAngle = CONE_LOW_PASS_FILTER.calculate(getTargetAngleOffset());
             }
             else {
                 filteredConeAngle = 0;
-                coneLowPassFilter.reset();
+                CONE_LOW_PASS_FILTER.reset();
             }
         }
 
@@ -399,7 +393,9 @@ public class VisionSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Limelight Target Found", isVisionTargetFound());
         SmartDashboard.putBoolean("Cube", currentVisionTargetType == VisionTargetType.CUBE && isVisionTargetFound());
         SmartDashboard.putBoolean("Cone", currentVisionTargetType == VisionTargetType.CONE && isVisionTargetFound());
-        SmartDashboard.putBoolean("Post", currentVisionTargetType == VisionTargetType.CONE_POST && isVisionTargetFound());
+        SmartDashboard.putBoolean("Post Low", currentVisionTargetType == VisionTargetType.CONE_POST_LOW && isVisionTargetFound());
+        SmartDashboard.putBoolean("Post High",
+            currentVisionTargetType == VisionTargetType.CONE_POST_HIGH && isVisionTargetFound());
         SmartDashboard.putBoolean("Tag", currentVisionTargetType == VisionTargetType.TAG && isVisionTargetFound());
         SmartDashboard.putNumber("Limelight tx-value", tx.getDouble(-1.0));
         SmartDashboard.putNumber("Limelight ty-value", ty.getDouble(-1.0));
@@ -439,7 +435,6 @@ public class VisionSubsystem extends SubsystemBase {
     /**
      * Check the camera motor limits and return the appropriate output speed based on the limits
      *
-     * @param inputSpeed
      * @return output speed for the camera motor based on the current camera position.
      */
     private double checkCameraMotorLimits(double inputSpeed) {
