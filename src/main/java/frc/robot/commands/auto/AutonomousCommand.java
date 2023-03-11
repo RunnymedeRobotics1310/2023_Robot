@@ -6,13 +6,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants.AutoAction;
 import frc.robot.Constants.AutoConstants.AutoLane;
 import frc.robot.Constants.AutoConstants.Orientation;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.GameConstants.Zone;
-import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.commands.arm.CompactCommand;
 import frc.robot.commands.arm.PickupGamePieceCommand;
 import frc.robot.commands.arm.ReleaseCommand;
@@ -22,26 +22,26 @@ import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
 import frc.robot.commands.drive.DriveToTargetCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
-import frc.robot.commands.vision.SetCameraViewCommand;
-import frc.robot.commands.vision.SwitchVisionTargetCommand;
+import frc.robot.commands.vision.ConfigureCameraCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
-import frc.robot.subsystems.VisionSubsystem.VisionTargetType;
+
+import static frc.robot.Constants.VisionConstants.VisionTarget.*;
 
 public class AutonomousCommand extends SequentialCommandGroup {
 
-    private AutoLane              startingLane           = null;
-    private GamePiece             currentGamePiece       = null;
-    private Orientation           currentOrientation     = null;
-    private Zone                  currentZone            = null;
+    private AutoLane    startingLane       = null;
+    private GamePiece   currentGamePiece   = null;
+    private Orientation currentOrientation = null;
+    private Zone        currentZone        = null;
 
-    private Alliance              alliance               = null;
+    private Alliance alliance = null;
 
-    private AutoAction            firstGamePieceScoring  = null;
-    private AutoAction            exitZoneAction         = null;
-    private AutoAction            secondGamePieceScoring = null;
-    private AutoAction            balanceAction          = null;
+    private AutoAction firstGamePieceScoring  = null;
+    private AutoAction exitZoneAction         = null;
+    private AutoAction secondGamePieceScoring = null;
+    private AutoAction balanceAction          = null;
 
     private final ArmSubsystem    armSubsystem;
     private final DriveSubsystem  driveSubsystem;
@@ -66,16 +66,16 @@ public class AutonomousCommand extends SequentialCommandGroup {
         // the next command will be executed.
         addCommands(new InstantCommand());
 
-        startingLane           = startingLaneChooser.getSelected();
-        currentGamePiece       = loadedGamePieceChooser.getSelected();
-        currentOrientation     = startingOrientationChooser.getSelected();
+        startingLane       = startingLaneChooser.getSelected();
+        currentGamePiece   = loadedGamePieceChooser.getSelected();
+        currentOrientation = startingOrientationChooser.getSelected();
 
         firstGamePieceScoring  = firstGamePieceScoringChooser.getSelected();
         exitZoneAction         = exitZoneActionChooser.getSelected();
         secondGamePieceScoring = secondGamePieceScoringChooser.getSelected();
         balanceAction          = balanceChooser.getSelected();
 
-        alliance               = DriverStation.getAlliance();
+        alliance = DriverStation.getAlliance();
 
         StringBuilder sb = new StringBuilder();
         sb.append("Auto Selections");
@@ -232,12 +232,10 @@ public class AutonomousCommand extends SequentialCommandGroup {
         // Start by switching the camera view if picking up a game piece.
         // this will set the camera angle while driving
         if (exitZoneAction == AutoAction.PICK_UP_CUBE) {
-            addCommands(new SetCameraViewCommand(CameraView.LOW, visionSubsystem));
-            addCommands(new SwitchVisionTargetCommand(VisionTargetType.CUBE, visionSubsystem));
+            addCommands(new ConfigureCameraCommand(CUBE_GROUND, visionSubsystem));
         }
         if (exitZoneAction == AutoAction.PICK_UP_CONE) {
-            addCommands(new SetCameraViewCommand(CameraView.LOW, visionSubsystem));
-            addCommands(new SwitchVisionTargetCommand(VisionTargetType.CONE, visionSubsystem));
+            addCommands(new ConfigureCameraCommand(CONE_GROUND, visionSubsystem));
         }
 
         // Drive out of the zone
@@ -263,7 +261,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
             // will end when the PickupGroundCommand ends, canceling the DriveToVisionTarget if
             // required.
             addCommands(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem)
-                .deadlineWith(new DriveToTargetCommand(VisionTargetType.CUBE, .2, driveSubsystem, visionSubsystem)));
+                .deadlineWith(new DriveToTargetCommand(CUBE_GROUND, .2, driveSubsystem, visionSubsystem)));
 
             addCommands(new PickupGamePieceCommand(GamePiece.CUBE, armSubsystem));
 
@@ -271,7 +269,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
         if (exitZoneAction == AutoAction.PICK_UP_CONE) {
 
             addCommands(new StartIntakeCommand(GamePiece.CONE, armSubsystem, visionSubsystem)
-                .deadlineWith(new DriveToTargetCommand(VisionTargetType.CONE, .2, driveSubsystem, visionSubsystem)));
+                .deadlineWith(new DriveToTargetCommand(CONE_GROUND, .2, driveSubsystem, visionSubsystem)));
 
             addCommands(new PickupGamePieceCommand(GamePiece.CONE, armSubsystem));
         }
@@ -302,7 +300,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
         // Turn around and go back to the grid
         addCommands(new DriveOnHeadingCommand(270.0, 0.5, 5, driveSubsystem));
         addCommands(new DriveOnHeadingCommand(180.0, 0.5, 300, driveSubsystem));
-        addCommands(new DriveToTargetCommand(VisionTargetType.TAG, 0.3, driveSubsystem, visionSubsystem));
+        addCommands(new DriveToTargetCommand(APRILTAG_GRID, 0.3, driveSubsystem, visionSubsystem));
 
         // Vision subsystem to acquire the nearest scoring position marker (vision subsystem
         // operation to find scoring position +
