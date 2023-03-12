@@ -30,6 +30,9 @@ public class DriveSubsystem extends SubsystemBase {
     private final CANSparkMax rightFollowerMotor = new CANSparkMax(DriveConstants.RIGHT_MOTOR_PORT + 1,
         MotorType.kBrushless);
 
+    private double previousLeftSpeed = 0;
+    private double previousRightSpeed = 0;
+    private long motorSpeedSetTime = 0;
     private double leftSpeed  = 0;
     private double rightSpeed = 0;
 
@@ -293,8 +296,13 @@ public class DriveSubsystem extends SubsystemBase {
         // when this method is called, the motors should be set to brake.
         setIdleMode(IdleMode.kBrake);
 
-        this.leftSpeed  = leftSpeed;
-        this.rightSpeed = rightSpeed;
+        this.leftSpeed     = leftSpeed;
+        this.rightSpeed    = rightSpeed;
+
+        // Save previous motor speeds to determine acceleration
+        motorSpeedSetTime  = System.currentTimeMillis();
+        previousLeftSpeed  = (leftPrimaryMotor.get() + leftFollowerMotor.get())/2;
+        previousRightSpeed = (rightPrimaryMotor.get() + rightFollowerMotor.get())/2;
 
         checkMotorSpeedLimits();
 
@@ -368,6 +376,22 @@ public class DriveSubsystem extends SubsystemBase {
         rightFollowerMotor.setIdleMode(idleMode);
     }
 
+    /**
+     * The maximum speed limit when SLOW is required
+     */
+    final double SPEED_LIMIT_SLOW = .35;
+
+    /**
+     * The maximum acceleration of wheels in motor-speed-units/second
+     * <ul>
+     *     <li>10.0 is full stop from boost speed in 0.1s</li>
+     *     <li>5.0 is full stop from boost speed in 0.2s</li>
+     *     <li>1.0 is full stop from boost speed in 1.0s</li>
+     * </ul>
+     */
+    final double MAX_ACCEL = 5.0;
+
+
     private void checkMotorSpeedLimits() {
 
         // If the arm is not retracted, then the max speed is .25
@@ -376,25 +400,58 @@ public class DriveSubsystem extends SubsystemBase {
         // Determine if the arm is inside the robot
         boolean armInsideFrame = armSubsystem.isArmInsideFrame();
 
+
         if (!armSubsystem.isArmRetracted() && !armInsideFrame && DriverStation.isTeleopEnabled()) {
 
-            // Limit each side to 0.25
+            // Limit each side to SPEED_LIMIT_SLOW
 
-            leftSpeed  = Math.min(Math.abs(leftSpeed), .35) * Math.signum(leftSpeed);
-            rightSpeed = Math.min(Math.abs(rightSpeed), .35) * Math.signum(rightSpeed);
+            leftSpeed  = Math.min(Math.abs(leftSpeed), SPEED_LIMIT_SLOW) * Math.signum(leftSpeed);
+            rightSpeed = Math.min(Math.abs(rightSpeed), SPEED_LIMIT_SLOW) * Math.signum(rightSpeed);
+
+            // Limit extreme speed changes
+            limitAcceleration(MAX_ACCEL);
 
             // Watch out for sharp turns
             limitTurning(0.35);
         }
         else if (!armInsideFrame) {
 
+            // Limit extreme speed changes
+            limitAcceleration(MAX_ACCEL);
+
             // If the arm is not inside the frame, limit all turns to 0.5
             limitTurning(.35);
         }
 
         else {
+            // Limit extreme speed changes
+            limitAcceleration(MAX_ACCEL);
+
             // Always limit the turning to 1.0
             limitTurning(1.0);
+        }
+
+    }
+
+    /**
+     * Limit the acceleration of the left and right wheels to prevent
+     * the robot from slipping, tumbling, or popping a wheelie. The
+     * {@link #leftSpeed} and {@link #rightSpeed} are overridden by
+     * this method.
+     * @param maxAccel the maximum acceleration, in
+     * change-in-motor-speed-units per second
+     */
+    private void limitAcceleration(double maxAccel) {
+        double seconds = (double)(System.currentTimeMillis() - motorSpeedSetTime) / 1000;
+        double leftAccel = (leftSpeed - previousLeftSpeed)/seconds;
+        double rightAccel = (rightSpeed - previousRightSpeed)/seconds;
+
+        // reduce acceleration independently for each wheel.
+        if (Math.abs(leftAccel) > Math.abs(maxAccel)) {
+            leftSpeed = previousLeftSpeed * (Math.signum(leftAccel) * maxAccel) * seconds;
+        }
+        if (Math.abs(rightAccel) > Math.abs(maxAccel)) {
+            rightSpeed = previousRightSpeed * (Math.signum(rightAccel) * maxAccel) * seconds;
         }
 
     }
