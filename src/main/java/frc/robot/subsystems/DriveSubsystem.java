@@ -448,10 +448,10 @@ public class DriveSubsystem extends SubsystemBase {
 
         // reduce acceleration independently for each wheel.
         if (Math.abs(leftAccel) > Math.abs(maxAccel)) {
-            leftSpeed = previousLeftSpeed * (Math.signum(leftAccel) * maxAccel) * seconds;
+            leftSpeed = previousLeftSpeed - ((Math.signum(leftAccel) * maxAccel) * seconds);
         }
         if (Math.abs(rightAccel) > Math.abs(maxAccel)) {
-            rightSpeed = previousRightSpeed * (Math.signum(rightAccel) * maxAccel) * seconds;
+            rightSpeed = previousRightSpeed - ((Math.signum(rightAccel) * maxAccel) * seconds);
         }
 
     }
