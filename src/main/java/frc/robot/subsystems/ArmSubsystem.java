@@ -673,7 +673,7 @@ public class ArmSubsystem extends SubsystemBase {
     /**
      * Set the maximum acceleration of the arm extension in encoder-motor-speed/second.
      */
-    private static final double MAX_EXTEND_ACCEL = 10.0;
+    private static final double MAX_EXTEND_ACCEL = 5.0;
 
     private double getSafeExtendSpeed(double inputSpeed, double distanceAvailable) {
         double minStoppingDistance = Math.pow(inputSpeed, 2) / (2 * -MAX_EXTEND_ACCEL);
