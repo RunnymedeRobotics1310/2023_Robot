@@ -31,7 +31,7 @@ public class CalibratePincherCommand extends BaseArmCommand {
     public boolean isFinished() {
 
         if (armSubsystem.getArmLiftAngle() == ArmConstants.CLEAR_FRAME_ARM_ANGLE
-            && armSubsystem.isPincherOpen()) {
+            && (!armSubsystem.isPincherOpen())) {
             return true;
         }
         else {
