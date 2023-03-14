@@ -244,10 +244,10 @@ public final class Constants {
         /*
          * Scoring Constants
          */
-        public static final ArmPosition SCORE_TOP_CONE_POSITION             = new ArmPosition(100, 54);                  // Confirmed
+        public static final ArmPosition SCORE_TOP_CONE_POSITION             = new ArmPosition(97, 54);                  // Confirmed
         public static final ArmPosition SCORE_TOP_CUBE_POSITION             = new ArmPosition(90, 50);                   // Confirmed
 
-        public static final ArmPosition SCORE_MIDDLE_CONE_POSITION          = new ArmPosition(90, 7);                    // Confirmed
+        public static final ArmPosition SCORE_MIDDLE_CONE_POSITION          = new ArmPosition(85, 7);                    // Confirmed
         public static final ArmPosition SCORE_MIDDLE_CUBE_POSITION          = new ArmPosition(78, 13);                   // Confirmed
 
         public static final ArmPosition SCORE_BOTTOM_CONE_POSITION          = new ArmPosition(43, 7);                    // todo:
