@@ -20,7 +20,7 @@ public class BalanceCommand extends CommandBase {
 
     static final double          ADJUST_SPEED               = .01;
     static final double          CENTERING_SPEED            = .25;
-    static final double          CENTER_OF_GRAVITY_MOVEMENT = 4;    // cm
+    static final double          CENTER_OF_GRAVITY_MOVEMENT = 1;    // cm
     static final double          CENTERING_DELAY            = 1000; // ms
 
     static final double          LEVEL_THRESHOLD            = 2;
