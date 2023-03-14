@@ -6,6 +6,8 @@ import frc.robot.subsystems.ArmSubsystem;
 
 public class ReleaseCommand extends BaseArmCommand {
 
+    double startingPincherPosition = 0;
+
     public ReleaseCommand(ArmSubsystem armSubsystem) {
         super(armSubsystem);
     }
@@ -15,6 +17,7 @@ public class ReleaseCommand extends BaseArmCommand {
         System.out.println("ReleaseCommand started");
         printArmState();
 
+        startingPincherPosition = armSubsystem.getPincherEncoder();
     }
 
     @Override
@@ -26,7 +29,13 @@ public class ReleaseCommand extends BaseArmCommand {
 
     @Override
     public boolean isFinished() {
-        return !armSubsystem.isGamePieceDetected();
+
+        if (armSubsystem.isPincherOpen()) {
+            return true;
+        }
+
+        return armSubsystem.getPincherEncoder() < startingPincherPosition - 35
+            && !armSubsystem.isGamePieceDetected();
     }
 
     @Override

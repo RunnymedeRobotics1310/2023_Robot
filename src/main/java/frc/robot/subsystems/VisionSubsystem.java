@@ -9,6 +9,7 @@ import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -33,6 +34,7 @@ public class VisionSubsystem extends SubsystemBase {
     private static final long            PIPELINE_POST_DETECT          = 4;
 
     private static final LinearFilter    CONE_LOW_PASS_FILTER          = LinearFilter.singlePoleIIR(.1, .02);
+    private static final int             CAMERA_UP_LIMIT_SWITCH_PORT   = 1;
 
     NetworkTable                         table                         = NetworkTableInstance.getDefault().getTable("limelight");
 
@@ -67,6 +69,9 @@ public class VisionSubsystem extends SubsystemBase {
     private double                       cameraMotorSpeed              = 0;
 
     private double                       cameraEncoderOffset           = 0;
+
+    private DigitalInput                 cameraUpLimitSwitch           = new DigitalInput(
+        VisionSubsystem.CAMERA_UP_LIMIT_SWITCH_PORT);
 
     public VisionSubsystem() {
 
@@ -462,14 +467,10 @@ public class VisionSubsystem extends SubsystemBase {
             return;
         }
 
-        if (cameraInitializationStartTime == 0) {
-            cameraInitializationStartTime = System.currentTimeMillis();
-        }
-
+        // Drive up until the camera touches the limit
         cameraMotor.set(.3);
 
-        // End after 3 seconds, motor will be at hard stop
-        if ((System.currentTimeMillis() - cameraInitializationStartTime) > 3000) {
+        if (!cameraUpLimitSwitch.get()) {
 
             // Turn off the motor
             cameraMotor.set(0);
