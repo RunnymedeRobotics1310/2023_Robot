@@ -175,7 +175,7 @@ public final class Constants {
         public static final double      ARM_LIFT_ANGLE_TOLERANCE_DEGREES    = 2;
         public static final double      ARM_LIFT_SLOW_ZONE_DEGREES          = 5;
 
-        public static final double      CLEAR_FRAME_ARM_ANGLE               = 38;
+        public static final double      CLEAR_FRAME_ARM_ANGLE               = 34.1;
 
         /** Arm lift PID proportional gain */
         public static final double      ARM_LIFT_PID_P                      = 0.015;
