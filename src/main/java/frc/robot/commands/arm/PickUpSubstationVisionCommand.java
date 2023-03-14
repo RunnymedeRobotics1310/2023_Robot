@@ -7,31 +7,31 @@ import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.Constants.VisionConstants.VisionTarget;
 import frc.robot.commands.vision.SetVisionTargetCommand;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.*;
 
 public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
-    private static final double   MIN_PICKUP_DISTANCE             = 95;
-    private static final double   MAX_PICKUP_DISTANCE             = 115;
-    private static final double   TARGET_CAMERA_OFFSET            = 5;
-    private static final double   VISION_TARGET_HEADING_TOLERANCE = 1;
+    private static final double   MIN_PICKUP_DISTANCE              = 95;
+    private static final double   MAX_PICKUP_DISTANCE              = 115;
+    private static final double   TARGET_CAMERA_OFFSET             = 5;
+    private static final double   VISION_TARGET_HEADING_TOLERANCE  = 1;
 
     private final VisionSubsystem visionSubsystem;
     private final DriveSubsystem  driveSubsystem;
 
-    private double                requiredExtensionEncoderPosition;
+    private double                requiredExtensionEncoderPosition = 0;
+    private double                requiredArmAngle                 = 0;
+    private double                pauseStartTime                   = 0;
 
     /**
      * Only cone is supported for now.
      */
-    private GamePiece             gamePiece                       = GamePiece.CONE;
+    private GamePiece             gamePiece                        = GamePiece.CONE;
 
-    private double                visionTargetHeadingError        = 0;
+    private double                visionTargetHeadingError         = 0;
 
     private enum State {
-        MOVE_CAMERA_AND_GET_WITHIN_RANGE, ALIGN, PICKUP
+        MOVE_CAMERA_AND_GET_WITHIN_RANGE, ALIGN, PAUSE, EXTEND_ARM, PICKUP
     }
 
     private State currentState = State.MOVE_CAMERA_AND_GET_WITHIN_RANGE;
@@ -45,7 +45,6 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
         this.driveSubsystem  = driveSubsystem;
 
         addRequirements(driveSubsystem);
-        requiredExtensionEncoderPosition = 0;
     }
 
     @Override
@@ -76,7 +75,8 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
         case MOVE_CAMERA_AND_GET_WITHIN_RANGE: {
 
-            moveToScoringRange();
+            double speed = calcSpeedToScoringRange();
+            driveSubsystem.setMotorSpeeds(speed, speed);
 
             // Wait for the camera to get into position
             if (visionSubsystem.getCameraView() == CameraView.HIGH) {
@@ -99,7 +99,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
                 visionTargetHeadingError = visionSubsystem.getTargetAngleOffset();
             }
 
-            double speed = moveToScoringRange();
+            double speed = calcSpeedToScoringRange();
 
             alignToVisionTarget(speed);
 
@@ -109,10 +109,9 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
                 // Stop the motors
                 driveSubsystem.setMotorSpeeds(0, 0);
 
-                // Set the required extension distance based on the following formula
-                requiredExtensionEncoderPosition = ultrasonicDistanceCm * .88 - 53.1;
+                pauseStartTime = System.currentTimeMillis();
 
-                currentState                     = State.PICKUP;
+                currentState   = State.PAUSE;
             }
 
             // Wait for target and distance alignment
@@ -120,7 +119,34 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
         }
 
-        case PICKUP:
+        case PAUSE:
+
+            // Stop the motors
+            driveSubsystem.setMotorSpeeds(0, 0);
+
+            // Wait 250 ms for the base to stop moving and for the ultrasonic to settle.
+            if (System.currentTimeMillis() - pauseStartTime > 250) {
+
+                // Set the required extension distance based on the following formula
+                requiredExtensionEncoderPosition = ultrasonicDistanceCm * .88 - 53.1;
+
+                double pickupAngle = ArmConstants.SUBSTATION_PICKUP_POSITION.angle;
+
+                // tweak the angle slightly higher if closer to the substation. The range of
+                // distances is 75-115 cm.
+                // NOTE: This calculation must be done before raising the arm in the way.
+
+                pickupAngle      += (115 - ultrasonicDistanceCm) / 12d;
+
+                requiredArmAngle  = pickupAngle;
+
+                currentState      = State.EXTEND_ARM;
+            }
+
+            return;
+
+
+        case EXTEND_ARM:
 
             /*
              * Special logic to make sure the arm comes up over the frame when extending.
@@ -144,16 +170,24 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
             // Always open the pincher, there is no point in waiting
             openPincher();
 
-            if (moveArmLiftToAngle(ArmConstants.SUBSTATION_PICKUP_POSITION.angle)) {
-
+            if (moveArmLiftToAngle(requiredArmAngle)) {
 
                 if (moveArmExtendToEncoderCount(requiredExtensionEncoderPosition, ArmConstants.MAX_EXTEND_SPEED)) {
 
-                    if (armSubsystem.isGamePieceDetected()) {
-                        movePincherToEncoderCount(gamePiece.pincherEncoderCount);
-                    }
+                    currentState = State.PICKUP;
                 }
             }
+
+            return;
+
+        case PICKUP:
+
+            movePincherToEncoderCount(gamePiece.pincherEncoderCount);
+
+            return;
+
+        default:
+            return;
         }
 
     }
@@ -163,6 +197,11 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
         // If holding the required piece
         if (armSubsystem.getHeldGamePiece() == gamePiece) {
+            return true;
+        }
+
+        // If the pincher is closed the command ends even if there is no game piece
+        if (armSubsystem.isAtPincherPosition(gamePiece.pincherEncoderCount)) {
             return true;
         }
 
@@ -185,17 +224,11 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
         // In Teleop, pick the next command
         if (DriverStation.isTeleopEnabled()) {
 
-            if (armSubsystem.isGamePieceDetected()) {
-                CommandScheduler.getInstance().schedule(new PickupGamePieceCommand(gamePiece, armSubsystem));
-            }
-            else {
-                CommandScheduler.getInstance().schedule(new CompactCommand(armSubsystem));
-            }
-
+            CommandScheduler.getInstance().schedule(new PickupGamePieceCommand(gamePiece, armSubsystem));
         }
     }
 
-    private double moveToScoringRange() {
+    private double calcSpeedToScoringRange() {
 
         // Move forward or backwards until the distance is in range
         // Scoring can only happen between 75 and 115

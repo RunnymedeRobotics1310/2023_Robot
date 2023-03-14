@@ -19,58 +19,57 @@ import frc.robot.Constants.VisionConstants.VisionTarget;
 
 public class VisionSubsystem extends SubsystemBase {
 
-    private static final long            LED_MODE_PIPELINE             = 0;
-    private static final long            LED_MODE_OFF                  = 1;
-    private static final long            LED_MODE_BLINK                = 2;
-    private static final long            LED_MODE_ON                   = 3;
+    private static final long            LED_MODE_PIPELINE           = 0;
+    private static final long            LED_MODE_OFF                = 1;
+    private static final long            LED_MODE_BLINK              = 2;
+    private static final long            LED_MODE_ON                 = 3;
 
-    private static final long            CAM_MODE_VISION               = 0;
-    private static final long            CAM_MODE_DRIVER               = 1;
+    private static final long            CAM_MODE_VISION             = 0;
+    private static final long            CAM_MODE_DRIVER             = 1;
 
     // configure more pipelines here
-    private static final long            PIPELINE_CONE_DETECT          = 0;
-    private static final long            PIPELINE_CUBE_DETECT          = 1;
-    private static final long            PIPELINE_APRIL_TAG_DETECT     = 3;
-    private static final long            PIPELINE_POST_DETECT          = 4;
+    private static final long            PIPELINE_CONE_DETECT        = 0;
+    private static final long            PIPELINE_CUBE_DETECT        = 1;
+    private static final long            PIPELINE_APRIL_TAG_DETECT   = 3;
+    private static final long            PIPELINE_POST_DETECT        = 4;
 
-    private static final LinearFilter    CONE_LOW_PASS_FILTER          = LinearFilter.singlePoleIIR(.1, .02);
-    private static final int             CAMERA_UP_LIMIT_SWITCH_PORT   = 1;
+    private static final LinearFilter    CONE_LOW_PASS_FILTER        = LinearFilter.singlePoleIIR(.1, .02);
+    private static final int             CAMERA_UP_LIMIT_SWITCH_PORT = 1;
 
-    NetworkTable                         table                         = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTable                         table                       = NetworkTableInstance.getDefault().getTable("limelight");
 
     // inputs/configs
-    NetworkTableEntry                    ledMode                       = table.getEntry("ledMode");
-    NetworkTableEntry                    camMode                       = table.getEntry("camMode");
-    NetworkTableEntry                    pipeline                      = table.getEntry("pipeline");
+    NetworkTableEntry                    ledMode                     = table.getEntry("ledMode");
+    NetworkTableEntry                    camMode                     = table.getEntry("camMode");
+    NetworkTableEntry                    pipeline                    = table.getEntry("pipeline");
 
     // output
-    NetworkTableEntry                    tv                            = table.getEntry("tv");
-    NetworkTableEntry                    tx                            = table.getEntry("tx");
-    NetworkTableEntry                    ty                            = table.getEntry("ty");
-    NetworkTableEntry                    ta                            = table.getEntry("ta");
-    NetworkTableEntry                    tl                            = table.getEntry("tl");
+    NetworkTableEntry                    tv                          = table.getEntry("tv");
+    NetworkTableEntry                    tx                          = table.getEntry("tx");
+    NetworkTableEntry                    ty                          = table.getEntry("ty");
+    NetworkTableEntry                    ta                          = table.getEntry("ta");
+    NetworkTableEntry                    tl                          = table.getEntry("tl");
 
-    private boolean                      isCameraPositionInitialized   = false;
-    private long                         cameraInitializationStartTime = 0;
+    private boolean                      isCameraPositionInitialized = false;
 
-    private VisionConstants.VisionTarget currentVisionTarget           = NONE;
+    private VisionConstants.VisionTarget currentVisionTarget         = NONE;
 
-    private double                       filteredConeAngle             = 0;
+    private double                       filteredConeAngle           = 0;
 
     /*
      * Camera motor and encoder
      */
-    private final CANSparkMax            cameraMotor                   = new CANSparkMax(VisionConstants.CAMERA_ANGLE_MOTOR_PORT,
+    private final CANSparkMax            cameraMotor                 = new CANSparkMax(VisionConstants.CAMERA_ANGLE_MOTOR_PORT,
         MotorType.kBrushless);
 
     // Arm lift encoder
-    private final RelativeEncoder        cameraEncoder                 = cameraMotor.getEncoder();
+    private final RelativeEncoder        cameraEncoder               = cameraMotor.getEncoder();
 
-    private double                       cameraMotorSpeed              = 0;
+    private double                       cameraMotorSpeed            = 0;
 
-    private double                       cameraEncoderOffset           = 0;
+    private double                       cameraEncoderOffset         = 0;
 
-    private DigitalInput                 cameraUpLimitSwitch           = new DigitalInput(
+    private DigitalInput                 cameraUpLimitSwitch         = new DigitalInput(
         VisionSubsystem.CAMERA_UP_LIMIT_SWITCH_PORT);
 
     public VisionSubsystem() {
@@ -372,6 +371,7 @@ public class VisionSubsystem extends SubsystemBase {
         SmartDashboard.putString("Camera view", getCameraView().toString());
         SmartDashboard.putNumber("Camera Motor Speed", cameraMotorSpeed);
         SmartDashboard.putNumber("Camera Encoder", Math.round(getCameraEncoder() * 100) / 100d);
+        SmartDashboard.putBoolean("Camera Upper Limit", getCameraUpperLimitSwitch());
 
         SmartDashboard.putNumber("Cone Angle Filtered", filteredConeAngle);
     }
@@ -470,21 +470,26 @@ public class VisionSubsystem extends SubsystemBase {
         // Drive up until the camera touches the limit
         cameraMotor.set(.3);
 
-        if (!cameraUpLimitSwitch.get()) {
+        if (getCameraUpperLimitSwitch()) {
 
             // Turn off the motor
             cameraMotor.set(0);
+
             // Initialize the encoder so that zero is slightly down from the hard stop.
-            cameraEncoder.setPosition(2);
+            setCameraEncoderPosition(10);
 
             isCameraPositionInitialized = true;
         }
+    }
+
+    private boolean getCameraUpperLimitSwitch() {
+        return !cameraUpLimitSwitch.get();
     }
 
     /**
      * Set the camera encoder to the supplied position
      */
     private void setCameraEncoderPosition(double cameraEncoderPosition) {
-        cameraEncoderOffset = -cameraEncoder.getPosition();
+        cameraEncoderOffset = cameraEncoderPosition - cameraEncoder.getPosition();
     }
 }
