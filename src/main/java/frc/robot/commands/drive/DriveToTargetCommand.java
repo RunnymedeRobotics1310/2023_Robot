@@ -9,10 +9,22 @@ import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.VisionTarget;
 import frc.robot.commands.vision.SetVisionTargetCommand;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class DriveToTargetCommand extends CommandBase {
+
+    private static final List<VisionTarget> SUPPORTED_DRIVE_TARGETS = Arrays.asList(
+        VisionTarget.CONE_GROUND,
+        VisionTarget.CUBE_GROUND,
+        VisionTarget.APRILTAG_GRID,
+        VisionTarget.POST_HIGH,
+        VisionTarget.POST_LOW
+    );
 
     final double                               factor                 = 0.01;
 
@@ -20,6 +32,7 @@ public class DriveToTargetCommand extends CommandBase {
 
     private final DriveSubsystem               driveSubsystem;
     private final VisionSubsystem              visionSubsystem;
+    private final ArmSubsystem                 armSubsystem;
 
     private final VisionConstants.VisionTarget target;
 
@@ -43,8 +56,8 @@ public class DriveToTargetCommand extends CommandBase {
      * @param visionSubsystem
      */
     public DriveToTargetCommand(VisionConstants.VisionTarget target, double speed,
-        DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
-        this(target, speed, Constants.DEFAULT_COMMAND_TIMEOUT_SECONDS, driveSubsystem, visionSubsystem);
+        DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem, ArmSubsystem armSubsystem) {
+        this(target, speed, Constants.DEFAULT_COMMAND_TIMEOUT_SECONDS, driveSubsystem, visionSubsystem, armSubsystem);
     }
 
     /**
@@ -56,13 +69,14 @@ public class DriveToTargetCommand extends CommandBase {
      * @param visionSubsystem
      */
     public DriveToTargetCommand(VisionTarget target, double speed, double timeoutSeconds,
-        DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
+        DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem, ArmSubsystem armSubsystem) {
 
         this.target          = target;
         this.speed           = speed;
         this.timeoutSeconds  = timeoutSeconds;
         this.driveSubsystem  = driveSubsystem;
         this.visionSubsystem = visionSubsystem;
+        this.armSubsystem    = armSubsystem;
 
         addRequirements(driveSubsystem);
 
@@ -77,6 +91,12 @@ public class DriveToTargetCommand extends CommandBase {
             + ", timeout " + timeoutSeconds);
 
         initializeTime = System.currentTimeMillis();
+
+        if (!SUPPORTED_DRIVE_TARGETS.contains(target)) {
+            System.out.println("Cannot drive to target "+target+". Cancelling.");
+            this.cancel();
+            return;
+        }
 
         if (visionSubsystem.getCurrentVisionTarget() != target) {
             targetDelaySec = VisionConstants.VISION_SWITCH_TIME_SEC;
@@ -162,31 +182,20 @@ public class DriveToTargetCommand extends CommandBase {
             return true;
         }
 
-        // Stop when the claw detects the cube.
-        // FIXME: The detector should be in the claw subsystem.
-        // if (driveSubsystem.isTargetDetected() || visionSubsystem.isVisionTargetClose()) {
-        // return true;
-        // }
-
         double targetArea = visionSubsystem.getTargetAreaPercent();
         switch (target) {
         case CONE_GROUND:
-        case CONE_SUBSTATION:
-            if (targetArea >= 20) {
-                return true;
-            }
-            break;
         case CUBE_GROUND:
-        case CUBE_SUBSTATION:
-            if (targetArea >= 60) {
-                return true;
-            }
-            break;
+            return armSubsystem.isGamePieceDetected();
         case APRILTAG_GRID:
             if (targetArea >= 5) {
                 return true;
             }
             break;
+        case POST_HIGH:
+        case POST_LOW:
+            System.out.println("Not yet supported");
+            return true;
         default:
             System.out.println("Don't know how to drive to target " + target);
             break;

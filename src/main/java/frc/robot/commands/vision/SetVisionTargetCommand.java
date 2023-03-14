@@ -22,44 +22,17 @@ public class SetVisionTargetCommand extends CommandBase {
 
         System.out.println("SetVisionTargetCommand started, target vision target : " + target);
 
-        visionSubsystem.setVisionTarget(target);
-
         if (!(target.getCameraView() == Constants.VisionConstants.CameraView.HIGH
             || target.getCameraView() == Constants.VisionConstants.CameraView.LOW)) {
 
             // Only HIGH or LOW are valid for this command, otherwise cancel
-            visionSubsystem.setCameraMotorSpeed(0);
             System.out.println("ConfigureCameraCommand: unsupported camera view: " + target.getCameraView() + ". Cancelling.");
             this.cancel();
 
             return;
         }
 
-    }
-
-    @Override
-    public void execute() {
-
-        Constants.VisionConstants.CameraView currentCameraView = visionSubsystem.getCameraView();
-
-        if (currentCameraView == target.getCameraView()) {
-
-            // Camera is already in position.
-            visionSubsystem.setCameraMotorSpeed(0);
-
-        }
-        else if (target.getCameraView() == Constants.VisionConstants.CameraView.HIGH) {
-
-            // Run the motor forward to raise the camera view
-            visionSubsystem.setCameraMotorSpeed(Constants.VisionConstants.MAX_CAMERA_MOTOR_SPEED);
-
-        }
-        else {
-
-            // Run the motor in reverse to lower the camera view
-            visionSubsystem.setCameraMotorSpeed(-Constants.VisionConstants.MAX_CAMERA_MOTOR_SPEED);
-
-        }
+        visionSubsystem.setVisionTarget(target);
     }
 
     @Override
