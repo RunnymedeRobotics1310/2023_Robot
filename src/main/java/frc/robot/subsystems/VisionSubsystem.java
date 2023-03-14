@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.CameraView;
+import frc.robot.Constants.VisionConstants.VisionTarget;
 
 public class VisionSubsystem extends SubsystemBase {
 
@@ -145,6 +146,17 @@ public class VisionSubsystem extends SubsystemBase {
 
         if (!isVisionTargetFound()) {
             return 0;
+        }
+
+        // Return the angle offset based on a the target
+        if (getCurrentVisionTarget() == VisionTarget.CUBE_GROUND) {
+
+            // CUBE offset measurements.
+
+            // At a y value of +17, the x offset is +7
+            // At a y value of -14, the x offset is +10
+
+            return getTargetX() - 10 + (14 + getTargetY()) / 10;
         }
 
         // FIXME: return the filtered cone value if a cone.
@@ -376,6 +388,24 @@ public class VisionSubsystem extends SubsystemBase {
         d[0] = tx.getDouble(-1.0);
         d[1] = ty.getDouble(-1.0);
         return d;
+    }
+
+    /**
+     * Get the limelight X angle measurement to the target.
+     *
+     * @return limelight X target coordinates
+     */
+    private double getTargetX() {
+        return tx.getDouble(-1.0);
+    }
+
+    /**
+     * Get the limelight Y angle measurement to the target.
+     *
+     * @return limelight Y target coordinates
+     */
+    private double getTargetY() {
+        return ty.getDouble(-1.0);
     }
 
     /**
