@@ -17,64 +17,64 @@ import frc.robot.Constants.DriveConstants;
 public class DriveSubsystem extends SubsystemBase {
 
     // The motors on the left side of the drive.
-    private final CANSparkMax leftPrimaryMotor = new CANSparkMax(DriveConstants.LEFT_MOTOR_PORT,
+    private final CANSparkMax     leftPrimaryMotor         = new CANSparkMax(DriveConstants.LEFT_MOTOR_PORT,
         MotorType.kBrushless);
 
-    private final CANSparkMax leftFollowerMotor = new CANSparkMax(DriveConstants.LEFT_MOTOR_PORT + 1,
+    private final CANSparkMax     leftFollowerMotor        = new CANSparkMax(DriveConstants.LEFT_MOTOR_PORT + 1,
         MotorType.kBrushless);
 
     // The motors on the right side of the drive.
-    private final CANSparkMax rightPrimaryMotor = new CANSparkMax(DriveConstants.RIGHT_MOTOR_PORT,
+    private final CANSparkMax     rightPrimaryMotor        = new CANSparkMax(DriveConstants.RIGHT_MOTOR_PORT,
         MotorType.kBrushless);
 
-    private final CANSparkMax rightFollowerMotor = new CANSparkMax(DriveConstants.RIGHT_MOTOR_PORT + 1,
+    private final CANSparkMax     rightFollowerMotor       = new CANSparkMax(DriveConstants.RIGHT_MOTOR_PORT + 1,
         MotorType.kBrushless);
 
-    private double leftSpeed  = 0;
-    private double rightSpeed = 0;
+    private double                leftSpeed                = 0;
+    private double                rightSpeed               = 0;
 
-    private IdleMode idleMode = null;
+    private IdleMode              idleMode                 = null;
 
     // Encoders
-    private final RelativeEncoder leftEncoder  = leftPrimaryMotor.getEncoder();
-    private final RelativeEncoder rightEncoder = rightPrimaryMotor.getEncoder();
+    private final RelativeEncoder leftEncoder              = leftPrimaryMotor.getEncoder();
+    private final RelativeEncoder rightEncoder             = rightPrimaryMotor.getEncoder();
 
-    private double leftEncoderOffset  = 0;
-    private double rightEncoderOffset = 0;
+    private double                leftEncoderOffset        = 0;
+    private double                rightEncoderOffset       = 0;
 
     // Conversion from volts to distance in cm
     // Volts distance
     // 0.12 30.5 cm
     // 2.245 609.6 cm
-    private final AnalogInput ultrasonicDistanceSensor = new AnalogInput(0);
+    private final AnalogInput     ultrasonicDistanceSensor = new AnalogInput(0);
 
-    private final double ULTRASONIC_M = (609.6 - 30.5) / (2.245 - .12);
-    private final double ULTRASONIC_B = 609.6 - ULTRASONIC_M * 2.245;
+    private final double          ULTRASONIC_M             = (609.6 - 30.5) / (2.245 - .12);
+    private final double          ULTRASONIC_B             = 609.6 - ULTRASONIC_M * 2.245;
 
     /*
      * Gyro
      */
-    private AHRS navXGyro = new AHRS() {
-        // Override the "Value" in the gyro
-        // sendable to use the angle instead
-        // of
-        // the yaw.
-        // Using the angle makes the gyro
-        // appear
-        // in the correct position accounting
-        // for the
-        // offset. The yaw is the raw sensor
-        // value which appears incorrectly on
-        // the dashboard.
-        @Override
-        public void initSendable(SendableBuilder builder) {
-            builder.setSmartDashboardType("Gyro");
-            builder.addDoubleProperty("Value", this::getAngle, null);
-        }
-    };
+    private AHRS                  navXGyro                 = new AHRS() {
+                                                               // Override the "Value" in the gyro
+                                                               // sendable to use the angle instead
+                                                               // of
+                                                               // the yaw.
+                                                               // Using the angle makes the gyro
+                                                               // appear
+                                                               // in the correct position accounting
+                                                               // for the
+                                                               // offset. The yaw is the raw sensor
+                                                               // value which appears incorrectly on
+                                                               // the dashboard.
+                                                               @Override
+                                                               public void initSendable(SendableBuilder builder) {
+                                                                   builder.setSmartDashboardType("Gyro");
+                                                                   builder.addDoubleProperty("Value", this::getAngle, null);
+                                                               }
+                                                           };
 
-    private double gyroHeadingOffset = 0;
-    private double gyroPitchOffset   = 0;
+    private double                gyroHeadingOffset        = 0;
+    private double                gyroPitchOffset          = 0;
 
     private enum GyroAxis {
         YAW, PITCH, ROLL
@@ -277,7 +277,7 @@ public class DriveSubsystem extends SubsystemBase {
 
         double ultrasonicVoltage = ultrasonicDistanceSensor.getVoltage();
 
-        double distanceCm = ULTRASONIC_M * ultrasonicVoltage + ULTRASONIC_B;
+        double distanceCm        = ULTRASONIC_M * ultrasonicVoltage + ULTRASONIC_B;
 
         return Math.round(distanceCm);
     }
@@ -376,7 +376,7 @@ public class DriveSubsystem extends SubsystemBase {
         // Determine if the arm is inside the robot
         boolean armInsideFrame = armSubsystem.isArmInsideFrame();
 
-        if (!armSubsystem.isArmRetracted() && !armInsideFrame && DriverStation.isTeleopEnabled()) {
+        if (armSubsystem.getArmExtendEncoder() >= 10 && DriverStation.isTeleopEnabled()) {
 
             // Limit each side to 0.25
 

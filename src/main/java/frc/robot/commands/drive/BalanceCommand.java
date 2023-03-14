@@ -71,7 +71,7 @@ public class BalanceCommand extends CommandBase {
          */
         double pitch = driveSubsystem.getPitch();
 
-        // Balance if within 4 degrees. FIXME: 4 deg may not be the right number?
+        // Balance if within 4 degrees. FIXME: 4 deg may not be the right number? not tested
         if (Math.abs(pitch) > 4) {
             currentState = State.CLIMB;
         }
@@ -139,8 +139,13 @@ public class BalanceCommand extends CommandBase {
 
 
         case BALANCE:
-            // FIXME: try to balance after re-centering
             setPitchSpeed(pitch);
+
+            // if angle is too big, we
+            // can't balance with BALANCE
+            if (Math.abs(pitch) > 8) {
+                currentState = State.CLIMB;
+            }
             break;
         }
 
@@ -156,9 +161,6 @@ public class BalanceCommand extends CommandBase {
 
         // Track the gyro pitch.
         double pitch = driveSubsystem.getPitch();
-
-        // FIXME: Only finish when it has been still for a couple of seconds. Instantaneous 0 is too
-        // soon, because the charger may be in the middle of passing through 0 while rocking.
 
         // Not level
         if (Math.abs(pitch) > LEVEL_THRESHOLD) {
