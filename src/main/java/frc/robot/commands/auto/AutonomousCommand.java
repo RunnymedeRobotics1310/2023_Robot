@@ -1,12 +1,15 @@
 package frc.robot.commands.auto;
 
+import static frc.robot.Constants.VisionConstants.VisionTarget.APRILTAG_GRID;
+import static frc.robot.Constants.VisionConstants.VisionTarget.CONE_GROUND;
+import static frc.robot.Constants.VisionConstants.VisionTarget.CUBE_GROUND;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants.AutoAction;
 import frc.robot.Constants.AutoConstants.AutoLane;
 import frc.robot.Constants.AutoConstants.Orientation;
@@ -26,8 +29,6 @@ import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
-
-import static frc.robot.Constants.VisionConstants.VisionTarget.*;
 
 public class AutonomousCommand extends SequentialCommandGroup {
 
@@ -155,10 +156,6 @@ public class AutonomousCommand extends SequentialCommandGroup {
 
         if (currentOrientation == Orientation.FACE_GRID) {
 
-            // FIXME:
-            // Set the arm position (different positions required for cone or cube
-            // Drive forward?
-            // Drop the piece
             switch (currentGamePiece) {
             case CUBE:
                 // Robot is holding a cube in the gripper, set pincher to CUBE distance
@@ -326,7 +323,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
             return;
         }
 
-        // Drive to the platform from community
+        // Drive to the platform from community facing grid
         if (currentZone == Zone.COMMUNITY && currentOrientation == Orientation.FACE_GRID) {
             if ((alliance == Alliance.Red && startingLane == AutoLane.BOTTOM)
                 || (alliance == Alliance.Blue && startingLane == AutoLane.TOP)) {
@@ -350,33 +347,34 @@ public class AutonomousCommand extends SequentialCommandGroup {
             }
         }
         else if (currentZone == Zone.FIELD && currentOrientation == Orientation.FACE_FIELD) { // Drive to the platform from field
+                                                                                              // facing field
             if ((alliance == Alliance.Red && startingLane == AutoLane.BOTTOM)
                 || (alliance == Alliance.Blue && startingLane == AutoLane.TOP)) {
 
                 System.out.println("Balance Red/Bot or Blue/Top");
                 addCommands(new DriveOnHeadingCommand(90, .3, 180, driveSubsystem));
-                addCommands(new DriveOnHeadingCommand(180, .3, 180, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 230, driveSubsystem));
             }
             else if ((alliance == Alliance.Red && startingLane == AutoLane.TOP)
                 || (alliance == Alliance.Blue && startingLane == AutoLane.BOTTOM)) {
 
                 System.out.println("Balance Red/Top or Blue/Bottom");
                 addCommands(new DriveOnHeadingCommand(270, .3, 180, driveSubsystem));
-                addCommands(new DriveOnHeadingCommand(180, .3, 180, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 230, driveSubsystem));
             }
             else {
                 System.out.println("Balance Mid");
-                addCommands(new DriveOnHeadingCommand(180, .3, 180, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 230, driveSubsystem));
             }
         }
-        else if (currentZone == Zone.FIELD && currentOrientation == Orientation.FACE_GRID) {
+        else if (currentZone == Zone.FIELD && currentOrientation == Orientation.FACE_GRID) { // from field facing grid
             if ((alliance == Alliance.Red && startingLane == AutoLane.BOTTOM)
                 || (alliance == Alliance.Blue && startingLane == AutoLane.TOP)) {
 
                 System.out.println("Balance Red/Bot or Blue/Top");
                 addCommands(new DriveOnHeadingCommand(135, .1, 1, driveSubsystem));
                 addCommands(new DriveOnHeadingCommand(90, .3, 180, driveSubsystem));
-                addCommands(new DriveOnHeadingCommand(180, .3, 180, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 230, driveSubsystem));
             }
             else if ((alliance == Alliance.Red && startingLane == AutoLane.TOP)
                 || (alliance == Alliance.Blue && startingLane == AutoLane.BOTTOM)) {
@@ -384,11 +382,11 @@ public class AutonomousCommand extends SequentialCommandGroup {
                 System.out.println("Balance Red/Top or Blue/Bottom");
                 addCommands(new DriveOnHeadingCommand(135, .1, 1, driveSubsystem));
                 addCommands(new DriveOnHeadingCommand(270, .3, 180, driveSubsystem));
-                addCommands(new DriveOnHeadingCommand(180, .3, 180, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 230, driveSubsystem));
             }
             else {
                 System.out.println("Balance Mid");
-                addCommands(new DriveOnHeadingCommand(180, .3, 180, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 230, driveSubsystem));
             }
         }
 
