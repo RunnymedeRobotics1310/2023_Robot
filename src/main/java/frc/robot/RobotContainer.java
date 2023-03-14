@@ -18,6 +18,8 @@ import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.OiConstants;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.SystemTestCommand;
+import frc.robot.commands.arm.CalibratePincherCommand;
+import frc.robot.commands.arm.CompactCommand;
 import frc.robot.commands.arm.DefaultArmCommand;
 import frc.robot.commands.arm.PickUpSubstationVisionCommand;
 import frc.robot.commands.arm.ReleaseCommand;
@@ -179,6 +181,10 @@ public class RobotContainer {
 
         new Trigger(() -> (operatorInput.balance()))
             .onTrue(new BalanceCommand(driveSubsystem));
+
+        new Trigger(() -> (operatorInput.calibratePincher()))
+            .onTrue(new CalibratePincherCommand(armSubsystem)
+                .andThen(new CompactCommand(armSubsystem)));
 
         new Trigger(() -> (operatorInput.isVisionSubstationConePickup()))
             .onTrue(new PickUpSubstationVisionCommand(armSubsystem, driveSubsystem, visionSubsystem));

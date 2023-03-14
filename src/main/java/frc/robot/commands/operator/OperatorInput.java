@@ -157,6 +157,10 @@ public class OperatorInput {
         return operatorController.getPOV() == 180;
     }
 
+    public boolean calibratePincher() {
+        return operatorController.getPOV() == 270;
+    }
+
     /**
      * return the raw underlying {@link RunnymedeGameController}. ONLY FOR USE IN TEST MODE.
      */
