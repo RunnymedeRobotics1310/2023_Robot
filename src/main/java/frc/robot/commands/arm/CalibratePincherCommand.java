@@ -1,6 +1,5 @@
 package frc.robot.commands.arm;
 
-import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.ArmSubsystem;
 
 public class CalibratePincherCommand extends BaseArmCommand {
@@ -21,7 +20,7 @@ public class CalibratePincherCommand extends BaseArmCommand {
     public void execute() {
 
         // raise arm and open claw
-        if (moveArmLiftToAngle(ArmConstants.CLEAR_FRAME_ARM_ANGLE)) {
+        if (moveArmLiftToAngle(40)) {
             openPincher();
         }
 
@@ -30,8 +29,7 @@ public class CalibratePincherCommand extends BaseArmCommand {
     @Override
     public boolean isFinished() {
 
-        if (armSubsystem.getArmLiftAngle() == ArmConstants.CLEAR_FRAME_ARM_ANGLE
-            && armSubsystem.isPincherOpen()) {
+        if (armSubsystem.isPincherOpen()) {
             return true;
         }
         else {
