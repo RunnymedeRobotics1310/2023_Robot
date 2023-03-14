@@ -50,12 +50,15 @@ public class DefaultDriveCommand extends CommandBase {
 
         double  leftSpeed = 0, rightSpeed = 0;
 
-        if (!boost) {
+        if (slow){
+            speed = speed/5;
+            turn = turn/5;
+        }
+
+        else if (!boost) {
             speed = speed / 2;
         }
-        else if (slow) {
-            speed = speed / 5;
-        }
+
         else {
             speed = Math.signum(speed);
         }
