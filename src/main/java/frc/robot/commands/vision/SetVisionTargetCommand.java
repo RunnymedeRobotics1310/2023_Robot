@@ -4,12 +4,12 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.VisionSubsystem;
 
-public class ConfigureCameraCommand extends CommandBase {
+public class SetVisionTargetCommand extends CommandBase {
 
     private final VisionSubsystem                        visionSubsystem;
     private final Constants.VisionConstants.VisionTarget target;
 
-    public ConfigureCameraCommand(Constants.VisionConstants.VisionTarget target, VisionSubsystem visionSubsystem) {
+    public SetVisionTargetCommand(Constants.VisionConstants.VisionTarget target, VisionSubsystem visionSubsystem) {
 
         this.visionSubsystem = visionSubsystem;
         this.target          = target;
@@ -20,14 +20,9 @@ public class ConfigureCameraCommand extends CommandBase {
     @Override
     public void initialize() {
 
-        System.out.println("ConfigureCameraCommand started, target vision target : " + target);
+        System.out.println("SetVisionTargetCommand started, target vision target : " + target);
+
         visionSubsystem.setVisionTarget(target);
-    }
-
-    @Override
-    public void execute() {
-
-        Constants.VisionConstants.CameraView currentCameraView = visionSubsystem.getCameraView();
 
         if (!(target.getCameraView() == Constants.VisionConstants.CameraView.HIGH
             || target.getCameraView() == Constants.VisionConstants.CameraView.LOW)) {
@@ -37,8 +32,17 @@ public class ConfigureCameraCommand extends CommandBase {
             System.out.println("ConfigureCameraCommand: unsupported camera view: " + target.getCameraView() + ". Cancelling.");
             this.cancel();
 
+            return;
         }
-        else if (currentCameraView == target.getCameraView()) {
+
+    }
+
+    @Override
+    public void execute() {
+
+        Constants.VisionConstants.CameraView currentCameraView = visionSubsystem.getCameraView();
+
+        if (currentCameraView == target.getCameraView()) {
 
             // Camera is already in position.
             visionSubsystem.setCameraMotorSpeed(0);

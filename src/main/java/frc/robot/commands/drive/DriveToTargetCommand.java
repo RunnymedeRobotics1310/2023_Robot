@@ -2,30 +2,34 @@
 
 package frc.robot.commands.drive;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.Constants.VisionConstants.VisionTarget;
+import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 public class DriveToTargetCommand extends CommandBase {
 
-    final double                   factor                 = 0.01;
+    final double                               factor                 = 0.01;
 
-    private final double           speed, timeoutSeconds;
+    private final double                       speed, timeoutSeconds;
 
-    private final DriveSubsystem   driveSubsystem;
-    private final VisionSubsystem  visionSubsystem;
+    private final DriveSubsystem               driveSubsystem;
+    private final VisionSubsystem              visionSubsystem;
 
     private final VisionConstants.VisionTarget target;
 
-    private long                   initializeTime         = 0;
+    private long                               initializeTime         = 0;
 
-    private double                 targetDelaySec         = 0;
+    private double                             targetDelaySec         = 0;
 
-    private boolean                targetFound            = false;
+    private boolean                            targetFound            = false;
 
-    private double                 lastKnownTargetHeading = 0;
+    private double                             lastKnownTargetHeading = 0;
 
     /**
      * Drive to a cube vision target. If this command does not find a cube vision target,
@@ -51,7 +55,7 @@ public class DriveToTargetCommand extends CommandBase {
      * @param driveSubsystem
      * @param visionSubsystem
      */
-    public DriveToTargetCommand(VisionConstants.VisionTarget target, double speed, double timeoutSeconds,
+    public DriveToTargetCommand(VisionTarget target, double speed, double timeoutSeconds,
         DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
 
         this.target          = target;
@@ -60,7 +64,7 @@ public class DriveToTargetCommand extends CommandBase {
         this.driveSubsystem  = driveSubsystem;
         this.visionSubsystem = visionSubsystem;
 
-        addRequirements(driveSubsystem, visionSubsystem);
+        addRequirements(driveSubsystem);
 
     }
 
@@ -76,7 +80,7 @@ public class DriveToTargetCommand extends CommandBase {
 
         if (visionSubsystem.getCurrentVisionTarget() != target) {
             targetDelaySec = VisionConstants.VISION_SWITCH_TIME_SEC;
-            visionSubsystem.setVisionTarget(target);
+            setVisionTarget(target);
         }
         else {
             targetDelaySec = 0;
@@ -212,4 +216,13 @@ public class DriveToTargetCommand extends CommandBase {
         // Stop the robot
         driveSubsystem.setMotorSpeeds(0, 0);
     }
+
+    private void setVisionTarget(VisionTarget target) {
+
+        if (DriverStation.isTeleopEnabled()) {
+
+            CommandScheduler.getInstance().schedule(new SetVisionTargetCommand(target, visionSubsystem));
+        }
+    }
+
 }

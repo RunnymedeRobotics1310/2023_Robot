@@ -35,11 +35,6 @@ public class DefaultVisionCommand extends CommandBase {
     @Override
     public void execute() {
 
-        // zero the encoders if required
-        if (driverController.isVisionReset()) {
-            visionSubsystem.setCameraEncoderPosition(0);
-        }
-
         visionSubsystem.setCameraMotorSpeed(driverController.getCameraMotorSpeed());
     }
 

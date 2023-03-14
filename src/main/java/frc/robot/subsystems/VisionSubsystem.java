@@ -1,13 +1,22 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.VisionConstants.VisionTarget.*;
+import static frc.robot.Constants.VisionConstants.VisionTarget.APRILTAG_GRID;
+import static frc.robot.Constants.VisionConstants.VisionTarget.CONE_GROUND;
+import static frc.robot.Constants.VisionConstants.VisionTarget.CONE_SUBSTATION;
+import static frc.robot.Constants.VisionConstants.VisionTarget.CUBE_GROUND;
+import static frc.robot.Constants.VisionConstants.VisionTarget.CUBE_SUBSTATION;
+import static frc.robot.Constants.VisionConstants.VisionTarget.NONE;
+import static frc.robot.Constants.VisionConstants.VisionTarget.POST_HIGH;
+import static frc.robot.Constants.VisionConstants.VisionTarget.POST_LOW;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.networktables.*;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,53 +25,55 @@ import frc.robot.Constants.VisionConstants.CameraView;
 
 public class VisionSubsystem extends SubsystemBase {
 
-    private static final long LED_MODE_PIPELINE = 0;
-    private static final long LED_MODE_OFF      = 1;
-    private static final long LED_MODE_BLINK    = 2;
-    private static final long LED_MODE_ON       = 3;
+    private static final long            LED_MODE_PIPELINE             = 0;
+    private static final long            LED_MODE_OFF                  = 1;
+    private static final long            LED_MODE_BLINK                = 2;
+    private static final long            LED_MODE_ON                   = 3;
 
-    private static final long CAM_MODE_VISION = 0;
-    private static final long CAM_MODE_DRIVER = 1;
+    private static final long            CAM_MODE_VISION               = 0;
+    private static final long            CAM_MODE_DRIVER               = 1;
 
     // configure more pipelines here
-    private static final long PIPELINE_CONE_DETECT      = 0;
-    private static final long PIPELINE_CUBE_DETECT      = 1;
-    private static final long PIPELINE_APRIL_TAG_DETECT = 3;
-    private static final long PIPELINE_POST_DETECT      = 4;
+    private static final long            PIPELINE_CONE_DETECT          = 0;
+    private static final long            PIPELINE_CUBE_DETECT          = 1;
+    private static final long            PIPELINE_APRIL_TAG_DETECT     = 3;
+    private static final long            PIPELINE_POST_DETECT          = 4;
 
-    private static final LinearFilter CONE_LOW_PASS_FILTER = LinearFilter.singlePoleIIR(.1, .02);
+    private static final LinearFilter    CONE_LOW_PASS_FILTER          = LinearFilter.singlePoleIIR(.1, .02);
 
-    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTable                         table                         = NetworkTableInstance.getDefault().getTable("limelight");
 
     // inputs/configs
-    NetworkTableEntry ledMode  = table.getEntry("ledMode");
-    NetworkTableEntry camMode  = table.getEntry("camMode");
-    NetworkTableEntry pipeline = table.getEntry("pipeline");
+    NetworkTableEntry                    ledMode                       = table.getEntry("ledMode");
+    NetworkTableEntry                    camMode                       = table.getEntry("camMode");
+    NetworkTableEntry                    pipeline                      = table.getEntry("pipeline");
 
     // output
-    NetworkTableEntry tv = table.getEntry("tv");
-    NetworkTableEntry tx = table.getEntry("tx");
-    NetworkTableEntry ty = table.getEntry("ty");
-    NetworkTableEntry ta = table.getEntry("ta");
-    NetworkTableEntry tl = table.getEntry("tl");
+    NetworkTableEntry                    tv                            = table.getEntry("tv");
+    NetworkTableEntry                    tx                            = table.getEntry("tx");
+    NetworkTableEntry                    ty                            = table.getEntry("ty");
+    NetworkTableEntry                    ta                            = table.getEntry("ta");
+    NetworkTableEntry                    tl                            = table.getEntry("tl");
 
-    private boolean isCameraPositionInitialized   = false;
-    private long    cameraInitializationStartTime = 0;
+    private boolean                      isCameraPositionInitialized   = false;
+    private long                         cameraInitializationStartTime = 0;
 
-    private VisionConstants.VisionTarget currentVisionTarget = NONE;
+    private VisionConstants.VisionTarget currentVisionTarget           = NONE;
 
-    private double filteredConeAngle = 0;
+    private double                       filteredConeAngle             = 0;
 
     /*
      * Camera motor and encoder
      */
-    private final CANSparkMax cameraMotor = new CANSparkMax(VisionConstants.CAMERA_ANGLE_MOTOR_PORT,
+    private final CANSparkMax            cameraMotor                   = new CANSparkMax(VisionConstants.CAMERA_ANGLE_MOTOR_PORT,
         MotorType.kBrushless);
 
     // Arm lift encoder
-    private final RelativeEncoder cameraEncoder = cameraMotor.getEncoder();
+    private final RelativeEncoder        cameraEncoder                 = cameraMotor.getEncoder();
 
-    private double cameraEncoderOffset = 0;
+    private double                       cameraMotorSpeed              = 0;
+
+    private double                       cameraEncoderOffset           = 0;
 
     public VisionSubsystem() {
 
@@ -133,7 +144,8 @@ public class VisionSubsystem extends SubsystemBase {
      * <p>
      * Check whether a target is acquired using {@link #isVisionTargetFound()}
      *
-     * @return degrees in horizontal angle offset from the current crosshairs. or {@code 0} if no target is currently found.
+     * @return degrees in horizontal angle offset from the current crosshairs. or {@code 0} if no
+     * target is currently found.
      */
     public double getTargetAngleOffset() {
 
@@ -248,36 +260,8 @@ public class VisionSubsystem extends SubsystemBase {
             return;
         }
 
-        double safeSpeed = checkCameraMotorLimits(speed);
-        cameraMotor.set(safeSpeed);
-    }
-
-    public void initializeCameraPosition() {
-
-        // Wait until the robot is enabled to initialize the camera
-        if (!DriverStation.isAutonomousEnabled() && !DriverStation.isTeleopEnabled()) {
-            return;
-        }
-
-        if (cameraInitializationStartTime == 0) {
-            cameraInitializationStartTime = System.currentTimeMillis();
-        }
-
-        cameraMotor.set(.3);
-
-        // End after 3 seconds
-        if ((System.currentTimeMillis() - cameraInitializationStartTime) > 3000) {
-            cameraMotor.set(0);
-            isCameraPositionInitialized = true;
-            cameraEncoder.setPosition(2); // Above the top limit.
-        }
-    }
-
-    /**
-     * Set the camera encoder to the supplied position
-     */
-    public void setCameraEncoderPosition(double cameraEncoderPosition) {
-        cameraEncoderOffset = -cameraEncoder.getPosition();
+        cameraMotorSpeed = checkCameraMotorLimits(speed);
+        cameraMotor.set(cameraMotorSpeed);
     }
 
     public void setVisionTarget(VisionConstants.VisionTarget visionTarget) {
@@ -329,7 +313,7 @@ public class VisionSubsystem extends SubsystemBase {
         }
 
         // Call the safety code on the camera motor movement
-        setCameraMotorSpeed(cameraMotor.get());
+        setCameraMotorSpeed(cameraMotorSpeed);
 
         // read values periodically and post to smart dashboard periodically
         SmartDashboard.putBoolean("Limelight Target Found", isVisionTargetFound());
@@ -351,7 +335,7 @@ public class VisionSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Cube Targed Acquired", isCubeTargetAcquired());
 
         SmartDashboard.putString("Camera view", getCameraView().toString());
-        SmartDashboard.putNumber("Camera Motor Speed", cameraMotor.get());
+        SmartDashboard.putNumber("Camera Motor Speed", cameraMotorSpeed);
         SmartDashboard.putNumber("Camera Encoder", Math.round(getCameraEncoder() * 100) / 100d);
 
         SmartDashboard.putNumber("Cone Angle Filtered", filteredConeAngle);
@@ -364,7 +348,8 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     /**
-     * Get the limelight coordinates for the target (i.e. with respect to the limelight origin, NOT the robot!!)
+     * Get the limelight coordinates for the target (i.e. with respect to the limelight origin, NOT
+     * the robot!!)
      *
      * @return limelight target coordinates
      */
@@ -420,5 +405,37 @@ public class VisionSubsystem extends SubsystemBase {
         }
 
         return inputSpeed;
+    }
+
+    private void initializeCameraPosition() {
+
+        // Wait until the robot is enabled to initialize the camera
+        if (!DriverStation.isAutonomousEnabled() && !DriverStation.isTeleopEnabled()) {
+            return;
+        }
+
+        if (cameraInitializationStartTime == 0) {
+            cameraInitializationStartTime = System.currentTimeMillis();
+        }
+
+        cameraMotor.set(.3);
+
+        // End after 3 seconds, motor will be at hard stop
+        if ((System.currentTimeMillis() - cameraInitializationStartTime) > 3000) {
+
+            // Turn off the motor
+            cameraMotor.set(0);
+            // Initialize the encoder so that zero is slightly down from the hard stop.
+            cameraEncoder.setPosition(2);
+
+            isCameraPositionInitialized = true;
+        }
+    }
+
+    /**
+     * Set the camera encoder to the supplied position
+     */
+    private void setCameraEncoderPosition(double cameraEncoderPosition) {
+        cameraEncoderOffset = -cameraEncoder.getPosition();
     }
 }

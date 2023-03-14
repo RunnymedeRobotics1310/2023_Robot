@@ -22,7 +22,7 @@ import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
 import frc.robot.commands.drive.DriveToTargetCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
-import frc.robot.commands.vision.ConfigureCameraCommand;
+import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -232,10 +232,10 @@ public class AutonomousCommand extends SequentialCommandGroup {
         // Start by switching the camera view if picking up a game piece.
         // this will set the camera angle while driving
         if (exitZoneAction == AutoAction.PICK_UP_CUBE) {
-            addCommands(new ConfigureCameraCommand(CUBE_GROUND, visionSubsystem));
+            addCommands(new SetVisionTargetCommand(CUBE_GROUND, visionSubsystem));
         }
         if (exitZoneAction == AutoAction.PICK_UP_CONE) {
-            addCommands(new ConfigureCameraCommand(CONE_GROUND, visionSubsystem));
+            addCommands(new SetVisionTargetCommand(CONE_GROUND, visionSubsystem));
         }
 
         // Drive out of the zone

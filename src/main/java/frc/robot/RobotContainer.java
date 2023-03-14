@@ -19,7 +19,6 @@ import frc.robot.Constants.OiConstants;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.SystemTestCommand;
 import frc.robot.commands.arm.DefaultArmCommand;
-import frc.robot.commands.arm.PickUpSubstationCommand;
 import frc.robot.commands.arm.PickUpSubstationVisionCommand;
 import frc.robot.commands.arm.ReleaseCommand;
 import frc.robot.commands.arm.ScoreCommand;
@@ -37,9 +36,12 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very little
- * robot logic should actually be handled in the {@link Robot} periodic methods (other than the scheduler calls). Instead, the
- * structure of the robot (including subsystems, commands, and button mappings) should be declared here.
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
+ * "declarative" paradigm, very little
+ * robot logic should actually be handled in the {@link Robot} periodic methods (other than the
+ * scheduler calls). Instead, the
+ * structure of the robot (including subsystems, commands, and button mappings) should be declared
+ * here.
  */
 public class RobotContainer {
 
@@ -127,8 +129,10 @@ public class RobotContainer {
     }
 
     /**
-     * Use this method to define your button->command mappings. Buttons can be created by instantiating a {@link GenericHID} or
-     * one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a
+     * Use this method to define your button->command mappings. Buttons can be created by
+     * instantiating a {@link GenericHID} or
+     * one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and
+     * then passing it to a
      * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
@@ -175,9 +179,6 @@ public class RobotContainer {
 
         new Trigger(() -> (operatorInput.balance()))
             .onTrue(new BalanceCommand(driveSubsystem));
-
-        new Trigger(() -> (operatorInput.isSubstationConePickup()))
-            .onTrue(new PickUpSubstationCommand(armSubsystem, visionSubsystem));
 
         new Trigger(() -> (operatorInput.isVisionSubstationConePickup()))
             .onTrue(new PickUpSubstationVisionCommand(armSubsystem, driveSubsystem, visionSubsystem));
