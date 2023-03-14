@@ -258,7 +258,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
             // will end when the PickupGroundCommand ends, canceling the DriveToVisionTarget if
             // required.
             addCommands(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem)
-                .deadlineWith(new DriveToTargetCommand(CUBE_GROUND, .2, driveSubsystem, visionSubsystem)));
+                .deadlineWith(new DriveToTargetCommand(CUBE_GROUND, .2, driveSubsystem, visionSubsystem, armSubsystem)));
 
             addCommands(new PickupGamePieceCommand(GamePiece.CUBE, armSubsystem));
 
@@ -266,7 +266,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
         if (exitZoneAction == AutoAction.PICK_UP_CONE) {
 
             addCommands(new StartIntakeCommand(GamePiece.CONE, armSubsystem, visionSubsystem)
-                .deadlineWith(new DriveToTargetCommand(CONE_GROUND, .2, driveSubsystem, visionSubsystem)));
+                .deadlineWith(new DriveToTargetCommand(CONE_GROUND, .2, driveSubsystem, visionSubsystem, armSubsystem)));
 
             addCommands(new PickupGamePieceCommand(GamePiece.CONE, armSubsystem));
         }
@@ -297,7 +297,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
         // Turn around and go back to the grid
         addCommands(new DriveOnHeadingCommand(270.0, 0.5, 5, driveSubsystem));
         addCommands(new DriveOnHeadingCommand(180.0, 0.5, 300, driveSubsystem));
-        addCommands(new DriveToTargetCommand(APRILTAG_GRID, 0.3, driveSubsystem, visionSubsystem));
+        addCommands(new DriveToTargetCommand(APRILTAG_GRID, 0.3, driveSubsystem, visionSubsystem, armSubsystem));
 
         // Vision subsystem to acquire the nearest scoring position marker (vision subsystem
         // operation to find scoring position +

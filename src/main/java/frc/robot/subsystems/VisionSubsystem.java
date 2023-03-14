@@ -264,8 +264,32 @@ public class VisionSubsystem extends SubsystemBase {
         cameraMotor.set(cameraMotorSpeed);
     }
 
+    private void setCameraView(CameraView desiredView) {
+        CameraView currentCameraView = getCameraView();
+
+        if (currentCameraView == desiredView) {
+
+            // Camera is already in position.
+            setCameraMotorSpeed(0);
+
+        }
+        else if (desiredView == CameraView.HIGH) {
+
+            // Run the motor forward to raise the camera view
+            setCameraMotorSpeed(VisionConstants.MAX_CAMERA_MOTOR_SPEED);
+
+        }
+        else {
+
+            // Run the motor in reverse to lower the camera view
+            setCameraMotorSpeed(-VisionConstants.MAX_CAMERA_MOTOR_SPEED);
+
+        }
+    }
+
     public void setVisionTarget(VisionConstants.VisionTarget visionTarget) {
         this.currentVisionTarget = visionTarget;
+        setCameraView(visionTarget.getCameraView());
         switch (visionTarget) {
         case CONE_GROUND:
         case CONE_SUBSTATION:
