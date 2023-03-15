@@ -161,6 +161,11 @@ public class OperatorInput {
         return operatorController.getPOV() == 270;
     }
 
+
+    public boolean isCameraViewHigh() { return driverController.getPOV() == 0; }
+    public boolean isCameraViewLow() { return driverController.getPOV() == 180; }
+
+
     /**
      * return the raw underlying {@link RunnymedeGameController}. ONLY FOR USE IN TEST MODE.
      */

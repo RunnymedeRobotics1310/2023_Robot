@@ -33,6 +33,7 @@ import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.vision.DefaultVisionCommand;
+import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -188,6 +189,12 @@ public class RobotContainer {
 
         new Trigger(() -> (operatorInput.isVisionSubstationConePickup()))
             .onTrue(new PickUpSubstationVisionCommand(armSubsystem, driveSubsystem, visionSubsystem));
+
+        new Trigger(() -> (operatorInput.isCameraViewHigh()))
+            .onTrue(new SetVisionTargetCommand(Constants.VisionConstants.VisionTarget.FIELD, visionSubsystem));
+
+        new Trigger(() ->(operatorInput.isCameraViewLow()))
+            .onTrue(new SetVisionTargetCommand(Constants.VisionConstants.VisionTarget.CUBE_GROUND, visionSubsystem));
     }
 
     /**
