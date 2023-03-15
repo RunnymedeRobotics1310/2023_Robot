@@ -64,43 +64,42 @@ abstract class BaseArmCommand extends CommandBase {
 
         SmartDashboard.putBoolean("At Extension Position", armSubsystem.isAtExtendPosition(targetCount));
 
+        // Special logic for fully retracting (ignore the encoder).
         if (targetCount <= 0) {
-            targetCount = -5; // compensate for the encoder at zero not aligning with the limit switch
+
             if (armSubsystem.isArmRetracted()) {
                 armSubsystem.setArmExtendSpeed(0);
                 return true;
             }
-        }
-        else {
-            if (armSubsystem.isAtExtendPosition(targetCount)) {
-                armSubsystem.setArmExtendSpeed(0);
-                return true;
+
+            if (armSubsystem.getArmExtendEncoder() < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
+
+                speed = ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED;
             }
+
+            armSubsystem.setArmExtendSpeed(-Math.min(Math.abs(speed), ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED));
+
+            return false;
+        }
+
+        // Logic when the arm is not being fully retracted.
+        if (armSubsystem.isAtExtendPosition(targetCount)) {
+            armSubsystem.setArmExtendSpeed(0);
+            return true;
         }
 
         double absSpd = Math.abs(speed);
         double gap    = targetCount - armSubsystem.getArmExtendEncoder();
 
-        // Special logic for the slow zone when the target encoder count <=0
-        if (targetCount <= 0) {
+        // Determine whether to slow down because we are close to the target.
+        if (Math.abs(gap) < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
 
-            if (armSubsystem.getArmExtendEncoder() < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
-
-                absSpd = Math.min(absSpd, ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED);
-            }
-        }
-        else {
-            // Determine whether to slow down because we are close to the target.
-            if (Math.abs(gap) < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
-
-                absSpd = Math.min(absSpd, ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED);
-            }
+            absSpd = Math.min(absSpd, ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED);
         }
 
         armSubsystem.setArmExtendSpeed(gap < 0 ? -absSpd : absSpd);
 
         return false;
-
     }
 
     /**
