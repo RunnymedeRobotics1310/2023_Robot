@@ -5,6 +5,13 @@ import frc.robot.subsystems.ArmSubsystem;
 
 public class CompactCommand extends BaseArmCommand {
 
+    private enum State {
+        CLEAR_FRAME, RETRACT, LOWER
+    };
+
+
+    private State state = State.CLEAR_FRAME;
+
     public CompactCommand(ArmSubsystem armSubsystem) {
         super(armSubsystem);
         addRequirements(armSubsystem);
@@ -17,7 +24,20 @@ public class CompactCommand extends BaseArmCommand {
 
     @Override
     public void initialize() {
-        printStatus("initialize");
+
+        double armAngle             = armSubsystem.getArmLiftAngle();
+        double armExtensionPosition = armSubsystem.getArmExtendEncoder();
+
+        if (armAngle < ArmConstants.CLEAR_FRAME_ARM_ANGLE
+            && armExtensionPosition > ArmConstants.MAX_ARM_EXTEND_INSIDE_FRAME) {
+
+            state = State.CLEAR_FRAME;
+        }
+        else {
+            state = State.RETRACT;
+        }
+
+        printStatus("initialize, starting state " + state.toString());
     }
 
     @Override
@@ -26,35 +46,57 @@ public class CompactCommand extends BaseArmCommand {
         double armAngle             = armSubsystem.getArmLiftAngle();
         double armExtensionPosition = armSubsystem.getArmExtendEncoder();
 
-        /*
-         * Special logic to make sure the arm comes up over the frame when retracting.
-         */
-        if (armAngle < ArmConstants.CLEAR_FRAME_ARM_ANGLE
-            && armExtensionPosition > ArmConstants.MAX_ARM_EXTEND_INSIDE_FRAME) {
+        switch (state) {
+
+        case CLEAR_FRAME:
 
             /*
-             * If the arm is not inside the frame, and the angle is below the clear frame angle,
-             * then raise the arm to clear the frame
+             * Special logic to make sure the arm comes up over the frame when retracting.
              */
+            if (armAngle < ArmConstants.CLEAR_FRAME_ARM_ANGLE
+                && armExtensionPosition > ArmConstants.MAX_ARM_EXTEND_INSIDE_FRAME) {
 
-            // Save time by closing the pincher at the same time
+                /*
+                 * If the arm is not inside the frame, and the angle is below the clear frame angle,
+                 * then raise the arm to clear the frame
+                 */
+
+                // Save time by closing the pincher at the same time
+                movePincherInsideFrame();
+
+                // Ensure the arm is higher than the clear frame angle
+                moveArmLiftToAngle(ArmConstants.CLEAR_FRAME_ARM_ANGLE + ArmConstants.ARM_LIFT_ANGLE_TOLERANCE_DEGREES + 2);
+
+            }
+            else {
+                armSubsystem.setArmLiftSpeed(0);
+                state = State.RETRACT;
+            }
+
+            break;
+
+        case RETRACT:
+
+            /*
+             * The arm is now clearing the frame or is already inside the frame
+             */
+            boolean armRetracted = retractArm();
+            boolean pincherInsideFrame = movePincherInsideFrame();
+
+            if (armRetracted && pincherInsideFrame) {
+                state = State.LOWER;
+            }
+            break;
+
+        case LOWER:
+
+            // Keep the arm retracted and do not let the pinchers outside the frame
+            retractArm();
             movePincherInsideFrame();
 
-            // Ensure the arm is higher than the clear frame angle
-            moveArmLiftToAngle(ArmConstants.CLEAR_FRAME_ARM_ANGLE + ArmConstants.ARM_LIFT_ANGLE_TOLERANCE_DEGREES + 2);
-
-            return;
-        }
-
-        /*
-         * The arm is now clearing the frame or is already retracted inside the frame
-         */
-
-        boolean armRetracted       = retractArm();
-        boolean pincherInsideFrame = movePincherInsideFrame();
-
-        if (armRetracted && pincherInsideFrame) {
+            // Lower the arm to the bottom
             lowerArmToBottom();
+            break;
         }
     }
 
