@@ -353,18 +353,18 @@ public class AutonomousCommand extends SequentialCommandGroup {
 
                 System.out.println("Balance Red/Bot or Blue/Top");
                 addCommands(new DriveOnHeadingCommand(90, .3, 180, driveSubsystem));
-                addCommands(new DriveOnHeadingCommand(180, .3, 230, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 215, driveSubsystem));
             }
             else if ((alliance == Alliance.Red && startingLane == AutoLane.TOP)
                 || (alliance == Alliance.Blue && startingLane == AutoLane.BOTTOM)) {
 
                 System.out.println("Balance Red/Top or Blue/Bottom");
                 addCommands(new DriveOnHeadingCommand(270, .3, 180, driveSubsystem));
-                addCommands(new DriveOnHeadingCommand(180, .3, 230, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 215, driveSubsystem));
             }
             else {
                 System.out.println("Balance Mid");
-                addCommands(new DriveOnHeadingCommand(180, .3, 230, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 215, driveSubsystem));
             }
         }
         else if (currentZone == Zone.FIELD && currentOrientation == Orientation.FACE_GRID) { // from field facing grid
@@ -374,7 +374,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
                 System.out.println("Balance Red/Bot or Blue/Top");
                 addCommands(new DriveOnHeadingCommand(135, .1, 1, driveSubsystem));
                 addCommands(new DriveOnHeadingCommand(90, .3, 180, driveSubsystem));
-                addCommands(new DriveOnHeadingCommand(180, .3, 230, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 215, driveSubsystem));
             }
             else if ((alliance == Alliance.Red && startingLane == AutoLane.TOP)
                 || (alliance == Alliance.Blue && startingLane == AutoLane.BOTTOM)) {
@@ -382,11 +382,11 @@ public class AutonomousCommand extends SequentialCommandGroup {
                 System.out.println("Balance Red/Top or Blue/Bottom");
                 addCommands(new DriveOnHeadingCommand(135, .1, 1, driveSubsystem));
                 addCommands(new DriveOnHeadingCommand(270, .3, 180, driveSubsystem));
-                addCommands(new DriveOnHeadingCommand(180, .3, 230, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 215, driveSubsystem));
             }
             else {
                 System.out.println("Balance Mid");
-                addCommands(new DriveOnHeadingCommand(180, .3, 230, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(180, .3, 215, driveSubsystem));
             }
         }
 
