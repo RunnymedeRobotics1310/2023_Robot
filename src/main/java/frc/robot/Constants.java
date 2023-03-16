@@ -244,6 +244,7 @@ public final class Constants {
         /*
          * Scoring Constants
          */
+        // 97 was too low for auto one time; 102 was WAY too high; trying 97 again.
         public static final ArmPosition SCORE_TOP_CONE_POSITION             = new ArmPosition(97, 54);                  // Confirmed
         public static final ArmPosition SCORE_TOP_CUBE_POSITION             = new ArmPosition(90, 50);                   // Confirmed
 

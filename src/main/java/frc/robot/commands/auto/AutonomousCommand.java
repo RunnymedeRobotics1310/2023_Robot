@@ -187,6 +187,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
 
             }
             addCommands(new ScoreCommand(scoringRow, armSubsystem));
+            addCommands(new WaitCommand(.1));
             addCommands(new ReleaseCommand(armSubsystem));
         }
         else {
@@ -234,14 +235,17 @@ public class AutonomousCommand extends SequentialCommandGroup {
         if (exitZoneAction == AutoAction.PICK_UP_CONE) {
             addCommands(new SetVisionTargetCommand(CONE_GROUND, visionSubsystem));
         }
-
+        double exitZoneDistance = 330;
+        if(startingLane == AutoLane.BOTTOM){
+            exitZoneDistance = 340;
+        }
         // Drive out of the zone
         // This command may cause a rotation to heading 0.
         if (currentOrientation == Orientation.FACE_FIELD) {
-            addCommands(new DriveOnHeadingCommand(0, 0.6, 330, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(0, 0.6, exitZoneDistance, driveSubsystem));
         }
         else {
-            addCommands(new DriveOnHeadingCommand(180, -0.6, 330, driveSubsystem)
+            addCommands(new DriveOnHeadingCommand(180, -0.6, exitZoneDistance, driveSubsystem)
                 .deadlineWith(new CompactCommand(armSubsystem)));
 
         }
@@ -391,7 +395,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
         }
 
         // Balance on the platform
-        addCommands(new WaitCommand(.5));
+        addCommands(new WaitCommand(1));
         addCommands(new BalanceCommand(driveSubsystem));
     }
 }
