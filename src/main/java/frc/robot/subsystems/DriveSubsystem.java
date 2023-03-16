@@ -378,9 +378,6 @@ public class DriveSubsystem extends SubsystemBase {
 
         if (armSubsystem.getArmExtendEncoder() >= 10 && DriverStation.isTeleopEnabled()) {
 
-            // todo: fixme: remove this VERY verbose statement
-            System.out.println("Moving into slow mode due to arm encoder position "+armSubsystem.getArmExtendEncoder());
-
             // Limit each side to 0.25
 
             leftSpeed  = Math.min(Math.abs(leftSpeed), .35) * Math.signum(leftSpeed);
