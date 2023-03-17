@@ -3,8 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
+
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean constants. This class should
@@ -117,6 +119,7 @@ public final class Constants {
                 return view;
             }
 
+            @Override
             public String toString() {
                 return "VisionTarget: " + name() + "(" + view + ")";
             }
@@ -220,7 +223,7 @@ public final class Constants {
 
         // If the arm is below the frame clearance, and the arm extension is greater
         // than the max inside frame extension, then the robot is outside the frame.
-        public static final double MAX_ARM_EXTEND_INSIDE_FRAME = 6;
+        public static final double      MAX_ARM_EXTEND_INSIDE_FRAME         = 6;
 
 
         /*
@@ -244,8 +247,8 @@ public final class Constants {
         /*
          * Scoring Constants
          */
-        // 97 was too low for auto one time; 102 was WAY too high; trying 97 again.
-        public static final ArmPosition SCORE_TOP_CONE_POSITION             = new ArmPosition(97, 54);                  // Confirmed
+        public static final ArmPosition SCORE_TOP_CONE_AUTO_POSITION        = new ArmPosition(103, 54);                  // Confirmed
+        public static final ArmPosition SCORE_TOP_CONE_POSITION             = new ArmPosition(97, 54);                   // Confirmed
         public static final ArmPosition SCORE_TOP_CUBE_POSITION             = new ArmPosition(90, 50);                   // Confirmed
 
         public static final ArmPosition SCORE_MIDDLE_CONE_POSITION          = new ArmPosition(85, 7);                    // Confirmed
@@ -278,11 +281,13 @@ public final class Constants {
         // Helper routine to get a scoring position
         public static ArmPosition getScoringPosition(GamePiece gamePiece, ScoringRow scoringRow) {
 
+            boolean isAuto = DriverStation.isAutonomousEnabled();
+
             if (gamePiece == GamePiece.CONE) {
 
                 switch (scoringRow) {
                 case TOP:
-                    return SCORE_TOP_CONE_POSITION;
+                    return isAuto ? SCORE_TOP_CONE_AUTO_POSITION : SCORE_TOP_CONE_POSITION;
                 case MIDDLE:
                     return SCORE_MIDDLE_CONE_POSITION;
                 case BOTTOM:
