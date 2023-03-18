@@ -7,7 +7,9 @@ import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.Constants.VisionConstants.VisionTarget;
 import frc.robot.commands.vision.SetVisionTargetCommand;
-import frc.robot.subsystems.*;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 
 public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
@@ -22,6 +24,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
     private double                requiredExtensionEncoderPosition = 0;
     private double                requiredArmAngle                 = 0;
     private double                pauseStartTime                   = 0;
+    private double                alignStartTime                   = 0;
 
     /**
      * Only cone is supported for now.
@@ -81,11 +84,13 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
             // Wait for the camera to get into position
             if (visionSubsystem.getCameraView() == CameraView.HIGH) {
 
-                currentState = State.ALIGN;
+                currentState   = State.ALIGN;
+                alignStartTime = System.currentTimeMillis();
 
                 // If there is a vision target, then update the error
                 if (visionSubsystem.isVisionTargetFound()) {
                     visionTargetHeadingError = visionSubsystem.getTargetAngleOffset();
+                    System.out.print("target aquired");
                 }
             }
 
@@ -97,6 +102,15 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
             // If there is a vision target, then update the error
             if (visionSubsystem.isVisionTargetFound()) {
                 visionTargetHeadingError = visionSubsystem.getTargetAngleOffset();
+            }
+
+            if (System.currentTimeMillis() - alignStartTime > 1000) {
+                currentState = State.PAUSE;
+                // Stop the motors
+                driveSubsystem.setMotorSpeeds(0, 0);
+                pauseStartTime = System.currentTimeMillis();
+                System.out
+                    .println("Timing out alignment prior to aligning perfectly. Current error: " + visionTargetHeadingError);
             }
 
             double speed = calcSpeedToScoringRange();
@@ -235,11 +249,11 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
         double driveSpeed = 0;
 
         if (driveSubsystem.getUltrasonicDistanceCm() < MIN_PICKUP_DISTANCE) {
-            driveSpeed = -.1;
+            driveSpeed = -.2;
         }
 
         if (driveSubsystem.getUltrasonicDistanceCm() > MAX_PICKUP_DISTANCE) {
-            driveSpeed = .1;
+            driveSpeed = .2;
         }
 
         // If there is no forward or backward movement, then the
