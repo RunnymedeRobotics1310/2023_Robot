@@ -8,9 +8,11 @@ import frc.robot.subsystems.ArmSubsystem;
 
 public class ScoreAutoCommand extends BaseArmCommand {
 
+    private final long       MAX_TIME_TO_SCORE_MILLIS = 3000L;
+
     private final ScoringRow scoringRow;
-    private ArmPosition      scoringPosition = null;
-    private GamePiece        gamePiece       = null;
+    private ArmPosition      scoringPosition          = null;
+    private GamePiece        gamePiece                = null;
 
     private enum Step {
         CLEAR_FRAME, LIFT_AND_EXTEND, LOWER_ARM, FINISH
@@ -112,7 +114,7 @@ public class ScoreAutoCommand extends BaseArmCommand {
         }
 
         // If the command has been running for more than 3 seconds, then end.
-        if (System.currentTimeMillis() - commandStartTime > 3) {
+        if (System.currentTimeMillis() - commandStartTime > MAX_TIME_TO_SCORE_MILLIS) {
             System.out.println("ScoreAutoCommand: Timed out after 3 seconds");
             return true;
         }
