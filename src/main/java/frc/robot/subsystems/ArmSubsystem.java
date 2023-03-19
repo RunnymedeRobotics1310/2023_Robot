@@ -639,6 +639,9 @@ public class ArmSubsystem extends SubsystemBase {
 
                 return Math.min(inputSpeed, ArmConstants.MAX_LIFT_SLOW_ZONE_SPEED);
             }
+
+            // Limit the up speed to the max
+            return Math.min(inputSpeed, ArmConstants.MAX_LIFT_UP_SPEED);
         }
 
         /*
@@ -658,10 +661,12 @@ public class ArmSubsystem extends SubsystemBase {
 
                 return Math.max(inputSpeed, -ArmConstants.MAX_LIFT_SLOW_ZONE_SPEED);
             }
+
+            // Limit the down speed to the max
+            return Math.max(inputSpeed, -ArmConstants.MAX_LIFT_DOWN_SPEED);
         }
 
-        // If not at (or near) the limit, then return the limited value of the input speed
-        return Math.min(Math.abs(inputSpeed), ArmConstants.MAX_LIFT_SPEED) * Math.signum(inputSpeed);
+        return 0;
     }
 
     /**
