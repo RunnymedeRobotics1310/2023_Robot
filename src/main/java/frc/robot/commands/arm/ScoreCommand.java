@@ -8,9 +8,12 @@ import frc.robot.subsystems.ArmSubsystem;
 
 public class ScoreCommand extends BaseArmCommand {
 
+    private final long       MAX_TIME_TO_SCORE_MILLIS = 3000L;
+
     private final ScoringRow scoringRow;
-    private ArmPosition      scoringPosition = null;
-    private GamePiece        gamePiece       = null;
+    private ArmPosition      scoringPosition          = null;
+    private GamePiece        gamePiece                = null;
+    private long             startScoreTime           = 0L;
 
     public ScoreCommand(ScoringRow scoringRow, ArmSubsystem armSubsystem) {
         super(armSubsystem);
@@ -27,6 +30,7 @@ public class ScoreCommand extends BaseArmCommand {
 
         printArmState();
         stopArmMotors();
+        startScoreTime = System.currentTimeMillis();
     }
 
     @Override
@@ -70,6 +74,10 @@ public class ScoreCommand extends BaseArmCommand {
 
     @Override
     public boolean isFinished() {
+        if (System.currentTimeMillis() - startScoreTime > MAX_TIME_TO_SCORE_MILLIS) {
+            System.out.println("Score timeout exceeded - aborting");
+            return true;
+        }
 
         // ensure that we have a piece and haven't dropped it
         if (!armSubsystem.isGamePieceDetected()) {
