@@ -3,6 +3,7 @@ package frc.robot.commands.arm;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ArmPosition;
 import frc.robot.Constants.GameConstants.GamePiece;
+import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.ArmSubsystem;
 
 public class PickupGamePieceCommand extends BaseArmCommand {
@@ -11,12 +12,14 @@ public class PickupGamePieceCommand extends BaseArmCommand {
 
     ArmPosition       targetArmPosition         = null;
     double            targetPincherEncoderCount = 0;
+    OperatorInput     operatorInput             = null;
 
-    public PickupGamePieceCommand(GamePiece gamePiece, ArmSubsystem armSubsystem) {
+    public PickupGamePieceCommand(GamePiece gamePiece, OperatorInput operatorInput, ArmSubsystem armSubsystem) {
 
         super(armSubsystem);
 
-        this.gamePiece = gamePiece;
+        this.gamePiece     = gamePiece;
+        this.operatorInput = operatorInput;
     }
 
     @Override
@@ -44,6 +47,9 @@ public class PickupGamePieceCommand extends BaseArmCommand {
         // Close on the game piece first
         if (movePincherToEncoderCount(targetPincherEncoderCount)) {
 
+            if (operatorInput != null) {
+                operatorInput.startVibrate();
+            }
             // If above the target, then retract first
             if (armSubsystem.getArmLiftAngle() > targetArmPosition.angle) {
 
@@ -79,6 +85,9 @@ public class PickupGamePieceCommand extends BaseArmCommand {
     public void end(boolean interrupted) {
 
         stopArmMotors();
+        if (operatorInput != null) {
+            operatorInput.stopVibrate();
+        }
 
         if (interrupted) {
             System.out.print("PickupGamePieceCommand interrupted");

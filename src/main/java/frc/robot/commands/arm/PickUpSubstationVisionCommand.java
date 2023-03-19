@@ -6,6 +6,7 @@ import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.Constants.VisionConstants.VisionTarget;
+import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -20,6 +21,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
     private final VisionSubsystem visionSubsystem;
     private final DriveSubsystem  driveSubsystem;
+    private final OperatorInput   operatorInput;
 
     private double                requiredExtensionEncoderPosition = 0;
     private double                requiredArmAngle                 = 0;
@@ -39,13 +41,14 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
     private State currentState = State.MOVE_CAMERA_AND_GET_WITHIN_RANGE;
 
-    public PickUpSubstationVisionCommand(ArmSubsystem armSubsystem, DriveSubsystem driveSubsystem,
+    public PickUpSubstationVisionCommand(OperatorInput operatorInput, ArmSubsystem armSubsystem, DriveSubsystem driveSubsystem,
         VisionSubsystem visionSubsystem) {
 
         super(armSubsystem);
 
         this.visionSubsystem = visionSubsystem;
         this.driveSubsystem  = driveSubsystem;
+        this.operatorInput   = operatorInput;
 
         addRequirements(driveSubsystem);
     }
@@ -111,6 +114,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
                 pauseStartTime = System.currentTimeMillis();
                 System.out
                     .println("Timing out alignment prior to aligning perfectly. Current error: " + visionTargetHeadingError);
+                return;
             }
 
             double speed = calcSpeedToScoringRange();
@@ -238,7 +242,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
         // In Teleop, pick the next command
         if (DriverStation.isTeleopEnabled()) {
 
-            CommandScheduler.getInstance().schedule(new PickupGamePieceCommand(gamePiece, armSubsystem));
+            CommandScheduler.getInstance().schedule(new PickupGamePieceCommand(gamePiece, operatorInput, armSubsystem));
         }
     }
 

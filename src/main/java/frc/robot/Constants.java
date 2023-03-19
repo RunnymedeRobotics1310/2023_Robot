@@ -174,7 +174,10 @@ public final class Constants {
 
         /** The maximum speed to drive the arm lift - manually or automatically */
         public static final double  MAX_LIFT_DOWN_SPEED                 = .2;
-        public static final double  MAX_LIFT_UP_SPEED                   = .3;
+        public static final double  MAX_LIFT_UP_SPEED                   = .2;                                   // setting it to
+                                                                                                                // .3 causes arm
+                                                                                                                // to overshoot
+                                                                                                                // target.
 
         public static final double  MAX_LIFT_SLOW_ZONE_SPEED            = .1;
 
@@ -195,7 +198,7 @@ public final class Constants {
          *
          * loop increment = 4 seconds to go from 25-110 degrees / 50 loops/sec
          */
-        public static final double  MAX_ARM_ANGLE_LIFT_LOOP_INCREMENT   = 100 / 4 / 50d;
+        public static final double  MAX_ARM_ANGLE_LIFT_LOOP_INCREMENT   = 100 / 3 / 50d;
 
         /*
          * Arm Angle Constants
@@ -243,7 +246,7 @@ public final class Constants {
         public static final double  MAX_PINCHER_SLOW_ZONE_SPEED         = .15;
         public static final double  PINCHER_CLOSE_LIMIT_ENCODER_VALUE   = 120;
         public static final double  PINCHER_POSITION_TOLERANCE          = 2;
-        public static final double  PINCHER_SLOW_ZONE_ENCODER_VALUE     = 12;
+        public static final double  PINCHER_SLOW_ZONE_ENCODER_VALUE     = 8;
         public static final double  PINCHER_GAME_PIECE_RELEASE_DISTANCE = 30;
         public static final double  MIN_PINCHER_INSIDE_FRAME_POSITION   = 100;
 
