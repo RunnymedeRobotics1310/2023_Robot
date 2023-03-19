@@ -1914,6 +1914,21 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "11,4": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Camera Upper Limit",
+              "_title": "SmartDashboard/Camera Upper Limit",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
           }
         }
       }
@@ -2283,6 +2298,6 @@
     "x": 0.0,
     "y": 0.0,
     "width": 1920.0,
-    "height": 916.0
+    "height": 927.0
   }
 }

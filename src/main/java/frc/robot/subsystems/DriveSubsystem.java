@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -105,7 +106,8 @@ public class DriveSubsystem extends SubsystemBase {
     /**
      * Calibrate Gyro
      * <p>
-     * This routine calibrates the gyro. The robot must not be moved during the calibrate routine which lasts about 10 seconds
+     * This routine calibrates the gyro. The robot must not be moved during the calibrate routine
+     * which lasts about 10 seconds
      */
     public void calibrateGyro() {
 
@@ -370,18 +372,12 @@ public class DriveSubsystem extends SubsystemBase {
 
     private void checkMotorSpeedLimits() {
 
-        // If the arm is not retracted, then the max speed is .25
-        // normally, the drive speed is .5 and can be boosted.
+        // If the arm is not retracted, then the max speed is limited
 
-        // Determine if the arm is inside the robot
-        boolean armInsideFrame = armSubsystem.isArmInsideFrame();
+        if (armSubsystem.getArmExtendEncoder() >= ArmConstants.MAX_ARM_EXTEND_INSIDE_FRAME
+            && DriverStation.isTeleopEnabled()) {
 
-        if (armSubsystem.getArmExtendEncoder() >= 10 && DriverStation.isTeleopEnabled()) {
-
-            // todo: fixme: remove this VERY verbose statement
-            System.out.println("Moving into slow mode due to arm encoder position "+armSubsystem.getArmExtendEncoder());
-
-            // Limit each side to 0.25
+            // Limit each side
 
             leftSpeed  = Math.min(Math.abs(leftSpeed), .35) * Math.signum(leftSpeed);
             rightSpeed = Math.min(Math.abs(rightSpeed), .35) * Math.signum(rightSpeed);
@@ -389,12 +385,6 @@ public class DriveSubsystem extends SubsystemBase {
             // Watch out for sharp turns
             limitTurning(0.35);
         }
-        else if (!armInsideFrame) {
-
-            // If the arm is not inside the frame, limit all turns to 0.5
-            limitTurning(.35);
-        }
-
         else {
             // Always limit the turning to 1.0
             limitTurning(1.0);

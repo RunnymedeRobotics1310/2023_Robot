@@ -1,14 +1,12 @@
 package frc.robot.commands.arm;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.ArmSubsystem;
 
-public class DefaultArmCommand extends CommandBase {
+public class DefaultArmCommand extends BaseArmCommand {
 
-    private final ArmSubsystem  armSubsystem;
-    private final OperatorInput driverController;
+    private final OperatorInput operatorInput;
 
     /**
      * Creates a new ExampleCommand.
@@ -17,11 +15,9 @@ public class DefaultArmCommand extends CommandBase {
      */
     public DefaultArmCommand(OperatorInput driverController, ArmSubsystem armSubsystem) {
 
-        this.driverController = driverController;
-        this.armSubsystem     = armSubsystem;
+        super(armSubsystem);
 
-        // Use addRequirements() here to declare subsystem dependencies.
-        addRequirements(armSubsystem);
+        this.operatorInput = driverController;
     }
 
     // Called when the command is initially scheduled.
@@ -34,12 +30,24 @@ public class DefaultArmCommand extends CommandBase {
     @Override
     public void execute() {
 
-        double armAngleLiftIncrement = driverController.getArmLiftMotorSpeed() * ArmConstants.MAX_ARM_ANGLE_LIFT_LOOP_INCREMENT;
+        double armAngleLiftIncrement = operatorInput.getArmLiftMotorSpeed() * ArmConstants.MAX_ARM_ANGLE_LIFT_LOOP_INCREMENT;
+
+        // Lift up faster than down
+        if (armAngleLiftIncrement > 0) {
+            armAngleLiftIncrement *= 1.5;
+        }
+
         armSubsystem.moveArmLiftToAngle(armSubsystem.getArmLiftAngleSetpoint() + armAngleLiftIncrement);
 
-        armSubsystem.setArmExtendSpeed(driverController.getArmExtendMotorSpeed());
-        armSubsystem.setPincherSpeed(driverController.getPincherMotorSpeed());
+        armSubsystem.setPincherSpeed(operatorInput.getPincherMotorSpeed());
 
+        // If the arm is down, keep the arm retracted
+        if (armSubsystem.isArmDown()) {
+            retractArm();
+        }
+        else {
+            armSubsystem.setArmExtendSpeed(operatorInput.getArmExtendMotorSpeed());
+        }
     }
 
     // Returns true when the command should end.

@@ -61,46 +61,46 @@ abstract class BaseArmCommand extends CommandBase {
      * @return true if at the desired location, false if still moving to that point
      */
     protected final boolean moveArmExtendToEncoderCount(double targetCount, double speed) {
+        speed = Math.abs(speed); // ignore negative values
 
         SmartDashboard.putBoolean("At Extension Position", armSubsystem.isAtExtendPosition(targetCount));
 
+        // Special logic for fully retracting (ignore the encoder).
         if (targetCount <= 0) {
-            targetCount = -5; // compensate for the encoder at zero not aligning with the limit switch
+
             if (armSubsystem.isArmRetracted()) {
                 armSubsystem.setArmExtendSpeed(0);
                 return true;
             }
-        }
-        else {
-            if (armSubsystem.isAtExtendPosition(targetCount)) {
-                armSubsystem.setArmExtendSpeed(0);
-                return true;
+
+            if (armSubsystem.getArmExtendEncoder() < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE
+                && speed > ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED) {
+
+                speed = ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED;
             }
+
+            armSubsystem.setArmExtendSpeed(-speed);
+
+            return false;
         }
 
-        double absSpd = Math.abs(speed);
+        // Logic when the arm is not being fully retracted.
+        if (armSubsystem.isAtExtendPosition(targetCount)) {
+            armSubsystem.setArmExtendSpeed(0);
+            return true;
+        }
+
         double gap    = targetCount - armSubsystem.getArmExtendEncoder();
 
-        // Special logic for the slow zone when the target encoder count <=0
-        if (targetCount <= 0) {
+        // Determine whether to slow down because we are close to the target.
+        if (Math.abs(gap) < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
 
-            if (armSubsystem.getArmExtendEncoder() < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
-
-                absSpd = Math.min(absSpd, ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED);
-            }
-        }
-        else {
-            // Determine whether to slow down because we are close to the target.
-            if (Math.abs(gap) < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
-
-                absSpd = Math.min(absSpd, ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED);
-            }
+            speed = Math.min(speed, ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED);
         }
 
-        armSubsystem.setArmExtendSpeed(gap < 0 ? -absSpd : absSpd);
+        armSubsystem.setArmExtendSpeed(gap < 0 ? -speed : speed);
 
         return false;
-
     }
 
     /**

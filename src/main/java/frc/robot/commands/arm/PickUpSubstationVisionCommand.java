@@ -6,8 +6,11 @@ import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.Constants.VisionConstants.VisionTarget;
+import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.vision.SetVisionTargetCommand;
-import frc.robot.subsystems.*;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 
 public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
@@ -18,10 +21,12 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
     private final VisionSubsystem visionSubsystem;
     private final DriveSubsystem  driveSubsystem;
+    private final OperatorInput   operatorInput;
 
     private double                requiredExtensionEncoderPosition = 0;
     private double                requiredArmAngle                 = 0;
     private double                pauseStartTime                   = 0;
+    private double                alignStartTime                   = 0;
 
     /**
      * Only cone is supported for now.
@@ -36,13 +41,14 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
     private State currentState = State.MOVE_CAMERA_AND_GET_WITHIN_RANGE;
 
-    public PickUpSubstationVisionCommand(ArmSubsystem armSubsystem, DriveSubsystem driveSubsystem,
+    public PickUpSubstationVisionCommand(OperatorInput operatorInput, ArmSubsystem armSubsystem, DriveSubsystem driveSubsystem,
         VisionSubsystem visionSubsystem) {
 
         super(armSubsystem);
 
         this.visionSubsystem = visionSubsystem;
         this.driveSubsystem  = driveSubsystem;
+        this.operatorInput   = operatorInput;
 
         addRequirements(driveSubsystem);
     }
@@ -81,11 +87,13 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
             // Wait for the camera to get into position
             if (visionSubsystem.getCameraView() == CameraView.HIGH) {
 
-                currentState = State.ALIGN;
+                currentState   = State.ALIGN;
+                alignStartTime = System.currentTimeMillis();
 
                 // If there is a vision target, then update the error
                 if (visionSubsystem.isVisionTargetFound()) {
                     visionTargetHeadingError = visionSubsystem.getTargetAngleOffset();
+                    System.out.print("target aquired");
                 }
             }
 
@@ -97,6 +105,16 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
             // If there is a vision target, then update the error
             if (visionSubsystem.isVisionTargetFound()) {
                 visionTargetHeadingError = visionSubsystem.getTargetAngleOffset();
+            }
+
+            if (System.currentTimeMillis() - alignStartTime > 1000) {
+                currentState = State.PAUSE;
+                // Stop the motors
+                driveSubsystem.setMotorSpeeds(0, 0);
+                pauseStartTime = System.currentTimeMillis();
+                System.out
+                    .println("Timing out alignment prior to aligning perfectly. Current error: " + visionTargetHeadingError);
+                return;
             }
 
             double speed = calcSpeedToScoringRange();
@@ -224,7 +242,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
         // In Teleop, pick the next command
         if (DriverStation.isTeleopEnabled()) {
 
-            CommandScheduler.getInstance().schedule(new PickupGamePieceCommand(gamePiece, armSubsystem));
+            CommandScheduler.getInstance().schedule(new PickupGamePieceCommand(gamePiece, operatorInput, armSubsystem));
         }
     }
 
@@ -235,11 +253,11 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
         double driveSpeed = 0;
 
         if (driveSubsystem.getUltrasonicDistanceCm() < MIN_PICKUP_DISTANCE) {
-            driveSpeed = -.1;
+            driveSpeed = -.2;
         }
 
         if (driveSubsystem.getUltrasonicDistanceCm() > MAX_PICKUP_DISTANCE) {
-            driveSpeed = .1;
+            driveSpeed = .2;
         }
 
         // If there is no forward or backward movement, then the

@@ -19,7 +19,7 @@ import frc.robot.Constants.GameConstants.Zone;
 import frc.robot.commands.arm.CompactCommand;
 import frc.robot.commands.arm.PickupGamePieceCommand;
 import frc.robot.commands.arm.ReleaseCommand;
-import frc.robot.commands.arm.ScoreCommand;
+import frc.robot.commands.arm.ScoreAutoCommand;
 import frc.robot.commands.arm.StartIntakeCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
@@ -186,7 +186,8 @@ public class AutonomousCommand extends SequentialCommandGroup {
                 break;
 
             }
-            addCommands(new ScoreCommand(scoringRow, armSubsystem));
+            addCommands(new ScoreAutoCommand(scoringRow, armSubsystem));
+            addCommands(new WaitCommand(.1));
             addCommands(new ReleaseCommand(armSubsystem));
         }
         else {
@@ -234,14 +235,17 @@ public class AutonomousCommand extends SequentialCommandGroup {
         if (exitZoneAction == AutoAction.PICK_UP_CONE) {
             addCommands(new SetVisionTargetCommand(CONE_GROUND, visionSubsystem));
         }
-
+        double exitZoneDistance = 330;
+        if (startingLane == AutoLane.BOTTOM) {
+            exitZoneDistance = 340;
+        }
         // Drive out of the zone
         // This command may cause a rotation to heading 0.
         if (currentOrientation == Orientation.FACE_FIELD) {
-            addCommands(new DriveOnHeadingCommand(0, 0.6, 330, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(0, 0.6, exitZoneDistance, driveSubsystem));
         }
         else {
-            addCommands(new DriveOnHeadingCommand(180, -0.6, 330, driveSubsystem)
+            addCommands(new DriveOnHeadingCommand(180, -0.6, exitZoneDistance, driveSubsystem)
                 .deadlineWith(new CompactCommand(armSubsystem)));
 
         }
@@ -260,7 +264,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
             addCommands(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem)
                 .deadlineWith(new DriveToTargetCommand(CUBE_GROUND, .2, driveSubsystem, visionSubsystem, armSubsystem)));
 
-            addCommands(new PickupGamePieceCommand(GamePiece.CUBE, armSubsystem));
+            addCommands(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem));
 
         }
         if (exitZoneAction == AutoAction.PICK_UP_CONE) {
@@ -268,7 +272,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
             addCommands(new StartIntakeCommand(GamePiece.CONE, armSubsystem, visionSubsystem)
                 .deadlineWith(new DriveToTargetCommand(CONE_GROUND, .2, driveSubsystem, visionSubsystem, armSubsystem)));
 
-            addCommands(new PickupGamePieceCommand(GamePiece.CONE, armSubsystem));
+            addCommands(new PickupGamePieceCommand(GamePiece.CONE, null, armSubsystem));
         }
     }
 
@@ -391,7 +395,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
         }
 
         // Balance on the platform
-        addCommands(new WaitCommand(.5));
+        addCommands(new WaitCommand(1));
         addCommands(new BalanceCommand(driveSubsystem));
     }
 }

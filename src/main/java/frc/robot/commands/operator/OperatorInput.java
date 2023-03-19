@@ -1,6 +1,6 @@
 package frc.robot.commands.operator;
 
-import frc.robot.Constants.ArmConstants;
+import edu.wpi.first.wpilibj.GenericHID;
 
 /**
  * The DriverController exposes all driver functions
@@ -138,7 +138,7 @@ public class OperatorInput {
     }
 
     public double getArmLiftMotorSpeed() {
-        return operatorController.getLeftY() * ArmConstants.MAX_LIFT_SPEED;
+        return operatorController.getLeftY();
     }
 
     public double getArmExtendMotorSpeed() {
@@ -162,8 +162,21 @@ public class OperatorInput {
     }
 
 
-    public boolean isCameraViewHigh() { return driverController.getPOV() == 0; }
-    public boolean isCameraViewLow() { return driverController.getPOV() == 180; }
+    public boolean isCameraViewHigh() {
+        return driverController.getPOV() == 0;
+    }
+
+    public boolean isCameraViewLow() {
+        return driverController.getPOV() == 180;
+    }
+
+    public void startVibrate() {
+        driverController.setRumble(GenericHID.RumbleType.kBothRumble, 1);
+    }
+
+    public void stopVibrate() {
+        driverController.setRumble(GenericHID.RumbleType.kBothRumble, 0);
+    }
 
 
     /**
