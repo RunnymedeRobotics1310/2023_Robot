@@ -246,7 +246,7 @@ public final class Constants {
         public static final double  MAX_PINCHER_SLOW_ZONE_SPEED         = .15;
         public static final double  PINCHER_CLOSE_LIMIT_ENCODER_VALUE   = 120;
         public static final double  PINCHER_POSITION_TOLERANCE          = 2;
-        public static final double  PINCHER_SLOW_ZONE_ENCODER_VALUE     = 12;
+        public static final double  PINCHER_SLOW_ZONE_ENCODER_VALUE     = 8;
         public static final double  PINCHER_GAME_PIECE_RELEASE_DISTANCE = 30;
         public static final double  MIN_PINCHER_INSIDE_FRAME_POSITION   = 100;
 
