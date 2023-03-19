@@ -174,7 +174,10 @@ public final class Constants {
 
         /** The maximum speed to drive the arm lift - manually or automatically */
         public static final double  MAX_LIFT_DOWN_SPEED                 = .2;
-        public static final double  MAX_LIFT_UP_SPEED                   = .3;
+        public static final double  MAX_LIFT_UP_SPEED                   = .2;                                   // setting it to
+                                                                                                                // .3 causes arm
+                                                                                                                // to overshoot
+                                                                                                                // target.
 
         public static final double  MAX_LIFT_SLOW_ZONE_SPEED            = .1;
 
