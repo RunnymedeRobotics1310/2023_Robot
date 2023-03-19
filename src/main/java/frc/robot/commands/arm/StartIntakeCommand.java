@@ -2,9 +2,9 @@ package frc.robot.commands.arm;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.GameConstants.GamePiece;
+import frc.robot.Constants.VisionConstants.VisionTarget;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -31,6 +31,8 @@ public class StartIntakeCommand extends BaseArmCommand {
 
         this.operatorInput   = operatorInput;
         this.visionSubsystem = visionSubsystem;
+
+        this.gamePiece       = GamePiece.NONE;
     }
 
     @Override
@@ -38,23 +40,30 @@ public class StartIntakeCommand extends BaseArmCommand {
 
         // Resolve the game piece from the operator input.
         if (operatorInput != null) {
+
             if (operatorInput.isPickUpCube()) {
-                visionSubsystem.setVisionTarget(Constants.VisionConstants.VisionTarget.CUBE_GROUND);
                 gamePiece = GamePiece.CUBE;
             }
             else {
                 if (operatorInput.isPickUpCone()) {
-                    visionSubsystem.setVisionTarget(Constants.VisionConstants.VisionTarget.CONE_GROUND);
                     gamePiece = GamePiece.CONE;
                 }
             }
         }
 
-        if (gamePiece == null) {
-            gamePiece = GamePiece.NONE;
-        }
-
         System.out.println("StartIntakeCommand started.  GamePiece " + gamePiece);
+
+        // Start the vision based on the game piece
+        if (gamePiece == GamePiece.CUBE) {
+
+            visionSubsystem.setVisionTarget(VisionTarget.CUBE_GROUND);
+
+        }
+        else if (gamePiece == GamePiece.CONE) {
+
+            visionSubsystem.setVisionTarget(VisionTarget.CONE_GROUND);
+
+        }
 
         printArmState();
         stopArmMotors();
@@ -65,16 +74,19 @@ public class StartIntakeCommand extends BaseArmCommand {
 
         // Resolve the game piece from the operator input.
         if (operatorInput != null) {
+
             if (operatorInput.isPickUpCube() && gamePiece != GamePiece.CUBE) {
+
                 System.out.println("StartIntakeCommand: Game Piece switched to CUBE.");
                 gamePiece = GamePiece.CUBE;
-                visionSubsystem.setVisionTarget(Constants.VisionConstants.VisionTarget.CUBE_GROUND);
+                visionSubsystem.setVisionTarget(VisionTarget.CUBE_GROUND);
             }
             else {
-                if (operatorInput.isPickUpCone()) {
+                if (operatorInput.isPickUpCone() && gamePiece != GamePiece.CONE) {
+
                     System.out.println("StartIntakeCommand: Game Piece switched to CONE.");
                     gamePiece = GamePiece.CONE;
-                    visionSubsystem.setVisionTarget(Constants.VisionConstants.VisionTarget.CONE_GROUND);
+                    visionSubsystem.setVisionTarget(VisionTarget.CONE_GROUND);
                 }
             }
         }

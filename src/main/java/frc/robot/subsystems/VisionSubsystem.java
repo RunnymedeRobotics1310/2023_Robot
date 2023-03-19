@@ -15,7 +15,9 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.networktables.*;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -282,6 +284,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     private void setCameraView(CameraView desiredView) {
+
         CameraView currentCameraView = getCameraView();
 
         if (currentCameraView == desiredView) {
@@ -305,8 +308,11 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public void setVisionTarget(VisionConstants.VisionTarget visionTarget) {
+
         this.currentVisionTarget = visionTarget;
+
         setCameraView(visionTarget.getCameraView());
+
         switch (visionTarget) {
         case CONE_GROUND:
         case CONE_SUBSTATION:
