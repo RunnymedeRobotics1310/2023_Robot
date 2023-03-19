@@ -30,8 +30,6 @@ public class DefaultArmCommand extends BaseArmCommand {
     @Override
     public void execute() {
 
-        double armLiftSpeed          = operatorInput.getArmLiftMotorSpeed();
-
         double armAngleLiftIncrement = operatorInput.getArmLiftMotorSpeed() * ArmConstants.MAX_ARM_ANGLE_LIFT_LOOP_INCREMENT;
 
         // Lift up faster than down

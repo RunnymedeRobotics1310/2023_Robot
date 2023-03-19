@@ -193,7 +193,7 @@ public final class Constants {
          * down to full up (using the manual trim). Setting the setpoint will result
          * in a faster movement.
          *
-         * loop increment = 4 seconds to go from 20-120 degrees / 50 loops/sec
+         * loop increment = 4 seconds to go from 25-110 degrees / 50 loops/sec
          */
         public static final double  MAX_ARM_ANGLE_LIFT_LOOP_INCREMENT   = 100 / 50d;
 
