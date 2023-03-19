@@ -8,7 +8,7 @@ import frc.robot.subsystems.ArmSubsystem;
 
 public class ScoreAutoCommand extends BaseArmCommand {
 
-    private final long       MAX_TIME_TO_SCORE_MILLIS = 3000L;
+    private final long       MAX_TIME_TO_SCORE_MILLIS = 4000L;
 
     private final ScoringRow scoringRow;
     private ArmPosition      scoringPosition          = null;
@@ -62,6 +62,7 @@ public class ScoreAutoCommand extends BaseArmCommand {
                 return;
             }
 
+            step = Step.LIFT_AND_EXTEND;
             return;
 
         case LIFT_AND_EXTEND:
@@ -93,7 +94,7 @@ public class ScoreAutoCommand extends BaseArmCommand {
 
             // Lower the arm onto the post
             // Lower the arm by 5 degrees or .5 seconds whichever comes first.
-            if (moveArmLiftToAngle(scoringPosition.angle - 5)
+            if (moveArmLiftToAngle(scoringPosition.angle - 11)
                 || System.currentTimeMillis() - lowerArmStartTime > 500) {
 
                 step = Step.FINISH;

@@ -19,7 +19,7 @@ import frc.robot.Constants.GameConstants.Zone;
 import frc.robot.commands.arm.CompactCommand;
 import frc.robot.commands.arm.PickupGamePieceCommand;
 import frc.robot.commands.arm.ReleaseCommand;
-import frc.robot.commands.arm.ScoreCommand;
+import frc.robot.commands.arm.ScoreAutoCommand;
 import frc.robot.commands.arm.StartIntakeCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
@@ -186,7 +186,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
                 break;
 
             }
-            addCommands(new ScoreCommand(scoringRow, armSubsystem));
+            addCommands(new ScoreAutoCommand(scoringRow, armSubsystem));
             addCommands(new WaitCommand(.1));
             addCommands(new ReleaseCommand(armSubsystem));
         }
