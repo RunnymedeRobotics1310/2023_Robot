@@ -1,5 +1,7 @@
 package frc.robot.commands.operator;
 
+import edu.wpi.first.wpilibj.GenericHID;
+
 /**
  * The DriverController exposes all driver functions
  */
@@ -166,6 +168,14 @@ public class OperatorInput {
 
     public boolean isCameraViewLow() {
         return driverController.getPOV() == 180;
+    }
+
+    public void startVibrate() {
+        driverController.setRumble(GenericHID.RumbleType.kBothRumble, 1);
+    }
+
+    public void stopVibrate() {
+        driverController.setRumble(GenericHID.RumbleType.kBothRumble, 0);
     }
 
 

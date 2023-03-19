@@ -75,16 +75,16 @@ public class StartIntakeCommand extends BaseArmCommand {
         // Resolve the game piece from the operator input.
         if (operatorInput != null) {
 
-            if (operatorInput.isPickUpCube() && gamePiece != GamePiece.CUBE) {
+            if (operatorInput.isPickUpCube()) { // && gamePiece != GamePiece.CUBE) {
 
-                System.out.println("StartIntakeCommand: Game Piece switched to CUBE.");
+                // System.out.println("StartIntakeCommand: Game Piece switched to CUBE.");
                 gamePiece = GamePiece.CUBE;
                 visionSubsystem.setVisionTarget(VisionTarget.CUBE_GROUND);
             }
             else {
-                if (operatorInput.isPickUpCone() && gamePiece != GamePiece.CONE) {
+                if (operatorInput.isPickUpCone()) {
 
-                    System.out.println("StartIntakeCommand: Game Piece switched to CONE.");
+                    // System.out.println("StartIntakeCommand: Game Piece switched to CONE.");
                     gamePiece = GamePiece.CONE;
                     visionSubsystem.setVisionTarget(VisionTarget.CONE_GROUND);
                 }
@@ -162,7 +162,7 @@ public class StartIntakeCommand extends BaseArmCommand {
         if (DriverStation.isTeleopEnabled()) {
 
             if (armSubsystem.isGamePieceDetected()) {
-                CommandScheduler.getInstance().schedule(new PickupGamePieceCommand(gamePiece, armSubsystem));
+                CommandScheduler.getInstance().schedule(new PickupGamePieceCommand(gamePiece, operatorInput, armSubsystem));
             }
             else {
                 CommandScheduler.getInstance().schedule(new CompactCommand(armSubsystem));

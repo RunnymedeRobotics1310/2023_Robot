@@ -195,7 +195,7 @@ public final class Constants {
          *
          * loop increment = 4 seconds to go from 25-110 degrees / 50 loops/sec
          */
-        public static final double  MAX_ARM_ANGLE_LIFT_LOOP_INCREMENT   = 100 / 4 / 50d;
+        public static final double  MAX_ARM_ANGLE_LIFT_LOOP_INCREMENT   = 100 / 3 / 50d;
 
         /*
          * Arm Angle Constants

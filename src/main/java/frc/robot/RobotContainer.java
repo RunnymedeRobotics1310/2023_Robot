@@ -95,10 +95,10 @@ public class RobotContainer {
 
         // FIXME: (low) consider moving all of the choosers to their own classes.
 
-        startingLaneChooser.setDefaultOption("Top", AutoLane.TOP);
+        startingLaneChooser.setDefaultOption("Substation", AutoLane.TOP);
         SmartDashboard.putData("Starting Lane", startingLaneChooser);
         startingLaneChooser.addOption("Middle", AutoLane.MIDDLE);
-        startingLaneChooser.addOption("Bottom", AutoLane.BOTTOM);
+        startingLaneChooser.addOption("Wall", AutoLane.BOTTOM);
 
         startingGamePieceChooser.setDefaultOption("Cone", GamePiece.CONE);
         SmartDashboard.putData("Starting Game Piece", startingGamePieceChooser);
@@ -188,12 +188,12 @@ public class RobotContainer {
                 .andThen(new CompactCommand(armSubsystem)));
 
         new Trigger(() -> (operatorInput.isVisionSubstationConePickup()))
-            .onTrue(new PickUpSubstationVisionCommand(armSubsystem, driveSubsystem, visionSubsystem));
+            .onTrue(new PickUpSubstationVisionCommand(operatorInput, armSubsystem, driveSubsystem, visionSubsystem));
 
         new Trigger(() -> (operatorInput.isCameraViewHigh()))
             .onTrue(new SetVisionTargetCommand(Constants.VisionConstants.VisionTarget.FIELD, visionSubsystem));
 
-        new Trigger(() ->(operatorInput.isCameraViewLow()))
+        new Trigger(() -> (operatorInput.isCameraViewLow()))
             .onTrue(new SetVisionTargetCommand(Constants.VisionConstants.VisionTarget.CUBE_GROUND, visionSubsystem));
     }
 

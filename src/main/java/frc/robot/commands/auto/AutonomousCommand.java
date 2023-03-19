@@ -236,7 +236,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
             addCommands(new SetVisionTargetCommand(CONE_GROUND, visionSubsystem));
         }
         double exitZoneDistance = 330;
-        if(startingLane == AutoLane.BOTTOM){
+        if (startingLane == AutoLane.BOTTOM) {
             exitZoneDistance = 340;
         }
         // Drive out of the zone
@@ -264,7 +264,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
             addCommands(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem)
                 .deadlineWith(new DriveToTargetCommand(CUBE_GROUND, .2, driveSubsystem, visionSubsystem, armSubsystem)));
 
-            addCommands(new PickupGamePieceCommand(GamePiece.CUBE, armSubsystem));
+            addCommands(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem));
 
         }
         if (exitZoneAction == AutoAction.PICK_UP_CONE) {
@@ -272,7 +272,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
             addCommands(new StartIntakeCommand(GamePiece.CONE, armSubsystem, visionSubsystem)
                 .deadlineWith(new DriveToTargetCommand(CONE_GROUND, .2, driveSubsystem, visionSubsystem, armSubsystem)));
 
-            addCommands(new PickupGamePieceCommand(GamePiece.CONE, armSubsystem));
+            addCommands(new PickupGamePieceCommand(GamePiece.CONE, null, armSubsystem));
         }
     }
 
