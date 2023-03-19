@@ -50,9 +50,9 @@ public class DefaultDriveCommand extends CommandBase {
 
         double  leftSpeed = 0, rightSpeed = 0;
 
-        if (slow){
-            speed = speed/5;
-            turn = turn/5;
+        if (slow) {
+            speed = speed / 5;
+            turn  = turn / 2.5; // Turn was already divided by 2 above
         }
 
         else if (!boost) {
