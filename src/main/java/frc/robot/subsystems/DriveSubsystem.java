@@ -105,7 +105,8 @@ public class DriveSubsystem extends SubsystemBase {
     /**
      * Calibrate Gyro
      * <p>
-     * This routine calibrates the gyro. The robot must not be moved during the calibrate routine which lasts about 10 seconds
+     * This routine calibrates the gyro. The robot must not be moved during the calibrate routine
+     * which lasts about 10 seconds
      */
     public void calibrateGyro() {
 
@@ -373,9 +374,6 @@ public class DriveSubsystem extends SubsystemBase {
         // If the arm is not retracted, then the max speed is .25
         // normally, the drive speed is .5 and can be boosted.
 
-        // Determine if the arm is inside the robot
-        boolean armInsideFrame = armSubsystem.isArmInsideFrame();
-
         if (armSubsystem.getArmExtendEncoder() >= 10 && DriverStation.isTeleopEnabled()) {
 
             // Limit each side to 0.25
@@ -386,12 +384,6 @@ public class DriveSubsystem extends SubsystemBase {
             // Watch out for sharp turns
             limitTurning(0.35);
         }
-        else if (!armInsideFrame) {
-
-            // If the arm is not inside the frame, limit all turns to 0.5
-            limitTurning(.35);
-        }
-
         else {
             // Always limit the turning to 1.0
             limitTurning(1.0);
