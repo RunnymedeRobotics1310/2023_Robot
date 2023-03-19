@@ -31,7 +31,7 @@ public final class Constants {
         public static enum GamePiece {
 
             CUBE(65), // Confirmed
-            CONE(120), // Confirmed
+            CONE(123), // Confirmed
             NONE(ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE); // Confirmed
 
             public final double pincherEncoderCount;
@@ -244,7 +244,7 @@ public final class Constants {
 
         public static final double  MAX_PINCHER_SPEED                   = 1;
         public static final double  MAX_PINCHER_SLOW_ZONE_SPEED         = .15;
-        public static final double  PINCHER_CLOSE_LIMIT_ENCODER_VALUE   = 120;
+        public static final double  PINCHER_CLOSE_LIMIT_ENCODER_VALUE   = 125;
         public static final double  PINCHER_POSITION_TOLERANCE          = 2;
         public static final double  PINCHER_SLOW_ZONE_ENCODER_VALUE     = 8;
         public static final double  PINCHER_GAME_PIECE_RELEASE_DISTANCE = 30;
@@ -259,7 +259,7 @@ public final class Constants {
         // rocking wheels and the weighting in the back
         // therefore compensate for this by bringing the angle down a bit.
         // For our first qual match we will try 100 degrees
-        public static final ArmPosition SCORE_TOP_CONE_AUTO_POSITION = new ArmPosition(99, 55);                   // Confirmed
+        public static final ArmPosition SCORE_TOP_CONE_AUTO_POSITION = new ArmPosition(101, 55);                  // Confirmed
         public static final ArmPosition SCORE_TOP_CONE_POSITION      = new ArmPosition(97, 54);                   // Confirmed
         public static final ArmPosition SCORE_TOP_CUBE_POSITION      = new ArmPosition(90, 50);                   // Confirmed
 
@@ -273,7 +273,7 @@ public final class Constants {
 
         // Pickup constants
         public static final ArmPosition GROUND_PICKUP_POSITION       = new ArmPosition(34, 14);                   // Confirmed
-        public static final ArmPosition SUBSTATION_PICKUP_POSITION   = new ArmPosition(87, 30);
+        public static final ArmPosition SUBSTATION_PICKUP_POSITION   = new ArmPosition(86.5, 30);
 
         // Drive with Piece constants
         public static final ArmPosition DRIVE_WITH_CONE_POSITION     = new ArmPosition(45, 0);                    // todo:
