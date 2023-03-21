@@ -77,6 +77,10 @@ public class ScoreAutoCommand extends BaseArmCommand {
                     step              = Step.LOWER_ARM;
                     lowerArmStartTime = System.currentTimeMillis();
 
+                    // DEBUG
+                    System.out.println("State = LOWER_ARM");
+                    System.out.println(commandStartTime - System.currentTimeMillis());
+
                     stopArmMotors();
                     return;
                 }
@@ -98,6 +102,10 @@ public class ScoreAutoCommand extends BaseArmCommand {
                 || System.currentTimeMillis() - lowerArmStartTime > 500) {
 
                 step = Step.FINISH;
+
+                // DEBUG
+                System.out.println("State = FINISH");
+                System.out.println(commandStartTime - System.currentTimeMillis());
             }
             return;
 
