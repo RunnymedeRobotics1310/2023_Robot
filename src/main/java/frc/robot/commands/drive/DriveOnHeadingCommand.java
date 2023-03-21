@@ -2,11 +2,11 @@
 
 package frc.robot.commands.drive;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class DriveOnHeadingCommand extends CommandBase {
+public class DriveOnHeadingCommand extends RunnymedeCommandBase {
 
     final double                 factor         = 0.01;
 
@@ -95,12 +95,14 @@ public class DriveOnHeadingCommand extends CommandBase {
     @Override
     public void initialize() {
 
-        System.out.println("DriveOnHeadingCommand started."
-            + " Heading " + heading
-            + ", Speed " + speed
-            + ", distance " + distanceCm
-            + ", brake at end " + brakeAtEnd
-            + ", timeout " + timeoutSeconds);
+        StringBuilder parms = new StringBuilder();
+        parms.append("Heading ").append(heading)
+            .append(", Speed ").append(speed)
+            .append(", Distance ").append(distanceCm)
+            .append(", Brake at end ").append(brakeAtEnd)
+            .append(", Timeout ").append(timeoutSeconds);
+
+        logCommandStart(parms.toString());
 
         // Reset the distance to zero.
         // Note: this must be done in the initialize instead of in the constructor
@@ -144,11 +146,13 @@ public class DriveOnHeadingCommand extends CommandBase {
         // Check the distance
         // use the absolute value to account for driving backwards
         if (Math.abs(driveSubsystem.getEncoderDistanceCm()) > Math.abs(distanceCm)) {
+            setFinishReason("At required distance");
             return true;
         }
 
         // Check the timeout
         if ((System.currentTimeMillis() - initializeTime) / 1000d > timeoutSeconds) {
+            setFinishReason("Timed out");
             return true;
         }
 
@@ -158,19 +162,7 @@ public class DriveOnHeadingCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
 
-        // Print an end of command message in the logs
-        double runTime = (System.currentTimeMillis() - initializeTime) / 1000d;
-
-        if (interrupted) {
-            System.out.print("DriveOnHeadingCommand interrupted");
-        }
-        else {
-            System.out.print("DriveOnHeadingCommand ended");
-        }
-        System.out.println(" at distance " + driveSubsystem.getEncoderDistanceCm()
-            + ", on heading " + driveSubsystem.getHeading()
-            + ", in " + runTime + "s"
-            + ", brake at end " + brakeAtEnd);
+        logCommandEnd(interrupted);
 
         // Stop the robot if required
         if (brakeAtEnd) {

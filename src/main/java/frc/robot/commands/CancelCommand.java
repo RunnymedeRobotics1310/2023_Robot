@@ -1,25 +1,26 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 /**
- * This command is used to safely stop the robot in its current position, and to cancel any running commands
+ * This command is used to safely stop the robot in its current position, and to cancel any running
+ * commands
  */
-public class CancelCommand extends CommandBase {
+public class CancelCommand extends RunnymedeCommandBase {
 
     private final DriveSubsystem  driveSubsystem;
     private final ArmSubsystem    armSubsystem;
     private final VisionSubsystem visionSubsystem;
 
-    private long startTime = 0;
+    private long                  startTime = 0;
 
     /**
      * Cancel the commands running on all subsystems.
      *
-     * All subsystems must be passed to this command, and each subsystem should have a stop command that safely stops the robot
+     * All subsystems must be passed to this command, and each subsystem should have a stop command
+     * that safely stops the robot
      * from moving.
      */
     public CancelCommand(DriveSubsystem driveSubsystem, ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem) {
@@ -34,7 +35,7 @@ public class CancelCommand extends CommandBase {
     @Override
     public void initialize() {
 
-        System.out.println("Cancel Command started.");
+        logCommandStart();
 
         driveSubsystem.stop();
         armSubsystem.stop();
@@ -53,6 +54,11 @@ public class CancelCommand extends CommandBase {
         }
 
         return false;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        logCommandEnd(interrupted);
     }
 
 }

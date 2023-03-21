@@ -2,10 +2,10 @@
 
 package frc.robot.commands.drive;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class BalanceCommand extends CommandBase {
+public class BalanceCommand extends RunnymedeCommandBase {
 
     private final DriveSubsystem driveSubsystem;
     long                         startTime                  = 0;
@@ -44,13 +44,10 @@ public class BalanceCommand extends CommandBase {
         this.driveSubsystem = driveSubsystem;
 
         addRequirements(driveSubsystem);
-
     }
 
     @Override
     public void initialize() {
-
-        System.out.println("BalanceCommand started at pitch " + driveSubsystem.getPitch() + ". CLIMB");
 
         startTime               = System.currentTimeMillis();
         prevLevelTime           = -1;
@@ -78,6 +75,8 @@ public class BalanceCommand extends CommandBase {
         else {
             currentState = State.BALANCE;
         }
+
+        logCommandStart("Initial state " + currentState);
     }
 
     @Override
@@ -101,7 +100,7 @@ public class BalanceCommand extends CommandBase {
                 // Move opposite to the climb direction
                 centeringSpeed = -CENTERING_SPEED * Math.signum(pitch);
 
-                System.out.println("Balance Command: CENTERING from pitch " + pitch);
+                logStateTransition("CLIMB -> CENTERING");
             }
 
             setPitchSpeed(pitch);
@@ -122,7 +121,7 @@ public class BalanceCommand extends CommandBase {
                 currentState            = State.WAIT;
                 centeringDelayStartTime = System.currentTimeMillis();
 
-                System.out.println("Balance Command: WAITING at pitch " + pitch);
+                logStateTransition("CENTERING -> WAIT");
             }
 
             break;
@@ -132,8 +131,10 @@ public class BalanceCommand extends CommandBase {
             trackInitialGyroHeading(0);
 
             if (System.currentTimeMillis() - centeringDelayStartTime > CENTERING_DELAY) {
+
                 currentState = State.BALANCE;
-                System.out.println("Balance Command: BALANCING from pitch " + pitch);
+
+                logStateTransition("WAIT -> BALANCE");
             }
             break;
 
@@ -144,7 +145,10 @@ public class BalanceCommand extends CommandBase {
             // if angle is too big, we
             // can't balance with BALANCE
             if (Math.abs(pitch) > 8) {
-                currentState = State.CLIMB;
+
+                // Reset the max climb pitch before going back to climbs
+                maxClimbPitch = pitch;
+                logStateTransition("BALANCE -> CLIMB");
             }
             break;
         }
@@ -156,6 +160,7 @@ public class BalanceCommand extends CommandBase {
 
         // Timeout
         if (System.currentTimeMillis() - startTime > 10000) {
+            setFinishReason("Command timed out after 10 seconds");
             return true;
         }
 
@@ -181,11 +186,21 @@ public class BalanceCommand extends CommandBase {
 
         if (System.currentTimeMillis() - prevLevelTime > LEVEL_TIMEOUT) {
             // It's been level long enough!
+            setFinishReason("Levelled!");
             return true;
         }
 
         // Keep trying
         return false;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+
+        logCommandEnd(interrupted);
+
+        // Stop the robot
+        driveSubsystem.setMotorSpeeds(0, 0);
     }
 
     private void setPitchSpeed(double pitch) {
@@ -233,19 +248,5 @@ public class BalanceCommand extends CommandBase {
 
         // In the end, set the speeds on the motors
         driveSubsystem.setMotorSpeeds(leftSpeed, rightSpeed);
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-
-        if (interrupted) {
-            System.out.print("BalanceCommand interrupted");
-        }
-        else {
-            System.out.print("BalanceCommand ended at " + driveSubsystem.getPitch());
-        }
-
-        // Stop the robot
-        driveSubsystem.setMotorSpeeds(0, 0);
     }
 }

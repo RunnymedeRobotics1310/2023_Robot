@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.operator.RunnymedeGameController;
@@ -13,7 +12,7 @@ import frc.robot.subsystems.VisionSubsystem;
  * This command is used to safely stop the robot in its current position, and to cancel any running
  * commands
  */
-public class SystemTestCommand extends CommandBase {
+public class SystemTestCommand extends RunnymedeCommandBase {
 
     private enum Motor {
         NONE,
@@ -74,7 +73,7 @@ public class SystemTestCommand extends CommandBase {
     @Override
     public void initialize() {
 
-        System.out.println("SystemTestCommand : started.");
+        logCommandStart();
 
         stopAllMotors();
 
@@ -298,6 +297,7 @@ public class SystemTestCommand extends CommandBase {
 
         // Cancel on the regular cancel button after the first 0.5 seconds
         if (driverController.isCancel()) {
+            setFinishReason("Cancelled by driver controller");
             return true;
         }
 
@@ -307,9 +307,6 @@ public class SystemTestCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
 
-        System.out.println("SystemTestCommand : "
-            + (interrupted ? "interrupted" : " cancelled by user"));
-
         stopAllMotors();
 
         selectedMotor = Motor.NONE;
@@ -318,6 +315,7 @@ public class SystemTestCommand extends CommandBase {
         SmartDashboard.putString("Test Motor", selectedMotor.toString());
         SmartDashboard.putNumber("Test Motor Speed", 0);
 
+        logCommandEnd(interrupted);
     }
 
     private void clearMotorIndicators() {

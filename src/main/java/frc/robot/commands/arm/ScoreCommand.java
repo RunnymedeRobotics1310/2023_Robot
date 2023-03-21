@@ -26,11 +26,10 @@ public class ScoreCommand extends BaseArmCommand {
         gamePiece       = armSubsystem.getHeldGamePiece();
         scoringPosition = ArmConstants.getScoringPosition(gamePiece, scoringRow);
 
-        System.out.println("ScoreCommand started.  Scoring row : " + scoringRow);
-
-        printArmState();
         stopArmMotors();
         startScoreTime = System.currentTimeMillis();
+
+        logCommandStart("Scoring row : " + scoringRow);
     }
 
     @Override
@@ -74,22 +73,22 @@ public class ScoreCommand extends BaseArmCommand {
 
     @Override
     public boolean isFinished() {
+
         if (System.currentTimeMillis() - startScoreTime > MAX_TIME_TO_SCORE_MILLIS) {
-            System.out.println("Score timeout exceeded - aborting");
+            setFinishReason("Score timeout exceeded - aborting");
             return true;
         }
 
         // ensure that we have a piece and haven't dropped it
         if (!armSubsystem.isGamePieceDetected()) {
-            System.out.print("Can not score, no piece is held.");
+            setFinishReason("Can not score, no piece is held.");
             return true;
         }
 
         // Check position
-        if (armSubsystem.isArmAtLiftAngle(scoringPosition.angle)
-            && armSubsystem.isAtExtendPosition(scoringPosition.extension)) {
+        if (armSubsystem.isInPosition(scoringPosition)) {
 
-            System.out.print("ScoreCommand finished");
+            setFinishReason("ScoreCommand finished");
             return true;
         }
 
@@ -101,12 +100,6 @@ public class ScoreCommand extends BaseArmCommand {
 
         stopArmMotors();
 
-        if (interrupted) {
-            System.out.print("ScoreCommand interrupted");
-        }
-        else {
-            System.out.print("ScoreCommand ended");
-        }
-        printArmState();
+        logCommandEnd(interrupted);
     }
 }

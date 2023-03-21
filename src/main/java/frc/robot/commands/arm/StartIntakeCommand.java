@@ -6,6 +6,7 @@ import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.VisionConstants.VisionTarget;
 import frc.robot.commands.operator.OperatorInput;
+import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
@@ -14,7 +15,8 @@ public class StartIntakeCommand extends BaseArmCommand {
     private final OperatorInput   operatorInput;
     private final VisionSubsystem visionSubsystem;
 
-    private GamePiece             gamePiece = null;
+    private GamePiece             gamePiece    = null;
+    private VisionTarget          visionTarget = null;
 
     public StartIntakeCommand(GamePiece gamePiece, ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem) {
 
@@ -42,31 +44,25 @@ public class StartIntakeCommand extends BaseArmCommand {
         if (operatorInput != null) {
 
             if (operatorInput.isPickUpCube()) {
-                gamePiece = GamePiece.CUBE;
+                gamePiece    = GamePiece.CUBE;
+                visionTarget = VisionTarget.CUBE_GROUND;
             }
             else {
                 if (operatorInput.isPickUpCone()) {
-                    gamePiece = GamePiece.CONE;
+                    gamePiece    = GamePiece.CONE;
+                    visionTarget = VisionTarget.CONE_GROUND;
                 }
+            }
+
+            if (gamePiece != GamePiece.NONE) {
+                // Set the vision target in the vision subsystem.
+                CommandScheduler.getInstance().schedule(new SetVisionTargetCommand(visionTarget, visionSubsystem));
             }
         }
 
-        System.out.println("StartIntakeCommand started.  GamePiece " + gamePiece);
-
-        // Start the vision based on the game piece
-        if (gamePiece == GamePiece.CUBE) {
-
-            visionSubsystem.setVisionTarget(VisionTarget.CUBE_GROUND);
-
-        }
-        else if (gamePiece == GamePiece.CONE) {
-
-            visionSubsystem.setVisionTarget(VisionTarget.CONE_GROUND);
-
-        }
-
-        printArmState();
         stopArmMotors();
+
+        logCommandStart("GamePiece " + gamePiece);
     }
 
     @Override
@@ -75,18 +71,22 @@ public class StartIntakeCommand extends BaseArmCommand {
         // Resolve the game piece from the operator input.
         if (operatorInput != null) {
 
-            if (operatorInput.isPickUpCube()) { // && gamePiece != GamePiece.CUBE) {
+            if (operatorInput.isPickUpCube() && gamePiece != GamePiece.CUBE) {
 
-                // System.out.println("StartIntakeCommand: Game Piece switched to CUBE.");
-                gamePiece = GamePiece.CUBE;
-                visionSubsystem.setVisionTarget(VisionTarget.CUBE_GROUND);
+                // Adjust the vision target
+                gamePiece    = GamePiece.CUBE;
+                visionTarget = VisionTarget.CUBE_GROUND;
+
+                CommandScheduler.getInstance().schedule(new SetVisionTargetCommand(visionTarget, visionSubsystem));
             }
             else {
-                if (operatorInput.isPickUpCone()) {
+                if (operatorInput.isPickUpCone() && gamePiece != GamePiece.CONE) {
 
-                    // System.out.println("StartIntakeCommand: Game Piece switched to CONE.");
-                    gamePiece = GamePiece.CONE;
-                    visionSubsystem.setVisionTarget(VisionTarget.CONE_GROUND);
+                    // Adjust the vision target
+                    gamePiece    = GamePiece.CONE;
+                    visionTarget = VisionTarget.CONE_GROUND;
+
+                    CommandScheduler.getInstance().schedule(new SetVisionTargetCommand(visionTarget, visionSubsystem));
                 }
             }
         }
@@ -128,6 +128,7 @@ public class StartIntakeCommand extends BaseArmCommand {
         // If the user is no longer asking for pickup
         if (operatorInput != null) {
             if (!operatorInput.isPickUpCone() && !operatorInput.isPickUpCube()) {
+                setFinishReason("Driver cancelled pickup");
                 return true;
             }
         }
@@ -137,6 +138,7 @@ public class StartIntakeCommand extends BaseArmCommand {
 
             // If a game piece is detected
             if (armSubsystem.isGamePieceDetected()) {
+                setFinishReason("Game piece detected in pickup");
                 return true;
             }
         }
@@ -149,14 +151,7 @@ public class StartIntakeCommand extends BaseArmCommand {
 
         stopArmMotors();
 
-        if (interrupted) {
-            System.out.print("ScoreCommand interrupted");
-        }
-        else {
-            System.out.print("ScoreCommand ended");
-        }
-        printArmState();
-
+        logCommandEnd(interrupted);
 
         // In Teleop, pick the next command
         if (DriverStation.isTeleopEnabled()) {

@@ -4,24 +4,17 @@ import static frc.robot.Constants.ArmConstants.MAX_EXTEND_SPEED;
 import static frc.robot.Constants.ArmConstants.MAX_PINCHER_SPEED;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.subsystems.ArmSubsystem;
 
-abstract class BaseArmCommand extends CommandBase {
+abstract class BaseArmCommand extends RunnymedeCommandBase {
 
     protected final ArmSubsystem armSubsystem;
 
     protected BaseArmCommand(ArmSubsystem armSubsystem) {
         this.armSubsystem = armSubsystem;
         addRequirements(armSubsystem);
-    }
-
-    protected final void printArmState() {
-        System.out.println("BaseArmCommand: armSubsystem.getHeldGamePiece: " + armSubsystem.getHeldGamePiece());
-        System.out.println("BaseArmCommand: Arm angle: " + armSubsystem.getArmLiftAngle());
-        System.out.println("BaseArmCommand: Arm extent: " + armSubsystem.getArmExtendEncoder());
-        System.out.println("BaseArmCommand: Pincher: " + armSubsystem.getPincherEncoder());
     }
 
     /**
@@ -90,7 +83,7 @@ abstract class BaseArmCommand extends CommandBase {
             return true;
         }
 
-        double gap    = targetCount - armSubsystem.getArmExtendEncoder();
+        double gap = targetCount - armSubsystem.getArmExtendEncoder();
 
         // Determine whether to slow down because we are close to the target.
         if (Math.abs(gap) < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
@@ -139,7 +132,8 @@ abstract class BaseArmCommand extends CommandBase {
                 return true;
             }
 
-            // When closing to the limit, slow down when the encoders read a value close to the limit.
+            // When closing to the limit, slow down when the encoders read a value close to the
+            // limit.
             // Note: if the encoders are way off, then it may take a while to get to the
             // limit from here which could affect the auto.
             if (gap > -ArmConstants.PINCHER_SLOW_ZONE_ENCODER_VALUE) {

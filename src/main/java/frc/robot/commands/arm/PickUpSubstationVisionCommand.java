@@ -3,6 +3,7 @@ package frc.robot.commands.arm;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.ArmPosition;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.Constants.VisionConstants.VisionTarget;
@@ -14,32 +15,31 @@ import frc.robot.subsystems.VisionSubsystem;
 
 public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
-    private static final double   MIN_PICKUP_DISTANCE              = 95;
-    private static final double   MAX_PICKUP_DISTANCE              = 115;
-    private static final double   TARGET_CAMERA_OFFSET             = 5;
-    private static final double   VISION_TARGET_HEADING_TOLERANCE  = 1;
+    private static final double   MIN_PICKUP_DISTANCE             = 95;
+    private static final double   MAX_PICKUP_DISTANCE             = 115;
+    private static final double   TARGET_CAMERA_OFFSET            = 5;
+    private static final double   VISION_TARGET_HEADING_TOLERANCE = 1;
 
     private final VisionSubsystem visionSubsystem;
     private final DriveSubsystem  driveSubsystem;
     private final OperatorInput   operatorInput;
 
-    private double                requiredExtensionEncoderPosition = 0;
-    private double                requiredArmAngle                 = 0;
-    private double                pauseStartTime                   = 0;
-    private double                alignStartTime                   = 0;
+    private ArmPosition           shelfTargetArmPosition          = null;
+    private double                pauseStartTime                  = 0;
+    private double                alignStartTime                  = 0;
 
     /**
      * Only cone is supported for now.
      */
-    private GamePiece             gamePiece                        = GamePiece.CONE;
+    private GamePiece             gamePiece                       = GamePiece.CONE;
 
-    private double                visionTargetHeadingError         = 0;
+    private double                visionTargetHeadingError        = 0;
 
     private enum State {
-        MOVE_CAMERA_AND_GET_WITHIN_RANGE, ALIGN, PAUSE, EXTEND_ARM, PICKUP
+        GET_WITHIN_RANGE, ALIGN, PAUSE, EXTEND_ARM, PICKUP
     }
 
-    private State currentState = State.MOVE_CAMERA_AND_GET_WITHIN_RANGE;
+    private State currentState = State.GET_WITHIN_RANGE;
 
     public PickUpSubstationVisionCommand(OperatorInput operatorInput, ArmSubsystem armSubsystem, DriveSubsystem driveSubsystem,
         VisionSubsystem visionSubsystem) {
@@ -56,18 +56,17 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
     @Override
     public void initialize() {
 
-        System.out.println("PickUp Substation started.  GamePiece " + gamePiece);
-
         // Schedule to set up the camera in parallel
         CommandScheduler.getInstance().schedule(
             new SetVisionTargetCommand(VisionTarget.CONE_SUBSTATION, visionSubsystem));
 
         visionTargetHeadingError = 0;
 
-        printArmState();
         stopArmMotors();
 
-        currentState = State.MOVE_CAMERA_AND_GET_WITHIN_RANGE;
+        currentState = State.GET_WITHIN_RANGE;
+
+        logCommandStart("Starting state: GET_WITHIN_RANGE");
     }
 
     @Override
@@ -79,7 +78,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
         switch (currentState) {
 
-        case MOVE_CAMERA_AND_GET_WITHIN_RANGE: {
+        case GET_WITHIN_RANGE: {
 
             double speed = calcSpeedToScoringRange();
             driveSubsystem.setMotorSpeeds(speed, speed);
@@ -87,7 +86,9 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
             // Wait for the camera to get into position
             if (visionSubsystem.getCameraView() == CameraView.HIGH) {
 
-                currentState   = State.ALIGN;
+                currentState = State.ALIGN;
+                logStateTransition("GET_WITHIN_RANGE -> ALIGN");
+
                 alignStartTime = System.currentTimeMillis();
 
                 // If there is a vision target, then update the error
@@ -112,8 +113,9 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
                 // Stop the motors
                 driveSubsystem.setMotorSpeeds(0, 0);
                 pauseStartTime = System.currentTimeMillis();
-                System.out
-                    .println("Timing out alignment prior to aligning perfectly. Current error: " + visionTargetHeadingError);
+
+                logStateTransition("ALIGN -> PAUSE",
+                    "Timing out alignment prior to aligning perfectly. Current error: " + visionTargetHeadingError);
                 return;
             }
 
@@ -130,6 +132,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
                 pauseStartTime = System.currentTimeMillis();
 
                 currentState   = State.PAUSE;
+                logStateTransition("ALIGN -> PAUSE", "Aligned, Vision Target Error " + visionTargetHeadingError);
             }
 
             // Wait for target and distance alignment
@@ -146,19 +149,21 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
             if (System.currentTimeMillis() - pauseStartTime > 250) {
 
                 // Set the required extension distance based on the following formula
-                requiredExtensionEncoderPosition = ultrasonicDistanceCm * .88 - 53.1;
+                double requiredExtensionEncoderPosition = ultrasonicDistanceCm * .88 - 53.1;
 
-                double pickupAngle = ArmConstants.SUBSTATION_PICKUP_POSITION.angle;
+                double pickupAngle                      = ArmConstants.SUBSTATION_PICKUP_POSITION.angle;
 
                 // tweak the angle slightly higher if closer to the substation. The range of
                 // distances is 75-115 cm.
                 // NOTE: This calculation must be done before raising the arm in the way.
 
-                pickupAngle      += (115 - ultrasonicDistanceCm) / 12d;
+                pickupAngle            += (115 - ultrasonicDistanceCm) / 12d;
 
-                requiredArmAngle  = pickupAngle;
+                shelfTargetArmPosition  = new ArmPosition(pickupAngle, requiredExtensionEncoderPosition);
 
-                currentState      = State.EXTEND_ARM;
+                currentState            = State.EXTEND_ARM;
+
+                logStateTransition("PAUSE -> EXTEND_ARM", "Target arm position " + shelfTargetArmPosition);
             }
 
             return;
@@ -188,11 +193,12 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
             // Always open the pincher, there is no point in waiting
             openPincher();
 
-            if (moveArmLiftToAngle(requiredArmAngle)) {
+            if (moveArmLiftToAngle(shelfTargetArmPosition.angle)) {
 
-                if (moveArmExtendToEncoderCount(requiredExtensionEncoderPosition, ArmConstants.MAX_EXTEND_SPEED)) {
+                if (moveArmExtendToEncoderCount(shelfTargetArmPosition.extension, ArmConstants.MAX_EXTEND_SPEED)) {
 
                     currentState = State.PICKUP;
+                    logStateTransition("EXTEND_ARM -> PICKUP");
                 }
             }
 
@@ -215,11 +221,13 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
         // If holding the required piece
         if (armSubsystem.getHeldGamePiece() == gamePiece) {
+            setFinishReason("Game Piece held " + gamePiece);
             return true;
         }
 
         // If the pincher is closed the command ends even if there is no game piece
         if (armSubsystem.isAtPincherPosition(gamePiece.pincherEncoderCount)) {
+            setFinishReason("At pincher close position");
             return true;
         }
 
@@ -231,13 +239,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
         stopArmMotors();
 
-        if (interrupted) {
-            System.out.print("Pick Up Substation interrupted");
-        }
-        else {
-            System.out.print("Pick Up Substation ended");
-        }
-        printArmState();
+        logCommandEnd(interrupted);
 
         // In Teleop, pick the next command
         if (DriverStation.isTeleopEnabled()) {

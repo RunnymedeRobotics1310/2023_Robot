@@ -25,10 +25,6 @@ public class PickupGamePieceCommand extends BaseArmCommand {
     @Override
     public void initialize() {
 
-        // Resolve the game piece from the operator input.
-        System.out.println("StartPickupGamePieceCommand.  GamePiece " + gamePiece);
-
-        printArmState();
         stopArmMotors();
 
         targetPincherEncoderCount = gamePiece.pincherEncoderCount;
@@ -39,6 +35,13 @@ public class PickupGamePieceCommand extends BaseArmCommand {
         else if (gamePiece == GamePiece.CONE) {
             targetArmPosition = ArmConstants.DRIVE_WITH_CONE_POSITION;
         }
+
+        StringBuilder commandParms = new StringBuilder();
+        commandParms.append("GamePiece ").append(gamePiece)
+            .append(", Pincher target ").append(targetPincherEncoderCount)
+            .append(", Arm target ").append(targetArmPosition);
+
+        logCommandStart(commandParms.toString());
     }
 
     @Override
@@ -47,9 +50,11 @@ public class PickupGamePieceCommand extends BaseArmCommand {
         // Close on the game piece first
         if (movePincherToEncoderCount(targetPincherEncoderCount)) {
 
+            // Notify the driver that they have a game piece
             if (operatorInput != null) {
                 operatorInput.startVibrate();
             }
+
             // If above the target, then retract first
             if (armSubsystem.getArmLiftAngle() > targetArmPosition.angle) {
 
@@ -75,6 +80,7 @@ public class PickupGamePieceCommand extends BaseArmCommand {
 
         // If the arm is at the target position.
         if (armSubsystem.isInPosition(targetArmPosition)) {
+            setFinishReason("arm in position");
             return true;
         }
 
@@ -85,16 +91,11 @@ public class PickupGamePieceCommand extends BaseArmCommand {
     public void end(boolean interrupted) {
 
         stopArmMotors();
+
         if (operatorInput != null) {
             operatorInput.stopVibrate();
         }
 
-        if (interrupted) {
-            System.out.print("PickupGamePieceCommand interrupted");
-        }
-        else {
-            System.out.print("PickupGamePieceCommand ended");
-        }
-        printArmState();
+        logCommandEnd(interrupted);
     }
 }

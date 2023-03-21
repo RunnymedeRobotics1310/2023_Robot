@@ -17,11 +17,6 @@ public class CompactCommand extends BaseArmCommand {
         addRequirements(armSubsystem);
     }
 
-    private void printStatus(String msg) {
-        System.out.println("Compact Command: " + msg);
-        printArmState();
-    }
-
     @Override
     public void initialize() {
 
@@ -37,7 +32,7 @@ public class CompactCommand extends BaseArmCommand {
             state = State.RETRACT;
         }
 
-        printStatus("initialize, starting state " + state.toString());
+        logCommandStart("Starting State " + state);
     }
 
     @Override
@@ -70,6 +65,7 @@ public class CompactCommand extends BaseArmCommand {
             }
             else {
                 armSubsystem.setArmLiftSpeed(0);
+                logStateTransition("CLEAR_FRAME -> RETRACT");
                 state = State.RETRACT;
             }
 
@@ -84,6 +80,7 @@ public class CompactCommand extends BaseArmCommand {
             boolean pincherInsideFrame = movePincherInsideFrame();
 
             if (armRetracted && pincherInsideFrame) {
+                logStateTransition("RETRACT -> LOWER");
                 state = State.LOWER;
             }
             break;
@@ -102,17 +99,20 @@ public class CompactCommand extends BaseArmCommand {
 
     @Override
     public boolean isFinished() {
-        return isCompactPose();
+
+        if (isCompactPose()) {
+            setFinishReason("in Compact Pose");
+            return true;
+        }
+
+        return false;
     }
 
     @Override
     public void end(boolean interrupted) {
-        if (interrupted) {
-            printStatus("End. Interrupted");
-        }
-        else {
-            printStatus("End. Not interrupted");
-        }
+
         stopArmMotors();
+
+        logCommandEnd(interrupted);
     }
 }

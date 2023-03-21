@@ -578,6 +578,20 @@ public class ArmSubsystem extends SubsystemBase {
 
     }
 
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(this.getClass().getSimpleName()).append(" : ")
+            .append(getArmLiftAngle()).append("deg")
+            .append(", Ext ").append(Math.round(armExtendEncoder.getPosition() * 100) / 100d)
+            .append(", Pinch ").append(Math.round(pincherEncoder.getPosition() * 100) / 100d)
+            .append(", GamePiece ").append(getHeldGamePiece());
+
+        return sb.toString();
+    }
+
     private void setArmLiftIdleMode(IdleMode idleMode) {
 
         // If the idle mode is already set to the supplied

@@ -156,9 +156,19 @@ public final class Constants {
 
         public final double angle, extension;
 
-        ArmPosition(double angle, double extension) {
+        public ArmPosition(double angle, double extension) {
             this.angle     = angle;
             this.extension = extension;
+        }
+
+        @Override
+        public String toString() {
+
+            StringBuilder sb = new StringBuilder();
+
+            sb.append("( ").append(angle).append("deg, ").append(extension).append(" )");
+
+            return sb.toString();
         }
     }
 
@@ -174,9 +184,14 @@ public final class Constants {
 
         /** The maximum speed to drive the arm lift - manually or automatically */
         public static final double  MAX_LIFT_DOWN_SPEED                 = .2;
-        public static final double  MAX_LIFT_UP_SPEED                   = .2;                                   // setting it to
-                                                                                                                // .3 causes arm
-                                                                                                                // to overshoot
+        public static final double  MAX_LIFT_UP_SPEED                   = .2;                                   // setting
+                                                                                                                // it
+                                                                                                                // to
+                                                                                                                // .3
+                                                                                                                // causes
+                                                                                                                // arm
+                                                                                                                // to
+                                                                                                                // overshoot
                                                                                                                 // target.
 
         public static final double  MAX_LIFT_SLOW_ZONE_SPEED            = .1;

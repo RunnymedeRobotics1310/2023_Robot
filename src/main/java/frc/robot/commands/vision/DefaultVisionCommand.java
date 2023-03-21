@@ -1,10 +1,10 @@
 package frc.robot.commands.vision;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.VisionSubsystem;
 
-public class DefaultVisionCommand extends CommandBase {
+public class DefaultVisionCommand extends RunnymedeCommandBase {
 
     private final VisionSubsystem visionSubsystem;
     private final OperatorInput   driverController;
@@ -28,7 +28,7 @@ public class DefaultVisionCommand extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        System.out.println("DefaultVisionCommand started.");
+        logCommandStart();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -47,11 +47,6 @@ public class DefaultVisionCommand extends CommandBase {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        if (interrupted) {
-            System.out.println("DefaultVisionCommand interrupted.");
-        }
-        else {
-            System.out.println("DefaultVisionCommand ended.");
-        }
+        logCommandEnd(interrupted);
     }
 }

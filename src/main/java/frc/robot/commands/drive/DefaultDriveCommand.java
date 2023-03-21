@@ -1,13 +1,13 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.operator.OperatorInput.Axis;
 import frc.robot.commands.operator.OperatorInput.Stick;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class DefaultDriveCommand extends CommandBase {
+public class DefaultDriveCommand extends RunnymedeCommandBase {
 
     private final DriveSubsystem driveSubsystem;
     private final OperatorInput  driverController;
@@ -29,7 +29,8 @@ public class DefaultDriveCommand extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        System.out.println("DefaultDriveCommand started.");
+
+        logCommandStart();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -118,11 +119,6 @@ public class DefaultDriveCommand extends CommandBase {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        if (interrupted) {
-            System.out.println("DefaultDriveCommand interrupted.");
-        }
-        else {
-            System.out.println("DefaultDriveCommand ended.");
-        }
+        logCommandEnd(interrupted);
     }
 }

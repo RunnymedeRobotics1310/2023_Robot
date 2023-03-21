@@ -13,7 +13,8 @@ public class CalibratePincherCommand extends BaseArmCommand {
 
     @Override
     public void initialize() {
-        System.out.print("InitializeArmCommand started");
+
+        logCommandStart();
     }
 
     @Override
@@ -30,6 +31,7 @@ public class CalibratePincherCommand extends BaseArmCommand {
     public boolean isFinished() {
 
         if (armSubsystem.isPincherOpen()) {
+            setFinishReason("Pincher open detected");
             return true;
         }
         else {
@@ -42,13 +44,7 @@ public class CalibratePincherCommand extends BaseArmCommand {
 
         stopArmMotors();
 
-        if (interrupted) {
-            System.out.print("CalibratePincherCommand interrupted");
-        }
-        else {
-            System.out.print("CalibratePincherCommand ended");
-        }
-        printArmState();
+        logCommandEnd(interrupted);
     }
 
 }

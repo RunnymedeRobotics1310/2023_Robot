@@ -14,10 +14,10 @@ public class ReleaseCommand extends BaseArmCommand {
 
     @Override
     public void initialize() {
-        System.out.println("ReleaseCommand started");
-        printArmState();
 
         startingPincherPosition = armSubsystem.getPincherEncoder();
+
+        logCommandStart("Starting pincher position " + startingPincherPosition);
     }
 
     @Override
@@ -31,18 +31,25 @@ public class ReleaseCommand extends BaseArmCommand {
     public boolean isFinished() {
 
         if (armSubsystem.isPincherOpen()) {
+            setFinishReason("Pinchers fully open");
             return true;
         }
 
-        return armSubsystem.getPincherEncoder() < startingPincherPosition - 35
-            && !armSubsystem.isGamePieceDetected();
+        if (armSubsystem.getPincherEncoder() < startingPincherPosition - 35
+            && !armSubsystem.isGamePieceDetected()) {
+            setFinishReason("Pinchers opened somewhat and no game piece");
+            return true;
+        }
+
+        return false;
     }
 
     @Override
     public void end(boolean interrupted) {
-        System.out.println("ReleaseCommand end.  " + (interrupted ? "Interrupted." : "Not interrupted"));
-        printArmState();
+
         stopArmMotors();
+
+        logCommandEnd(interrupted);
 
         // If in teleop, then automatically schedule the robot move to compact state
         if (DriverStation.isTeleopEnabled()) {

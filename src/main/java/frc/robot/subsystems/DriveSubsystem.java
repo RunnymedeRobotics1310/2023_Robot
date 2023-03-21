@@ -353,6 +353,20 @@ public class DriveSubsystem extends SubsystemBase {
         // SmartDashboard.putNumber("Gyro Raw Roll", getRawGyroAngle(GyroAxis.ROLL));
     }
 
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(this.getClass().getSimpleName()).append(" : ")
+            .append("Head ").append(getHeading())
+            .append(", Pitch ").append(getPitch())
+            .append(", Ultrasonic dist ").append(Math.round(getUltrasonicDistanceCm()))
+            .append(", Drive dist ").append(Math.round(getEncoderDistanceCm() * 10) / 10d);
+
+        return sb.toString();
+    }
+
     private void setIdleMode(IdleMode idleMode) {
 
         // If the idle mode is already set to the supplied

@@ -15,7 +15,7 @@ public class ScoreAutoCommand extends BaseArmCommand {
     private GamePiece        gamePiece                = null;
 
     private enum Step {
-        CLEAR_FRAME, LIFT_AND_EXTEND, LOWER_ARM, FINISH
+        RETRACT, LIFT_AND_EXTEND, LOWER_ARM, FINISH
     }
 
     private Step step              = null;
@@ -33,13 +33,12 @@ public class ScoreAutoCommand extends BaseArmCommand {
         gamePiece       = armSubsystem.getHeldGamePiece();
         scoringPosition = ArmConstants.getScoringPosition(gamePiece, scoringRow);
 
-        System.out.println("ScoreCommand started.  Scoring row : " + scoringRow);
-
-        printArmState();
         stopArmMotors();
 
         commandStartTime = System.currentTimeMillis();
-        step             = Step.CLEAR_FRAME;
+        step             = Step.RETRACT;
+
+        logCommandStart("Scoring row : " + scoringRow + ", Starting Step " + step);
     }
 
     @Override
@@ -47,20 +46,14 @@ public class ScoreAutoCommand extends BaseArmCommand {
 
         switch (step) {
 
-        case CLEAR_FRAME:
+        case RETRACT:
 
-            // If the arm is starting inside the frame, then
-            // retract before moving the arm.
-            if (armSubsystem.getArmLiftAngle() < ArmConstants.CLEAR_FRAME_ARM_ANGLE) {
-
-                if (!moveArmExtendToEncoderCount(0, 1)) {
-                    return;
-                }
-
-                System.out.println("ScoreAutoCommand: Arm Retracted : switching to lift");
-                step = Step.LIFT_AND_EXTEND;
+            // Ensure the arm is retracted before lifting
+            if (!moveArmExtendToEncoderCount(0, 1)) {
                 return;
             }
+
+            logStateTransition("RETRACT -> LIFT_AND_EXTEND");
 
             step = Step.LIFT_AND_EXTEND;
             return;
@@ -73,9 +66,10 @@ public class ScoreAutoCommand extends BaseArmCommand {
                 // Then extend
                 if (moveArmExtendToEncoderCount(scoringPosition.extension, .7)) {
 
-                    System.out.println("ScoreAutoCommand: Arm lifted and extended : switching to lowering");
                     step              = Step.LOWER_ARM;
                     lowerArmStartTime = System.currentTimeMillis();
+
+                    logStateTransition("LIFT_AND_EXTEND -> LOWER_ARM");
 
                     stopArmMotors();
                     return;
@@ -88,17 +82,26 @@ public class ScoreAutoCommand extends BaseArmCommand {
 
             // Do not lower the arm if already on the lowest scoring position
             if (scoringRow == ScoringRow.BOTTOM) {
+
+                logStateTransition("LOWER_ARM -> FINISH", "Target is bottom row");
+
                 step = Step.FINISH;
                 return;
             }
 
             // Lower the arm onto the post
             // Lower the arm by 5 degrees or .5 seconds whichever comes first.
-            if (moveArmLiftToAngle(scoringPosition.angle - 11)
-                || System.currentTimeMillis() - lowerArmStartTime > 500) {
+            if (moveArmLiftToAngle(scoringPosition.angle - 11)) {
+                logStateTransition("LOWER_ARM -> FINISH", "Arm lowered");
+                step = Step.FINISH;
+                return;
+            }
 
+            if (System.currentTimeMillis() - lowerArmStartTime > 500) {
+                logStateTransition("LOWER_ARM -> FINISH", "Lower arm timed out after 500ms");
                 step = Step.FINISH;
             }
+
             return;
 
         default:
@@ -111,12 +114,13 @@ public class ScoreAutoCommand extends BaseArmCommand {
     public boolean isFinished() {
 
         if (step == Step.FINISH) {
+            setFinishReason("Arm lowered");
             return true;
         }
 
         // If the command has been running for more than 3 seconds, then end.
         if (System.currentTimeMillis() - commandStartTime > MAX_TIME_TO_SCORE_MILLIS) {
-            System.out.println("ScoreAutoCommand: Timed out after 3 seconds");
+            setFinishReason("Timed out after 3 seconds");
             return true;
         }
 
@@ -128,12 +132,6 @@ public class ScoreAutoCommand extends BaseArmCommand {
 
         stopArmMotors();
 
-        if (interrupted) {
-            System.out.print("ScoreCommand interrupted");
-        }
-        else {
-            System.out.print("ScoreCommand ended");
-        }
-        printArmState();
+        logCommandEnd(interrupted);
     }
 }

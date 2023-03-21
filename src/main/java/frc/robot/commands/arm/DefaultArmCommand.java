@@ -23,7 +23,7 @@ public class DefaultArmCommand extends BaseArmCommand {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        System.out.println("DefaultArmCommand started.");
+        logCommandStart();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -59,11 +59,6 @@ public class DefaultArmCommand extends BaseArmCommand {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        if (interrupted) {
-            System.out.println("DefaultArmCommand interrupted.");
-        }
-        else {
-            System.out.println("DefaultArmCommand ended.");
-        }
+        logCommandEnd(interrupted);
     }
 }

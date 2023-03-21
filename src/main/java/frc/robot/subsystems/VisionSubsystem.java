@@ -283,30 +283,6 @@ public class VisionSubsystem extends SubsystemBase {
         cameraMotor.set(cameraMotorSpeed);
     }
 
-    private void setCameraView(CameraView desiredView) {
-
-        CameraView currentCameraView = getCameraView();
-
-        if (currentCameraView == desiredView) {
-
-            // Camera is already in position.
-            setCameraMotorSpeed(0);
-
-        }
-        else if (desiredView == CameraView.HIGH) {
-
-            // Run the motor forward to raise the camera view
-            setCameraMotorSpeed(VisionConstants.MAX_CAMERA_MOTOR_SPEED);
-
-        }
-        else {
-
-            // Run the motor in reverse to lower the camera view
-            setCameraMotorSpeed(-VisionConstants.MAX_CAMERA_MOTOR_SPEED);
-
-        }
-    }
-
     public void setVisionTarget(VisionConstants.VisionTarget visionTarget) {
 
         this.currentVisionTarget = visionTarget;
@@ -393,6 +369,20 @@ public class VisionSubsystem extends SubsystemBase {
 
         // Safely stop all motors
         cameraMotor.set(0);
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(this.getClass().getSimpleName()).append(" : ")
+            .append("Vision Target ").append(getCurrentVisionTarget())
+            .append(", Camera View ").append(getCameraView())
+            .append(", Target Detected ").append(isVisionTargetFound())
+            .append(", target angle ").append(Math.round(getTargetAngleOffset() * 10) / 10d);
+
+        return sb.toString();
     }
 
     /**
@@ -497,6 +487,30 @@ public class VisionSubsystem extends SubsystemBase {
 
     private boolean getCameraUpperLimitSwitch() {
         return !cameraUpLimitSwitch.get();
+    }
+
+    private void setCameraView(CameraView desiredView) {
+    
+        CameraView currentCameraView = getCameraView();
+    
+        if (currentCameraView == desiredView) {
+    
+            // Camera is already in position.
+            setCameraMotorSpeed(0);
+    
+        }
+        else if (desiredView == CameraView.HIGH) {
+    
+            // Run the motor forward to raise the camera view
+            setCameraMotorSpeed(VisionConstants.MAX_CAMERA_MOTOR_SPEED);
+    
+        }
+        else {
+    
+            // Run the motor in reverse to lower the camera view
+            setCameraMotorSpeed(-VisionConstants.MAX_CAMERA_MOTOR_SPEED);
+    
+        }
     }
 
     /**

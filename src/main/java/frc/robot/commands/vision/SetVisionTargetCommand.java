@@ -1,10 +1,10 @@
 package frc.robot.commands.vision;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.subsystems.VisionSubsystem;
 
-public class SetVisionTargetCommand extends CommandBase {
+public class SetVisionTargetCommand extends RunnymedeCommandBase {
 
     private final VisionSubsystem                        visionSubsystem;
     private final Constants.VisionConstants.VisionTarget target;
@@ -20,7 +20,7 @@ public class SetVisionTargetCommand extends CommandBase {
     @Override
     public void initialize() {
 
-        System.out.println("SetVisionTargetCommand started, target vision target : " + target);
+        logCommandStart("Vision target : " + target);
 
         if (!(target.getCameraView() == Constants.VisionConstants.CameraView.HIGH
             || target.getCameraView() == Constants.VisionConstants.CameraView.LOW)) {
@@ -38,7 +38,12 @@ public class SetVisionTargetCommand extends CommandBase {
     @Override
     public boolean isFinished() {
 
-        return visionSubsystem.getCurrentVisionTarget() == target && visionSubsystem.isCameraInPositionForTarget();
+        if (visionSubsystem.getCurrentVisionTarget() == target && visionSubsystem.isCameraInPositionForTarget()) {
+            setFinishReason("Vision system positioned");
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -47,15 +52,6 @@ public class SetVisionTargetCommand extends CommandBase {
         // Stop the motor
         visionSubsystem.setCameraMotorSpeed(0);
 
-        // Print a debug message
-        if (interrupted) {
-            System.out.print("SetCameraViewCommand interrupted: ");
-        }
-        else {
-            System.out.print("SetCameraViewCommand ended: ");
-        }
-
-        System.out.println("Current vision target " + visionSubsystem.getCurrentVisionTarget() + " current view: "
-            + visionSubsystem.getCameraView());
+        logCommandEnd(interrupted);
     }
 }

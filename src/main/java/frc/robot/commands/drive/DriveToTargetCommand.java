@@ -2,31 +2,30 @@
 
 package frc.robot.commands.drive;
 
+import java.util.Arrays;
+import java.util.List;
+
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.VisionTarget;
+import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
-import java.util.Arrays;
-import java.util.List;
+public class DriveToTargetCommand extends RunnymedeCommandBase {
 
-public class DriveToTargetCommand extends CommandBase {
-
-    private static final List<VisionTarget> SUPPORTED_DRIVE_TARGETS = Arrays.asList(
+    private static final List<VisionTarget>    SUPPORTED_DRIVE_TARGETS = Arrays.asList(
         VisionTarget.CONE_GROUND,
         VisionTarget.CUBE_GROUND,
         VisionTarget.APRILTAG_GRID,
         VisionTarget.POST_HIGH,
-        VisionTarget.POST_LOW
-    );
+        VisionTarget.POST_LOW);
 
-    final double                               factor                 = 0.01;
+    final double                               factor                  = 0.01;
 
     private final double                       speed, timeoutSeconds;
 
@@ -36,13 +35,13 @@ public class DriveToTargetCommand extends CommandBase {
 
     private final VisionConstants.VisionTarget target;
 
-    private long                               initializeTime         = 0;
+    private long                               initializeTime          = 0;
 
-    private double                             targetDelaySec         = 0;
+    private double                             targetDelaySec          = 0;
 
-    private boolean                            targetFound            = false;
+    private boolean                            targetFound             = false;
 
-    private double                             lastKnownTargetHeading = 0;
+    private double                             lastKnownTargetHeading  = 0;
 
     /**
      * Drive to a cube vision target. If this command does not find a cube vision target,
@@ -85,15 +84,19 @@ public class DriveToTargetCommand extends CommandBase {
     @Override
     public void initialize() {
 
-        System.out.println("DriveToTargetCommand started."
-            + " Target " + target
-            + " Speed " + speed
-            + ", timeout " + timeoutSeconds);
+        StringBuilder parms = new StringBuilder();
+
+        parms.append("Target ").append(target)
+            .append(", Speed ").append(speed)
+            .append(", timeout ").append(timeoutSeconds);
+
+        logCommandStart(parms.toString());
 
         initializeTime = System.currentTimeMillis();
 
         if (!SUPPORTED_DRIVE_TARGETS.contains(target)) {
-            System.out.println("Cannot drive to target "+target+". Cancelling.");
+            System.out.println("Cannot drive to target " + target + ". Cancelling.");
+            // FIXME: does this cancel the entire auto?
             this.cancel();
             return;
         }
@@ -179,6 +182,7 @@ public class DriveToTargetCommand extends CommandBase {
 
         // Check the timeout
         if ((System.currentTimeMillis() - initializeTime) / 1000d > timeoutSeconds) {
+            setFinishReason("Timed out");
             return true;
         }
 
@@ -207,20 +211,7 @@ public class DriveToTargetCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
 
-        // Print an end of command message in the logs
-        double runTime = (System.currentTimeMillis() - initializeTime) / 1000d;
-
-        if (interrupted) {
-            System.out.print(this.getClass().getSimpleName() + " interrupted");
-        }
-        else {
-            System.out.print(this.getClass().getSimpleName() + " ended");
-        }
-
-        System.out.println(": vision target detected " + targetFound
-            + ": current heading " + driveSubsystem.getHeading()
-            + ": in " + runTime + "s"
-            + ": area " + visionSubsystem.getTargetAreaPercent());
+        logCommandEnd(interrupted);
 
         // Stop the robot
         driveSubsystem.setMotorSpeeds(0, 0);
