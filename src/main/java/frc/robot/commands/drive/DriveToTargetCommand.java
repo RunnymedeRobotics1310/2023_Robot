@@ -96,7 +96,7 @@ public class DriveToTargetCommand extends RunnymedeCommandBase {
         initializeTime = System.currentTimeMillis();
 
         if (!SUPPORTED_DRIVE_TARGETS.contains(target)) {
-            System.out.println("Cannot drive to target " + target + ". Cancelling.");
+            log("Cannot drive to target " + target + ". Cancelling.");
             // FIXME: does this cancel the entire auto?
             this.cancel();
             return;
@@ -140,8 +140,7 @@ public class DriveToTargetCommand extends RunnymedeCommandBase {
 
             // The first time a target is found, print out the heading
             if (!targetFound) {
-                System.out.println(this.getClass().getSimpleName()
-                    + ": First target sighting at heading " + lastKnownTargetHeading);
+                log("First target sighting at heading " + lastKnownTargetHeading);
                 targetFound = true;
             }
         }
@@ -200,10 +199,10 @@ public class DriveToTargetCommand extends RunnymedeCommandBase {
             break;
         case POST_HIGH:
         case POST_LOW:
-            System.out.println("Not yet supported");
+            log("Not yet supported");
             return true;
         default:
-            System.out.println("Don't know how to drive to target " + target);
+            log("Don't know how to drive to target " + target);
             break;
         }
 

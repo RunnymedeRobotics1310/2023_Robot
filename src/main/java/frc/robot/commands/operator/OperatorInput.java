@@ -30,10 +30,6 @@ public class OperatorInput {
     }
 
 
-    public void sayHello() {
-        System.out.println("2023 game controller says hi!");
-    }
-
     private boolean shift() {
         return driverController.getLeftBumper() && driverController.getRightBumper();
     }

@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 public class RunnymedeCommandBase extends CommandBase {
 
     private long    startTime     = 0;
-    private String  finishReason  = "";
+    private String  finishReason  = null;
 
     List<Subsystem> subsystemList = new ArrayList<>();
 
@@ -44,9 +44,10 @@ public class RunnymedeCommandBase extends CommandBase {
             this.subsystemList.addAll(getRequirements());
         }
 
-        logCommandState("STARTING", commandParms);
-
         startTime = System.currentTimeMillis();
+        finishReason = null;
+
+        logCommandState("STARTING", commandParms);
     }
 
     public void logCommandEnd(boolean interrupted) {
@@ -73,18 +74,23 @@ public class RunnymedeCommandBase extends CommandBase {
         logCommandState(transition, msg);
     }
 
-    public void logCommandState(String state, String msg) {
+    public void log(String msg) {
+        logCommandState(null, msg);
+    }
+
+    private void logCommandState(String state, String msg) {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(this.getClass().getSimpleName())
-            .append(" : ").append(state);
+        sb.append(this.getClass().getSimpleName());
 
-        if (startTime != 0) {
-            sb.append(" at ").append(System.currentTimeMillis() - startTime).append("ms");
+        if (state != null) {
+            sb.append(" : ").append(state);
         }
 
-        if (!finishReason.isEmpty()) {
+        sb.append(" at ").append(System.currentTimeMillis() - startTime).append("ms");
+
+        if (finishReason != null) {
             sb.append(" : ").append(finishReason);
         }
 

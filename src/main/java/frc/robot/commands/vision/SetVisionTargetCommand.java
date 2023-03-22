@@ -26,7 +26,7 @@ public class SetVisionTargetCommand extends RunnymedeCommandBase {
             || target.getCameraView() == Constants.VisionConstants.CameraView.LOW)) {
 
             // Only HIGH or LOW are valid for this command, otherwise cancel
-            System.out.println("ConfigureCameraCommand: unsupported camera view: " + target.getCameraView() + ". Cancelling.");
+            log("Unsupported camera view: " + target.getCameraView() + ". Cancelling.");
             this.cancel();
 
             return;
