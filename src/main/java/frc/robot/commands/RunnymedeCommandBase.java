@@ -34,6 +34,8 @@ public class RunnymedeCommandBase extends CommandBase {
 
     public void logCommandStart(String commandParms, Subsystem... subsystemList) {
 
+        this.subsystemList.clear();
+
         // Capture the subsystem list associated with this command
         if (subsystemList != null && subsystemList.length > 0) {
             this.subsystemList.addAll(Arrays.asList(subsystemList));
