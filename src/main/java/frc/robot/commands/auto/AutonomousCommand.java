@@ -257,17 +257,18 @@ public class AutonomousCommand extends SequentialCommandGroup {
         else {
             addCommands(new DriveOnHeadingCommand(180, -0.6, exitZoneDistance, driveSubsystem)
                 .deadlineWith(new CompactCommand(armSubsystem)));
-
-
-
-            // Rotate to heading 0
-            if ((exitZoneAction == AutoAction.PICK_UP_CONE)
-                || (exitZoneAction == AutoAction.PICK_UP_CONE)) {
-                addCommands(new DriveOnHeadingCommand(90, .3, 20, driveSubsystem));
-                addCommands(new DriveOnHeadingCommand(0, .3, 20, driveSubsystem));
-            }
-
         }
+
+
+        // Rotate to heading 0
+        if (currentOrientation == Orientation.FACE_GRID
+            && (exitZoneAction == AutoAction.PICK_UP_CONE
+                || exitZoneAction == AutoAction.PICK_UP_CONE)) {
+            addCommands(new DriveOnHeadingCommand(90, .3, 20, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(0, .3, 20, driveSubsystem));
+        }
+
+
 
         currentZone = Zone.FIELD;
 
