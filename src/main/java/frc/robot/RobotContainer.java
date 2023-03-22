@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants.AutoAction;
 import frc.robot.Constants.AutoConstants.AutoLane;
@@ -16,12 +17,14 @@ import frc.robot.Constants.AutoConstants.Orientation;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.OiConstants;
+import frc.robot.Constants.VisionConstants.VisionTarget;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.SystemTestCommand;
 import frc.robot.commands.arm.CalibratePincherCommand;
 import frc.robot.commands.arm.CompactCommand;
 import frc.robot.commands.arm.DefaultArmCommand;
 import frc.robot.commands.arm.PickUpSubstationVisionCommand;
+import frc.robot.commands.arm.PickupGamePieceCommand;
 import frc.robot.commands.arm.ReleaseCommand;
 import frc.robot.commands.arm.ScoreCommand;
 import frc.robot.commands.arm.StartIntakeCommand;
@@ -29,6 +32,7 @@ import frc.robot.commands.auto.AutonomousCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DefaultDriveCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
+import frc.robot.commands.drive.DriveToTargetCommand;
 import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.commands.operator.OperatorInput;
@@ -195,6 +199,13 @@ public class RobotContainer {
 
         new Trigger(() -> (operatorInput.isCameraViewLow()))
             .onTrue(new SetVisionTargetCommand(Constants.VisionConstants.VisionTarget.CUBE_GROUND, visionSubsystem));
+
+        new Trigger(() -> (operatorInput.isPickUpConeVision()))
+            .onTrue(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem)
+                .deadlineWith(new WaitCommand(.5)
+                    .andThen(
+                        new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)))
+                .andThen(new PickupGamePieceCommand(GamePiece.CUBE, operatorInput, armSubsystem)));
     }
 
     /**

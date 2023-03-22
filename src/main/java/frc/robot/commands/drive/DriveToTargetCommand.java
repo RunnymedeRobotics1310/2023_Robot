@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
@@ -103,11 +104,12 @@ public class DriveToTargetCommand extends RunnymedeCommandBase {
 
         if (visionSubsystem.getCurrentVisionTarget() != target) {
             targetDelaySec = VisionConstants.VISION_SWITCH_TIME_SEC;
-            setVisionTarget(target);
         }
         else {
             targetDelaySec = 0;
         }
+        setVisionTarget(target);
+
 
         // Start by driving straight towards the target.
         // Assume the robot is lined up with the target.

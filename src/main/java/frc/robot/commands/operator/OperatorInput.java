@@ -178,6 +178,10 @@ public class OperatorInput {
         driverController.setRumble(GenericHID.RumbleType.kBothRumble, 0);
     }
 
+    public boolean isPickUpConeVision() {
+        return driverController.getPOV() == 90;
+    }
+
 
     /**
      * return the raw underlying {@link RunnymedeGameController}. ONLY FOR USE IN TEST MODE.
