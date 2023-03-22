@@ -1,9 +1,5 @@
 package frc.robot.commands.auto;
 
-import static frc.robot.Constants.VisionConstants.VisionTarget.APRILTAG_GRID;
-import static frc.robot.Constants.VisionConstants.VisionTarget.CONE_GROUND;
-import static frc.robot.Constants.VisionConstants.VisionTarget.CUBE_GROUND;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -16,6 +12,7 @@ import frc.robot.Constants.AutoConstants.Orientation;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.GameConstants.Zone;
+import frc.robot.Constants.VisionConstants.VisionTarget;
 import frc.robot.commands.arm.CompactCommand;
 import frc.robot.commands.arm.PickupGamePieceCommand;
 import frc.robot.commands.arm.ReleaseCommand;
@@ -227,35 +224,52 @@ public class AutonomousCommand extends SequentialCommandGroup {
             return;
         }
 
-        // Start by switching the camera view if picking up a game piece.
-        // this will set the camera angle while driving
-        if (exitZoneAction == AutoAction.PICK_UP_CUBE) {
-            addCommands(new SetVisionTargetCommand(CUBE_GROUND, visionSubsystem));
-            addCommands(new DriveToTargetCommand(CUBE_GROUND, 0.3, driveSubsystem, visionSubsystem, armSubsystem)
-                .deadlineWith(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem)));
-        }
-        if (exitZoneAction == AutoAction.PICK_UP_CONE) {
-            addCommands(new SetVisionTargetCommand(CONE_GROUND, visionSubsystem));
-            addCommands(new DriveToTargetCommand(CONE_GROUND, 0.3, driveSubsystem, visionSubsystem, armSubsystem)
-                .deadlineWith(new PickupGamePieceCommand(GamePiece.CONE, null, armSubsystem)));
-        }
+
+
         double exitZoneDistance = 330;
         if (startingLane == AutoLane.BOTTOM) {
             exitZoneDistance = 340;
         }
-        // Drive out of the zone
+        // Drive out of the zone and switch camera view
         // This command may cause a rotation to heading 0.
-        if (currentOrientation == Orientation.FACE_FIELD) {
-            addCommands(new DriveOnHeadingCommand(0, 0.6, exitZoneDistance, driveSubsystem));
+        if (exitZoneAction == AutoAction.PICK_UP_CUBE) {
+            if (currentOrientation == Orientation.FACE_FIELD) {
+                addCommands(new DriveOnHeadingCommand(0, 0.6, exitZoneDistance, driveSubsystem)
+                    .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
+            }
+            else {
+                addCommands(new DriveOnHeadingCommand(180, -0.6, exitZoneDistance, driveSubsystem)
+                    .deadlineWith(new CompactCommand(armSubsystem)
+                        .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem))));
+            }
+        }
+        else if (exitZoneAction == AutoAction.PICK_UP_CONE) {
+            if (currentOrientation == Orientation.FACE_FIELD) {
+                addCommands(new DriveOnHeadingCommand(0, 0.6, exitZoneDistance, driveSubsystem)
+                    .deadlineWith(new SetVisionTargetCommand(VisionTarget.CONE_GROUND, visionSubsystem)));
+            }
+            else {
+                addCommands(new DriveOnHeadingCommand(180, -0.6, exitZoneDistance, driveSubsystem)
+                    .deadlineWith(new CompactCommand(armSubsystem)
+                        .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem))));
+            }
         }
         else {
             addCommands(new DriveOnHeadingCommand(180, -0.6, exitZoneDistance, driveSubsystem)
                 .deadlineWith(new CompactCommand(armSubsystem)));
 
+
+
+            // Rotate to heading 0
+            if ((exitZoneAction == AutoAction.PICK_UP_CONE)
+                || (exitZoneAction == AutoAction.PICK_UP_CONE)) {
+                addCommands(new DriveOnHeadingCommand(90, .3, 20, driveSubsystem));
+                addCommands(new DriveOnHeadingCommand(0, .3, 20, driveSubsystem));
+            }
+
         }
 
-        currentZone        = Zone.FIELD;
-        currentOrientation = Orientation.FACE_FIELD;
+        currentZone = Zone.FIELD;
 
         /*
          * If a piece is not required, this portion is complete
@@ -266,17 +280,19 @@ public class AutonomousCommand extends SequentialCommandGroup {
             // will end when the PickupGroundCommand ends, canceling the DriveToVisionTarget if
             // required.
             addCommands(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem)
-                .deadlineWith(new DriveToTargetCommand(CUBE_GROUND, .2, driveSubsystem, visionSubsystem, armSubsystem)));
-
-            addCommands(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem));
+                .deadlineWith(new WaitCommand(.5)
+                    .andThen(
+                        new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)))
+                .andThen(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem)));
 
         }
         if (exitZoneAction == AutoAction.PICK_UP_CONE) {
 
-            addCommands(new StartIntakeCommand(GamePiece.CONE, armSubsystem, visionSubsystem)
-                .deadlineWith(new DriveToTargetCommand(CONE_GROUND, .2, driveSubsystem, visionSubsystem, armSubsystem)));
-
-            addCommands(new PickupGamePieceCommand(GamePiece.CONE, null, armSubsystem));
+            addCommands(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem)
+                .deadlineWith(new WaitCommand(.5)
+                    .andThen(
+                        new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)))
+                .andThen(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem)));
         }
     }
 
@@ -305,7 +321,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
         // Turn around and go back to the grid
         addCommands(new DriveOnHeadingCommand(270.0, 0.5, 5, driveSubsystem));
         addCommands(new DriveOnHeadingCommand(180.0, 0.5, 300, driveSubsystem));
-        addCommands(new DriveToTargetCommand(APRILTAG_GRID, 0.3, driveSubsystem, visionSubsystem, armSubsystem));
+        // addCommands(new DriveToTargetCommand(APRILTAG_GRID, 0.3, driveSubsystem, visionSubsystem, armSubsystem));
 
         // Vision subsystem to acquire the nearest scoring position marker (vision subsystem
         // operation to find scoring position +
