@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
@@ -193,7 +192,7 @@ public class DriveToTargetCommand extends RunnymedeCommandBase {
         case CUBE_GROUND:
             return armSubsystem.isGamePieceDetected();
         case APRILTAG_GRID:
-            if (targetArea >= 5) {
+            if (targetArea >= 3.5) {
                 return true;
             }
             break;
