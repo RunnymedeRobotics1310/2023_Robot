@@ -509,11 +509,19 @@ public class VisionSubsystem extends SubsystemBase {
             setCameraMotorSpeed(VisionConstants.MAX_CAMERA_MOTOR_SPEED);
     
         }
-        else {
+        else if (desiredView == CameraView.LOW){
     
             // Run the motor in reverse to lower the camera view
             setCameraMotorSpeed(-VisionConstants.MAX_CAMERA_MOTOR_SPEED);
     
+        } else if (desiredView == CameraView.MID) {
+            double cameraEncoderPosition = getCameraEncoder();
+
+            if (cameraEncoderPosition < VisionConstants.CAMERA_MID_ENCODER_VALUE) {
+                setCameraMotorSpeed(VisionConstants.MAX_CAMERA_MOTOR_SPEED);
+            } else {
+                setCameraMotorSpeed(-VisionConstants.MAX_CAMERA_MOTOR_SPEED);
+            }
         }
     }
 
