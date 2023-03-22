@@ -105,7 +105,7 @@ public final class Constants {
             CUBE_SUBSTATION(CameraView.HIGH),
             CONE_GROUND(CameraView.LOW),
             CONE_SUBSTATION(CameraView.HIGH),
-            APRILTAG_GRID(CameraView.HIGH),
+            APRILTAG_GRID(CameraView.MID),
             POST_LOW(CameraView.HIGH),
             POST_HIGH(CameraView.HIGH),
             FIELD(CameraView.HIGH),
@@ -132,6 +132,8 @@ public final class Constants {
         public enum CameraView {
             /** Point at an angle to view the intake */
             LOW,
+            /** Point towards the grid april tag */
+            MID,
             /** Point towards the high goal */
             HIGH,
             /** Neither high nor low */
@@ -148,6 +150,7 @@ public final class Constants {
         public static final double MAX_CAMERA_SLOW_ZONE_SPEED      = .2;
 
         public static final double CAMERA_DOWN_LIMIT_ENCODER_VALUE = -200;
+        public static final double CAMERA_MID_ENCODER_VALUE        = -70;
         public static final double CAMERA_POSITION_TOLERANCE       = 3;
         public static final double CAMERA_POSITION_SLOW_ZONE       = 15;
     }

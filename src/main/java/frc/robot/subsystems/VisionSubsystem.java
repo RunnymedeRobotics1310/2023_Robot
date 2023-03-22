@@ -119,6 +119,10 @@ public class VisionSubsystem extends SubsystemBase {
             return CameraView.HIGH;
         }
 
+        if (Math.abs(cameraEncoderPosition - VisionConstants.CAMERA_MID_ENCODER_VALUE) < VisionConstants.CAMERA_POSITION_TOLERANCE ) {
+            return CameraView.MID;
+        }
+
         if (Math.abs(
             cameraEncoderPosition - VisionConstants.CAMERA_DOWN_LIMIT_ENCODER_VALUE) < VisionConstants.CAMERA_POSITION_TOLERANCE
             || cameraEncoderPosition < VisionConstants.CAMERA_DOWN_LIMIT_ENCODER_VALUE) {
