@@ -2,6 +2,9 @@
 
 package frc.robot.commands.drive;
 
+import java.util.Arrays;
+import java.util.List;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -13,20 +16,16 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class DriveToTargetCommand extends CommandBase {
 
-    private static final List<VisionTarget> SUPPORTED_DRIVE_TARGETS = Arrays.asList(
+    private static final List<VisionTarget>    SUPPORTED_DRIVE_TARGETS = Arrays.asList(
         VisionTarget.CONE_GROUND,
         VisionTarget.CUBE_GROUND,
         VisionTarget.APRILTAG_GRID,
         VisionTarget.POST_HIGH,
-        VisionTarget.POST_LOW
-    );
+        VisionTarget.POST_LOW);
 
-    final double                               factor                 = 0.01;
+    final double                               factor                  = 0.01;
 
     private final double                       speed, timeoutSeconds;
 
@@ -36,13 +35,13 @@ public class DriveToTargetCommand extends CommandBase {
 
     private final VisionConstants.VisionTarget target;
 
-    private long                               initializeTime         = 0;
+    private long                               initializeTime          = 0;
 
-    private double                             targetDelaySec         = 0;
+    private double                             targetDelaySec          = 0;
 
-    private boolean                            targetFound            = false;
+    private boolean                            targetFound             = false;
 
-    private double                             lastKnownTargetHeading = 0;
+    private double                             lastKnownTargetHeading  = 0;
 
     /**
      * Drive to a cube vision target. If this command does not find a cube vision target,
@@ -93,18 +92,19 @@ public class DriveToTargetCommand extends CommandBase {
         initializeTime = System.currentTimeMillis();
 
         if (!SUPPORTED_DRIVE_TARGETS.contains(target)) {
-            System.out.println("Cannot drive to target "+target+". Cancelling.");
+            System.out.println("Cannot drive to target " + target + ". Cancelling.");
             this.cancel();
             return;
         }
 
         if (visionSubsystem.getCurrentVisionTarget() != target) {
             targetDelaySec = VisionConstants.VISION_SWITCH_TIME_SEC;
-            setVisionTarget(target);
         }
         else {
             targetDelaySec = 0;
         }
+        setVisionTarget(target);
+
 
         // Start by driving straight towards the target.
         // Assume the robot is lined up with the target.
