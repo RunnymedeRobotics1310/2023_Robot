@@ -262,10 +262,11 @@ public class AutonomousCommand extends SequentialCommandGroup {
 
         // Rotate to heading 0
         if (currentOrientation == Orientation.FACE_GRID
-            && (exitZoneAction == AutoAction.PICK_UP_CONE
+            && (exitZoneAction == AutoAction.PICK_UP_CUBE
                 || exitZoneAction == AutoAction.PICK_UP_CONE)) {
-            addCommands(new DriveOnHeadingCommand(90, .3, 20, driveSubsystem));
-            addCommands(new DriveOnHeadingCommand(0, .3, 20, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(90, .3, 10, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(0, .3, 40, driveSubsystem));
+            currentOrientation = Orientation.FACE_FIELD;
         }
 
 
@@ -321,8 +322,8 @@ public class AutonomousCommand extends SequentialCommandGroup {
 
         // Turn around and go back to the grid
         addCommands(new DriveOnHeadingCommand(270.0, 0.5, 5, driveSubsystem));
-        addCommands(new DriveOnHeadingCommand(180.0, 0.5, 300, driveSubsystem));
-        // addCommands(new DriveToTargetCommand(APRILTAG_GRID, 0.3, driveSubsystem, visionSubsystem, armSubsystem));
+        addCommands(new DriveOnHeadingCommand(180.0, 0.5, 200, driveSubsystem));
+        addCommands(new DriveToTargetCommand(VisionTarget.APRILTAG_GRID, 0.3, driveSubsystem, visionSubsystem, armSubsystem));
 
         // Vision subsystem to acquire the nearest scoring position marker (vision subsystem
         // operation to find scoring position +
