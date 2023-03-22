@@ -119,7 +119,8 @@ public class VisionSubsystem extends SubsystemBase {
             return CameraView.HIGH;
         }
 
-        if (Math.abs(cameraEncoderPosition - VisionConstants.CAMERA_MID_ENCODER_VALUE) < VisionConstants.CAMERA_POSITION_TOLERANCE ) {
+        if (Math
+            .abs(cameraEncoderPosition - VisionConstants.CAMERA_MID_ENCODER_VALUE) < VisionConstants.CAMERA_POSITION_TOLERANCE) {
             return CameraView.MID;
         }
 
@@ -174,6 +175,9 @@ public class VisionSubsystem extends SubsystemBase {
             // At a y value of -14, the x offset is +10
 
             return getTargetX() - 10 + (14 + getTargetY()) / 10;
+        }
+        else if (getCurrentVisionTarget() == VisionTarget.APRILTAG_GRID) {
+            return getTargetX() - 10;
         }
 
         // FIXME: return the filtered cone value if a cone.
@@ -494,26 +498,26 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     private void setCameraView(CameraView desiredView) {
-    
+
         CameraView currentCameraView = getCameraView();
-    
+
         if (currentCameraView == desiredView) {
-    
+
             // Camera is already in position.
             setCameraMotorSpeed(0);
-    
+
         }
         else if (desiredView == CameraView.HIGH) {
-    
+
             // Run the motor forward to raise the camera view
             setCameraMotorSpeed(VisionConstants.MAX_CAMERA_MOTOR_SPEED);
-    
+
         }
         else {
-    
+
             // Run the motor in reverse to lower the camera view
             setCameraMotorSpeed(-VisionConstants.MAX_CAMERA_MOTOR_SPEED);
-    
+
         }
     }
 
