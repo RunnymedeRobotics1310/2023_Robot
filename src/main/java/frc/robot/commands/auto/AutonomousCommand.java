@@ -231,13 +231,13 @@ public class AutonomousCommand extends SequentialCommandGroup {
         // this will set the camera angle while driving
         if (exitZoneAction == AutoAction.PICK_UP_CUBE) {
             addCommands(new SetVisionTargetCommand(CUBE_GROUND, visionSubsystem));
-            addCommands(new DriveToTargetCommand(CUBE_GROUND, 0.3, driveSubsystem, visionSubsystem, armSubsystem))
-                .deadlineWith(new PickupGamePieceCommand(CUBE_GROUND, null, armSubsystem));
+            addCommands(new DriveToTargetCommand(CUBE_GROUND, 0.3, driveSubsystem, visionSubsystem, armSubsystem)
+                .deadlineWith(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem)));
         }
         if (exitZoneAction == AutoAction.PICK_UP_CONE) {
             addCommands(new SetVisionTargetCommand(CONE_GROUND, visionSubsystem));
-            addCommands(new DriveToTargetCommand(CONE_GROUND, 0.3, driveSubsystem, visionSubsystem, armSubsystem))
-                .deadlineWith(new PickupGamePieceCommand(CONE_GROUND, null, armSubsystem));
+            addCommands(new DriveToTargetCommand(CONE_GROUND, 0.3, driveSubsystem, visionSubsystem, armSubsystem)
+                .deadlineWith(new PickupGamePieceCommand(GamePiece.CONE, null, armSubsystem)));
         }
         double exitZoneDistance = 330;
         if (startingLane == AutoLane.BOTTOM) {
