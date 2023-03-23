@@ -4,6 +4,8 @@ import frc.robot.Constants;
 import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.subsystems.VisionSubsystem;
 
+import static frc.robot.Constants.VisionConstants.CameraView.*;
+
 public class SetVisionTargetCommand extends RunnymedeCommandBase {
 
     private final VisionSubsystem                        visionSubsystem;
@@ -21,9 +23,9 @@ public class SetVisionTargetCommand extends RunnymedeCommandBase {
     public void initialize() {
 
         logCommandStart("Vision target : " + target);
+        Constants.VisionConstants.CameraView tv = target.getCameraView();
 
-        if (!(target.getCameraView() == Constants.VisionConstants.CameraView.HIGH
-            || target.getCameraView() == Constants.VisionConstants.CameraView.LOW)) {
+        if (!(tv == HIGH || tv == MID || tv == LOW)) {
 
             // Only HIGH or LOW are valid for this command, otherwise cancel
             log("Unsupported camera view: " + target.getCameraView() + ". Cancelling.");
