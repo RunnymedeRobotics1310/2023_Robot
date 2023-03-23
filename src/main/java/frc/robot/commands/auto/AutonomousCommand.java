@@ -17,6 +17,7 @@ import frc.robot.commands.arm.CompactCommand;
 import frc.robot.commands.arm.PickupGamePieceCommand;
 import frc.robot.commands.arm.ReleaseCommand;
 import frc.robot.commands.arm.ScoreAutoCommand;
+import frc.robot.commands.arm.ScoreCommand;
 import frc.robot.commands.arm.StartIntakeCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
@@ -264,8 +265,8 @@ public class AutonomousCommand extends SequentialCommandGroup {
         if (currentOrientation == Orientation.FACE_GRID
             && (exitZoneAction == AutoAction.PICK_UP_CUBE
                 || exitZoneAction == AutoAction.PICK_UP_CONE)) {
-            addCommands(new DriveOnHeadingCommand(90, .3, 10, driveSubsystem));
-            addCommands(new DriveOnHeadingCommand(0, .3, 40, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(90, .3, 20, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(0, .3, 60, driveSubsystem));
             currentOrientation = Orientation.FACE_FIELD;
         }
 
@@ -322,8 +323,10 @@ public class AutonomousCommand extends SequentialCommandGroup {
 
         // Turn around and go back to the grid
         addCommands(new DriveOnHeadingCommand(270.0, 0.5, 5, driveSubsystem));
-        addCommands(new DriveOnHeadingCommand(180.0, 0.5, 200, driveSubsystem));
-        addCommands(new DriveToTargetCommand(VisionTarget.APRILTAG_GRID, 0.3, driveSubsystem, visionSubsystem, armSubsystem));
+        addCommands(new DriveOnHeadingCommand(180.0, 0.6, 300, driveSubsystem)
+            .deadlineWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem)));
+        addCommands(new DriveToTargetCommand(VisionTarget.APRILTAG_GRID, 0.3, driveSubsystem, visionSubsystem, armSubsystem)
+            .deadlineWith(new ScoreCommand(ScoringRow.TOP, armSubsystem)));
 
         // Vision subsystem to acquire the nearest scoring position marker (vision subsystem
         // operation to find scoring position +
