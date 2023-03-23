@@ -22,6 +22,8 @@ import frc.robot.commands.arm.StartIntakeCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
 import frc.robot.commands.drive.DriveToTargetCommand;
+import frc.robot.commands.drive.RotateToHeadingCommand;
+import frc.robot.commands.drive.RotateToHeadingCommand.DirectionOfRotation;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -265,8 +267,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
         if (currentOrientation == Orientation.FACE_GRID
             && (exitZoneAction == AutoAction.PICK_UP_CUBE
                 || exitZoneAction == AutoAction.PICK_UP_CONE)) {
-            addCommands(new DriveOnHeadingCommand(270, -.3, 20, driveSubsystem));
-            addCommands(new DriveOnHeadingCommand(0, .3, 60, driveSubsystem));
+            addCommands(new RotateToHeadingCommand(0, DirectionOfRotation.CLOCKWISE, driveSubsystem));
             currentOrientation = Orientation.FACE_FIELD;
         }
 
@@ -321,12 +322,13 @@ public class AutonomousCommand extends SequentialCommandGroup {
             return;
         }
 
-        // Turn around and go back to the grid
-        addCommands(new DriveOnHeadingCommand(270.0, 0.5, 5, driveSubsystem));
+        // Turn around, go back to the grid, and score
+        addCommands(new RotateToHeadingCommand(180, DirectionOfRotation.COUNTER_CLOCKWISE, driveSubsystem));
         addCommands(new DriveOnHeadingCommand(180.0, 0.6, 300, driveSubsystem)
             .deadlineWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem)));
         addCommands(new DriveToTargetCommand(VisionTarget.APRILTAG_GRID, 0.3, driveSubsystem, visionSubsystem, armSubsystem)
             .deadlineWith(new ScoreCommand(ScoringRow.TOP, armSubsystem)));
+
 
         // Vision subsystem to acquire the nearest scoring position marker (vision subsystem
         // operation to find scoring position +
