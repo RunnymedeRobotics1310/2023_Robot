@@ -77,7 +77,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
 
         StringBuilder sb = new StringBuilder();
         sb.append("Auto Selections");
-        sb.append("\n   Starting Postion          :").append(startingLane);
+        sb.append("\n   Starting Position          :").append(startingLane);
         sb.append("\n   Starting Orientation      :").append(currentOrientation);
         sb.append("\n   Loaded Game Piece         :").append(currentGamePiece);
         sb.append("\n   First Game Piece Scoring  :").append(firstGamePieceScoring);
@@ -264,7 +264,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
         if (currentOrientation == Orientation.FACE_GRID
             && (exitZoneAction == AutoAction.PICK_UP_CUBE
                 || exitZoneAction == AutoAction.PICK_UP_CONE)) {
-            addCommands(new DriveOnHeadingCommand(90, .3, 10, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(270, -.3, 10, driveSubsystem));
             addCommands(new DriveOnHeadingCommand(0, .3, 40, driveSubsystem));
             currentOrientation = Orientation.FACE_FIELD;
         }
