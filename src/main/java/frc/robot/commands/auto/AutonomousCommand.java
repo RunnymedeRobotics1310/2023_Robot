@@ -268,9 +268,10 @@ public class AutonomousCommand extends SequentialCommandGroup {
 
         // Middle routine
         else if (exitZoneAction == AutoAction.PICK_UP_CUBE) {
+            addCommands(new DriveOnHeadingCommand(180, -.2, 20, driveSubsystem));
+
             addCommands(new CompactCommand(armSubsystem)
-                .deadlineWith(new DriveOnHeadingCommand(180, -.65, 20, driveSubsystem)));
-            addCommands(new RotateToHeadingCommand(0, null, driveSubsystem));
+                .deadlineWith(new RotateToHeadingCommand(0, null, driveSubsystem)));
             currentOrientation = Orientation.FACE_FIELD;
             addCommands(new DriveOnHeadingCommand(0, .65, exitZoneDistance, driveSubsystem)
                 .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
@@ -284,9 +285,10 @@ public class AutonomousCommand extends SequentialCommandGroup {
         }
 
         else if (exitZoneAction == AutoAction.PICK_UP_CONE) {
+            addCommands(new DriveOnHeadingCommand(180, -.2, 20, driveSubsystem));
+
             addCommands(new CompactCommand(armSubsystem)
-                .deadlineWith(new DriveOnHeadingCommand(180, -.65, 20, driveSubsystem)));
-            addCommands(new RotateToHeadingCommand(0, null, driveSubsystem));
+                .deadlineWith(new RotateToHeadingCommand(0, null, driveSubsystem)));
             currentOrientation = Orientation.FACE_FIELD;
             addCommands(new DriveOnHeadingCommand(0, .65, exitZoneDistance, driveSubsystem)
                 .deadlineWith(new SetVisionTargetCommand(VisionTarget.CONE_GROUND, visionSubsystem)));
@@ -435,7 +437,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
                 if (currentGamePiece != GamePiece.NONE) {
                     addCommands(new RotateToHeadingCommand(180, null, driveSubsystem));
                     currentOrientation = Orientation.FACE_GRID;
-                    addCommands(new DriveOnHeadingCommand(180, .5, 170, false, driveSubsystem));
+                    addCommands(new DriveOnHeadingCommand(180, .5, 190, false, driveSubsystem));
                     addCommands(new DriveOnHeadingCommand(180, .3, 100, driveSubsystem));
                 }
                 else {
