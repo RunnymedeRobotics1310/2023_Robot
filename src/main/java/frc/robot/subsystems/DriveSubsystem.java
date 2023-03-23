@@ -429,4 +429,32 @@ public class DriveSubsystem extends SubsystemBase {
 
     }
 
+    /**
+     * Get the error between the current heading and the requested heading in the
+     * range -180 to +180 degrees.
+     * <p>
+     * A positive result means that the passed in heading is clockwise from the
+     * current heading.
+     *
+     * @param requiredHeading to measure the heading error
+     * @return degrees difference between the required heading and the current heading.
+     */
+    public double getHeadingError(double requiredHeading) {
+
+        double currentHeading = getHeading();
+
+        // Determine the error between the current heading and
+        // the desired heading
+        double error          = requiredHeading - currentHeading;
+
+        if (error > 180) {
+            error -= 360;
+        }
+        else if (error < -180) {
+            error += 360;
+        }
+
+        return error;
+    }
+
 }

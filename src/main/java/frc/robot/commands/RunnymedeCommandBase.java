@@ -12,10 +12,10 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
  */
 public class RunnymedeCommandBase extends CommandBase {
 
-    private long    startTime     = 0;
-    private String  finishReason  = null;
+    protected long  initializeTime = 0;
+    private String  finishReason   = null;
 
-    List<Subsystem> subsystemList = new ArrayList<>();
+    List<Subsystem> subsystemList  = new ArrayList<>();
 
     public void logCommandStart() {
 
@@ -35,6 +35,8 @@ public class RunnymedeCommandBase extends CommandBase {
     public void logCommandStart(String commandParms, Subsystem... subsystemList) {
 
         this.subsystemList.clear();
+        finishReason   = null;
+        initializeTime = 0;
 
         // Capture the subsystem list associated with this command
         if (subsystemList != null && subsystemList.length > 0) {
@@ -44,10 +46,10 @@ public class RunnymedeCommandBase extends CommandBase {
             this.subsystemList.addAll(getRequirements());
         }
 
-        startTime = System.currentTimeMillis();
-        finishReason = null;
+        logCommandState("STARTING", commandParms, true);
 
-        logCommandState("STARTING", commandParms);
+        // Set the initialize time after logging of the start message.
+        initializeTime = System.currentTimeMillis();
     }
 
     public void logCommandEnd(boolean interrupted) {
@@ -63,22 +65,30 @@ public class RunnymedeCommandBase extends CommandBase {
             state = "INTERUPTED";
         }
 
-        logCommandState(state, endMsg);
+        logCommandState(state, endMsg, true);
     }
 
     public void logStateTransition(String transition) {
-        logCommandState(transition, null);
+        logStateTransition(transition, null);
+    }
+
+    public void logStateTransition(String transition, boolean logSubsystems) {
+        logStateTransition(transition, null, logSubsystems);
     }
 
     public void logStateTransition(String transition, String msg) {
-        logCommandState(transition, msg);
+        logStateTransition(transition, msg, false);
+    }
+
+    public void logStateTransition(String transition, String msg, boolean logSubsystems) {
+        logCommandState(transition, msg, logSubsystems);
     }
 
     public void log(String msg) {
-        logCommandState(null, msg);
+        logCommandState(null, msg, false);
     }
 
-    private void logCommandState(String state, String msg) {
+    private void logCommandState(String state, String msg, boolean logSubsystems) {
 
         StringBuilder sb = new StringBuilder();
 
@@ -88,7 +98,7 @@ public class RunnymedeCommandBase extends CommandBase {
             sb.append(" : ").append(state);
         }
 
-        sb.append(" at ").append(System.currentTimeMillis() - startTime).append("ms");
+        sb.append(" at ").append(System.currentTimeMillis() - initializeTime).append("ms");
 
         if (finishReason != null) {
             sb.append(" : ").append(finishReason);
@@ -98,9 +108,11 @@ public class RunnymedeCommandBase extends CommandBase {
             sb.append(" : ").append(msg);
         }
 
-        // Print the subsystems as passed in on the command start
-        for (Subsystem subsystem : subsystemList) {
-            sb.append("\n   ").append(subsystem.toString());
+        if (logSubsystems) {
+            // Print the subsystems as passed in on the command start
+            for (Subsystem subsystem : subsystemList) {
+                sb.append("\n   ").append(subsystem.toString());
+            }
         }
 
         System.out.println(sb.toString());

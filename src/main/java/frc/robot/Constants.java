@@ -78,15 +78,20 @@ public final class Constants {
             TANK, ARCADE, QUENTIN, DUAL_STICK_ARCADE;
         }
 
-        public static final int     LEFT_MOTOR_PORT      = 10;
-        public static final int     RIGHT_MOTOR_PORT     = 20;
+        public static final int     LEFT_MOTOR_PORT             = 10;
+        public static final int     RIGHT_MOTOR_PORT            = 20;
 
-        public static final boolean LEFT_MOTOR_REVERSED  = false;
-        public static final boolean RIGHT_MOTOR_REVERSED = true;
+        public static final boolean LEFT_MOTOR_REVERSED         = false;
+        public static final boolean RIGHT_MOTOR_REVERSED        = true;
 
-        public static final double  CM_PER_ENCODER_COUNT = 3.503;
+        public static final double  CM_PER_ENCODER_COUNT        = 3.503;
 
-        public static final boolean GYRO_REVERSED        = false;
+        public static final boolean GYRO_REVERSED               = false;
+
+        public static final double  ROTATION_MAX_SPEED          = .4;
+        public static final double  ROTATION_SLOW_ZONE          = 40;
+        public static final double  ROTATION_SLOW_ZONE_SPEED    = .15;
+        public static final double  ROTATION_STOPPING_TOLERANCE = 10;
     }
 
     public static final class OiConstants {

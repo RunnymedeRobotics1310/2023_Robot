@@ -117,19 +117,10 @@ public class DriveOnHeadingCommand extends RunnymedeCommandBase {
 
         // Track the gyro heading.
 
-        double currentHeading = driveSubsystem.getHeading();
-
         // Determine the error between the current heading and
         // the desired heading
 
-        double error          = heading - currentHeading;
-
-        if (error > 180) {
-            error -= 360;
-        }
-        else if (error < -180) {
-            error += 360;
-        }
+        double error      = driveSubsystem.getHeadingError(heading);
 
         double leftSpeed  = speed + error * factor;
         double rightSpeed = speed - error * factor;
