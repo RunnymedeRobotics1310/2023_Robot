@@ -212,6 +212,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
 
         // Now that the game piece is scored, we do not have a game piece
         currentGamePiece = GamePiece.NONE;
+
     }
 
     /**
@@ -233,33 +234,62 @@ public class AutonomousCommand extends SequentialCommandGroup {
         if (startingLane == AutoLane.BOTTOM) {
             exitZoneDistance = 340;
         }
+        else if (startingLane == AutoLane.MIDDLE) {
+            exitZoneDistance = 390;
+        }
         // Drive out of the zone and switch camera view
         // This command may cause a rotation to heading 0.
-        if (exitZoneAction == AutoAction.PICK_UP_CUBE) {
+        if (exitZoneAction == AutoAction.PICK_UP_CUBE
+            && startingLane != AutoLane.MIDDLE) {
             if (currentOrientation == Orientation.FACE_FIELD) {
-                addCommands(new DriveOnHeadingCommand(0, 0.6, exitZoneDistance, driveSubsystem)
+                addCommands(new DriveOnHeadingCommand(0, 0.65, exitZoneDistance, driveSubsystem)
+                    .deadlineWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))
                     .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
             }
             else {
-                addCommands(new DriveOnHeadingCommand(180, -0.6, exitZoneDistance, driveSubsystem)
-                    .deadlineWith(new CompactCommand(armSubsystem)
-                        .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem))));
+                addCommands(new DriveOnHeadingCommand(180, -0.65, exitZoneDistance, driveSubsystem)
+                    .deadlineWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))
+                    .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
             }
         }
-        else if (exitZoneAction == AutoAction.PICK_UP_CONE) {
+        else if (exitZoneAction == AutoAction.PICK_UP_CONE
+            && startingLane != AutoLane.MIDDLE) {
             if (currentOrientation == Orientation.FACE_FIELD) {
-                addCommands(new DriveOnHeadingCommand(0, 0.6, exitZoneDistance, driveSubsystem)
+                addCommands(new DriveOnHeadingCommand(0, 0.65, exitZoneDistance, driveSubsystem)
+                    .deadlineWith(new StartIntakeCommand(GamePiece.CONE, armSubsystem, visionSubsystem))
                     .deadlineWith(new SetVisionTargetCommand(VisionTarget.CONE_GROUND, visionSubsystem)));
             }
             else {
-                addCommands(new DriveOnHeadingCommand(180, -0.6, exitZoneDistance, driveSubsystem)
-                    .deadlineWith(new CompactCommand(armSubsystem)
-                        .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem))));
+                addCommands(new DriveOnHeadingCommand(180, -0.65, exitZoneDistance, driveSubsystem)
+                    .deadlineWith(new StartIntakeCommand(GamePiece.CONE, armSubsystem, visionSubsystem))
+                    .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
             }
         }
+
+        // Middle routine
+        else if (exitZoneAction == AutoAction.PICK_UP_CUBE) {
+            addCommands(new CompactCommand(armSubsystem)
+                .deadlineWith(new DriveOnHeadingCommand(180, -.3, 20, driveSubsystem)));
+            addCommands(new RotateToHeadingCommand(0, null, driveSubsystem));
+            currentOrientation = Orientation.FACE_FIELD;
+            addCommands(new DriveOnHeadingCommand(0, .3, exitZoneDistance, driveSubsystem)
+                .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
+            addCommands(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem));
+        }
+
+        else if (exitZoneAction == AutoAction.PICK_UP_CONE) {
+            addCommands(new CompactCommand(armSubsystem)
+                .deadlineWith(new DriveOnHeadingCommand(180, -.3, 20, driveSubsystem)));
+            addCommands(new RotateToHeadingCommand(0, null, driveSubsystem));
+            currentOrientation = Orientation.FACE_FIELD;
+            addCommands(new DriveOnHeadingCommand(0, .3, exitZoneDistance, driveSubsystem)
+                .deadlineWith(new SetVisionTargetCommand(VisionTarget.CONE_GROUND, visionSubsystem)));
+            addCommands(new StartIntakeCommand(GamePiece.CONE, armSubsystem, visionSubsystem));
+        }
+
         else {
-            addCommands(new DriveOnHeadingCommand(180, -0.6, exitZoneDistance, driveSubsystem)
-                .deadlineWith(new CompactCommand(armSubsystem)));
+            addCommands(new DriveOnHeadingCommand(180, -0.3, exitZoneDistance, driveSubsystem)
+                .andThen(new CompactCommand(armSubsystem)));
         }
 
 
@@ -267,7 +297,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
         if (currentOrientation == Orientation.FACE_GRID
             && (exitZoneAction == AutoAction.PICK_UP_CUBE
                 || exitZoneAction == AutoAction.PICK_UP_CONE)) {
-            addCommands(new RotateToHeadingCommand(0, DirectionOfRotation.CLOCKWISE, driveSubsystem));
+            addCommands(new RotateToHeadingCommand(5, DirectionOfRotation.COUNTER_CLOCKWISE, driveSubsystem));
             currentOrientation = Orientation.FACE_FIELD;
         }
 
@@ -283,19 +313,13 @@ public class AutonomousCommand extends SequentialCommandGroup {
             // Start the pickup, and at the same time, drive toward the vision target. This command
             // will end when the PickupGroundCommand ends, canceling the DriveToVisionTarget if
             // required.
-            addCommands(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem)
-                .deadlineWith(new WaitCommand(.5)
-                    .andThen(
-                        new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)))
+            addCommands(new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)
                 .andThen(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem)));
 
         }
         if (exitZoneAction == AutoAction.PICK_UP_CONE) {
 
-            addCommands(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem)
-                .deadlineWith(new WaitCommand(.5)
-                    .andThen(
-                        new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)))
+            addCommands(new DriveToTargetCommand(VisionTarget.CONE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)
                 .andThen(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem)));
         }
     }
@@ -324,21 +348,15 @@ public class AutonomousCommand extends SequentialCommandGroup {
 
         // Turn around, go back to the grid, and score
         addCommands(new RotateToHeadingCommand(180, DirectionOfRotation.COUNTER_CLOCKWISE, driveSubsystem));
-        addCommands(new DriveOnHeadingCommand(180.0, 0.6, 300, driveSubsystem)
+        addCommands(new DriveOnHeadingCommand(180.0, 0.6, 250, driveSubsystem)
             .deadlineWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem)));
-        addCommands(new DriveToTargetCommand(VisionTarget.APRILTAG_GRID, 0.3, driveSubsystem, visionSubsystem, armSubsystem)
+        addCommands(new DriveToTargetCommand(VisionTarget.APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem, armSubsystem)
             .deadlineWith(new ScoreCommand(ScoringRow.TOP, armSubsystem)));
 
-
-        // Vision subsystem to acquire the nearest scoring position marker (vision subsystem
-        // operation to find scoring position +
-        // command to switch to "locate AprilTag" or "locate ConePostRetroReflector", etc)
-        // Drive towards target
-        // todo: fixme: the bot cannot see the apriltag, so it doesn't know where to stop!
-        // addCommands(new DriveToTargetCommand(VisionSubsystem.VisionTargetType.TAG, 0.5,
-        // driveSubsystem, visionSubsystem));
-        // Position the arm to the appropriate height
-        // Drop object
+        // Drop piece & compact
+        addCommands(new ReleaseCommand(armSubsystem));
+        addCommands(new DriveOnHeadingCommand(180, -.2, 10, driveSubsystem));
+        addCommands(new CompactCommand(armSubsystem));
 
         currentOrientation = Orientation.FACE_GRID;
         currentZone        = Zone.COMMUNITY;
@@ -417,7 +435,13 @@ public class AutonomousCommand extends SequentialCommandGroup {
             }
             else {
                 System.out.println("Balance Mid");
-                addCommands(new DriveOnHeadingCommand(0, -.3, 170, driveSubsystem));
+                if (currentGamePiece != GamePiece.NONE) {
+                    addCommands(new RotateToHeadingCommand(180, null, driveSubsystem));
+                    addCommands(new DriveOnHeadingCommand(180, .3, 170, driveSubsystem));
+                }
+                else {
+                    addCommands(new DriveOnHeadingCommand(0, -.3, 170, driveSubsystem));
+                }
             }
         }
 
