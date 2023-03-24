@@ -9,10 +9,12 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants.AutoAction;
 import frc.robot.Constants.AutoConstants.AutoLane;
+import frc.robot.Constants.AutoConstants.AutoPattern;
 import frc.robot.Constants.AutoConstants.Orientation;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
@@ -29,6 +31,8 @@ import frc.robot.commands.arm.ReleaseCommand;
 import frc.robot.commands.arm.ScoreCommand;
 import frc.robot.commands.arm.StartIntakeCommand;
 import frc.robot.commands.auto.AutonomousCommand;
+import frc.robot.commands.auto.DoubleDownAutoCommand;
+import frc.robot.commands.auto.MiddleMayhemAutoCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DefaultDriveCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
@@ -58,6 +62,7 @@ public class RobotContainer {
     private final DriveSubsystem  driveSubsystem                = new DriveSubsystem(armSubsystem);
 
     // A set of choosers for autonomous patterns
+    SendableChooser<AutoPattern>  autoPatternChooser            = new SendableChooser<>();
     SendableChooser<AutoLane>     startingLaneChooser           = new SendableChooser<>();
     SendableChooser<GamePiece>    startingGamePieceChooser      = new SendableChooser<>();
     SendableChooser<Orientation>  startingOrientationChooser    = new SendableChooser<>();
@@ -98,6 +103,11 @@ public class RobotContainer {
     private void initAutoSelectors() {
 
         // FIXME: (low) consider moving all of the choosers to their own classes.
+        autoPatternChooser.setDefaultOption("Double Down", AutoPattern.DOUBLE_DOWN);
+        SmartDashboard.putData("Starting Lane", startingLaneChooser);
+        autoPatternChooser.addOption("Middle Mayhem", AutoPattern.MIDDLE_MAYHEM);
+        autoPatternChooser.addOption("Auto Builder", AutoPattern.AUTO_BUILDER);
+
 
         startingLaneChooser.setDefaultOption("Substation", AutoLane.TOP);
         SmartDashboard.putData("Starting Lane", startingLaneChooser);
@@ -215,17 +225,40 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
 
-        return new AutonomousCommand(
-            driveSubsystem,
-            armSubsystem,
-            visionSubsystem,
-            startingLaneChooser,
-            startingGamePieceChooser,
-            startingOrientationChooser,
-            firstGamePieceScoringChooser,
-            exitZoneActionChooser,
-            secondGamePieceScoringChooser,
-            balanceChooser);
+        switch (autoPatternChooser.getSelected()) {
+
+        case DOUBLE_DOWN:
+            return new DoubleDownAutoCommand(
+                driveSubsystem,
+                armSubsystem,
+                visionSubsystem,
+                startingLaneChooser);
+
+        case MIDDLE_MAYHEM:
+            return new MiddleMayhemAutoCommand(
+                driveSubsystem,
+                armSubsystem,
+                visionSubsystem);
+
+        case AUTO_BUILDER:
+
+            return new AutonomousCommand(
+                driveSubsystem,
+                armSubsystem,
+                visionSubsystem,
+                startingLaneChooser,
+                startingGamePieceChooser,
+                startingOrientationChooser,
+                firstGamePieceScoringChooser,
+                exitZoneActionChooser,
+                secondGamePieceScoringChooser,
+                balanceChooser);
+
+        default:
+            // If the chooser did not work, then do nothing as the default auto.
+            return new InstantCommand();
+
+        }
 
     }
 }

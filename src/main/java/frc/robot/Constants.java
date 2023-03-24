@@ -56,6 +56,10 @@ public final class Constants {
 
     public static final class AutoConstants {
 
+        public static enum AutoPattern {
+            DOUBLE_DOWN, MIDDLE_MAYHEM, AUTO_BUILDER
+        }
+
         public static enum AutoLane {
             BOTTOM, MIDDLE, TOP
         }
