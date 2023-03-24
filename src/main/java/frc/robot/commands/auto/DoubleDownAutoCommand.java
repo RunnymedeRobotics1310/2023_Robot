@@ -89,10 +89,12 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
             exitZoneDistance = 340;
         }
 
+        // Note: this command sets the intake to the correct position, but then cancels the
+        // StartIntakeCommand when the DriveOnHeading command is complete.
+
         addCommands(new DriveOnHeadingCommand(0, 0.65, exitZoneDistance, driveSubsystem)
             .deadlineWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))
             .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
-
 
         /*
          * Rotate to face the cube
@@ -128,6 +130,8 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
 
         /*
          * Pick up the cube using vision
+         *
+         * NOTE: The intake is already in the correct position
          */
         addCommands(new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem,
             visionSubsystem, armSubsystem)
@@ -138,7 +142,7 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          *
          * Turn around to face the grid
          *
-         * FIXME: Does the direction of rotation matter?
+         * FIXME: Does the direction of rotation matter? Can we use the shortest path?
          */
         if (alliance == Alliance.Red && startingLane == AutoLane.BOTTOM
             || alliance == Alliance.Blue && startingLane == AutoLane.TOP) {
@@ -160,6 +164,9 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
 
         /*
          * Track the April tag back to the scoring location.
+         *
+         * FIXME: should we use .alongWith instead of .deadlineWith to make sure both commands are
+         * finished before dropping?
          */
         addCommands(new DriveToTargetCommand(VisionTarget.APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem, armSubsystem)
             .deadlineWith(new ScoreCommand(ScoringRow.TOP, armSubsystem)));
@@ -172,8 +179,9 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         /*
          * Back up while compacting to not hit the mid cube scoring spot.
          */
-        addCommands(new DriveOnHeadingCommand(180, -.2, 10, driveSubsystem));
-        addCommands(new CompactCommand(armSubsystem));
+
+        addCommands(new CompactCommand(armSubsystem)
+            .deadlineWith(new DriveOnHeadingCommand(180, -.2, 10, driveSubsystem)));
 
     }
 }
