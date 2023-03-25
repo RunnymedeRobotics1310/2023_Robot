@@ -35,7 +35,8 @@ public class ReleaseCommand extends BaseArmCommand {
             return true;
         }
 
-        if (armSubsystem.getPincherEncoder() < startingPincherPosition - 35
+        // if the sensor is not picking up the piece but it is there, open a min amt before giving up
+        if (armSubsystem.getPincherEncoder() < startingPincherPosition - 20
             && !armSubsystem.isGamePieceDetected()) {
             setFinishReason("Pinchers opened somewhat and no game piece");
             return true;
