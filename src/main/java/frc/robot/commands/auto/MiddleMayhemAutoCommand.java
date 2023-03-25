@@ -3,14 +3,11 @@ package frc.robot.commands.auto;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.VisionConstants.VisionTarget;
-import frc.robot.commands.arm.CompactCommand;
-import frc.robot.commands.arm.PickupGamePieceCommand;
-import frc.robot.commands.arm.ReleaseCommand;
-import frc.robot.commands.arm.ScoreAutoCommand;
-import frc.robot.commands.arm.StartIntakeCommand;
+import frc.robot.commands.arm.*;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
 import frc.robot.commands.drive.DriveToTargetCommand;
@@ -41,13 +38,12 @@ public class MiddleMayhemAutoCommand extends SequentialCommandGroup {
          * Score the cone
          */
         addCommands(new ScoreAutoCommand(ScoringRow.TOP, armSubsystem));
-        addCommands(new WaitCommand(.1));
         addCommands(new ReleaseCommand(armSubsystem));
 
         /*
          * Move to compact pose while backing up a bit to give some room to spin
          */
-        addCommands(new CompactCommand(armSubsystem)
+        addCommands(new ExtendArmCommand(0, armSubsystem)
             .deadlineWith(new DriveOnHeadingCommand(180, -.2, 20, driveSubsystem)));
 
         /*
@@ -60,20 +56,32 @@ public class MiddleMayhemAutoCommand extends SequentialCommandGroup {
          */
 
         /*
-         * Drive over the charger and get the camera ready
+         * Drive over the charger
+         * Get the camera ready
+         * Get the arm close to ready
          */
-        addCommands(new DriveOnHeadingCommand(0, .65, 390, driveSubsystem)
-            .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
+        addCommands(new DriveOnHeadingCommand(0, .65, 360, false, driveSubsystem)
+            .alongWith(new OpenPincherCommand(armSubsystem)
+                .andThen(new MoveArmToAngleCommand(Constants.ArmConstants.GROUND_PICKUP_POSITION.angle+5, armSubsystem)))
+            .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem))
+        );
+
+        /*
+         * We are now over the charge station. Finish the drive.
+         * Now that we're clear, it's safe to get the arm into the final intake position
+         */
+        addCommands(new DriveOnHeadingCommand(0, .65, 30, driveSubsystem)
+            .alongWith(new ExtendArmCommand(Constants.ArmConstants.GROUND_PICKUP_POSITION.extension, armSubsystem)
+                .andThen(new MoveArmToAngleCommand(Constants.ArmConstants.GROUND_PICKUP_POSITION.angle, armSubsystem))
+            )
+        );
 
         /*
          * Pick up the cube
          */
-        addCommands(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem)
-
-            .deadlineWith(new WaitCommand(.5) // wait for the intake to get into position
-                .andThen(new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)))
-
-            .andThen(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem)));
+        addCommands(new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)
+            .andThen(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem))
+        );
 
         /*
          * Rotate back towards the grid with the game piece
