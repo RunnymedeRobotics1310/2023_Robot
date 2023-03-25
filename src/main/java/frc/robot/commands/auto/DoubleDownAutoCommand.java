@@ -169,7 +169,7 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          * finished before dropping?
          */
         addCommands(new DriveToTargetCommand(VisionTarget.APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem, armSubsystem)
-            .deadlineWith(new ScoreCommand(ScoringRow.TOP, armSubsystem)));
+            .deadlineWith(new ScoreAutoCommand(ScoringRow.TOP, armSubsystem)));
 
         /*
          * Score the cube
