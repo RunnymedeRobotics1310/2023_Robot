@@ -104,7 +104,7 @@ public class RobotContainer {
 
         // FIXME: (low) consider moving all of the choosers to their own classes.
         autoPatternChooser.setDefaultOption("Double Down", AutoPattern.DOUBLE_DOWN);
-        SmartDashboard.putData("Starting Lane", startingLaneChooser);
+        SmartDashboard.putData("Auto Pattern", autoPatternChooser);
         autoPatternChooser.addOption("Middle Mayhem", AutoPattern.MIDDLE_MAYHEM);
         autoPatternChooser.addOption("Auto Builder", AutoPattern.AUTO_BUILDER);
 
