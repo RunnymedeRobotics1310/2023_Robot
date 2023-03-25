@@ -140,7 +140,7 @@ public class DriveFastOnHeadingCommand extends RunnymedeCommandBase {
     /** Get the preferred speed needed to drive the specified distance. */
     public double getSpeed() {
 
-        final double MIN_SPEED = 0.2;
+        final double MIN_SPEED = 0.3;
         final double MAX_SPEED = 1.0;
         final double SHORT_DISTANCE_SPEED = 0.5;
 
