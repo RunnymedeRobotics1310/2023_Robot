@@ -107,6 +107,7 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Pattern", autoPatternChooser);
         autoPatternChooser.addOption("Middle Mayhem", AutoPattern.MIDDLE_MAYHEM);
         autoPatternChooser.addOption("Auto Builder", AutoPattern.AUTO_BUILDER);
+        autoPatternChooser.addOption("Humber Auto", AutoPattern.HUMBER_AUTO);
 
 
         startingLaneChooser.setDefaultOption("Substation", AutoLane.TOP);
