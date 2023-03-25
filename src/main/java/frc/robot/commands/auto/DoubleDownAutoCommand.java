@@ -16,31 +16,26 @@ import frc.robot.commands.arm.ReleaseCommand;
 import frc.robot.commands.arm.ScoreAutoCommand;
 import frc.robot.commands.arm.ScoreCommand;
 import frc.robot.commands.arm.StartIntakeCommand;
-import frc.robot.commands.drive.DriveOnHeadingCommand;
-import frc.robot.commands.drive.DriveToTargetCommand;
-import frc.robot.commands.drive.RotateToHeadingCommand;
+import frc.robot.commands.drive.*;
 import frc.robot.commands.drive.RotateToHeadingCommand.DirectionOfRotation;
-import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
-public class DoubleDownAutoCommand extends SequentialCommandGroup {
+import static frc.robot.commands.drive.DriveFastOnHeadingCommand.Direction.*;
 
-    private AutoLane startingLane = null;
-    private Alliance alliance     = null;
+public class DoubleDownAutoCommand extends SequentialCommandGroup {
 
     public DoubleDownAutoCommand(DriveSubsystem driveSubsystem, ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem,
         SendableChooser<AutoLane> startingLaneChooser) {
 
-        startingLane = startingLaneChooser.getSelected();
-        alliance     = DriverStation.getAlliance();
+        final AutoLane startingLane = startingLaneChooser.getSelected();
+        final Alliance alliance     = DriverStation.getAlliance();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Auto Selections");
-        sb.append("\n   Starting Position :").append(startingLane);
-        sb.append("\nAlliance             :").append(alliance);
+        StringBuilder sb = new StringBuilder("Auto Selections: ");
+        sb.append("Starting Position:").append(startingLane).append(' ');
+        sb.append("Alliance:").append(alliance);
 
         System.out.println(sb.toString());
 
@@ -84,17 +79,19 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          * and set the intake to pick up a cube.
          */
 
-        double exitZoneDistance = 330;
-        if (startingLane == AutoLane.BOTTOM) {
-            exitZoneDistance = 340;
-        }
-
         // Note: this command sets the intake to the correct position, but then cancels the
         // StartIntakeCommand when the DriveOnHeading command is complete.
-
-        addCommands(new DriveOnHeadingCommand(0, 0.65, exitZoneDistance, driveSubsystem)
-            .deadlineWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))
-            .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
+        if (startingLane == AutoLane.BOTTOM) {
+            // drive over the bump
+            addCommands(new DriveOnHeadingCommand(0, -0.65, 340, driveSubsystem)
+                .deadlineWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))
+                .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
+        } else {
+            // no bump
+            addCommands(new DriveFastOnHeadingCommand(0, backward, 330, false, driveSubsystem)
+                .deadlineWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))
+                .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
+        }
 
         /*
          * Rotate to face the cube
@@ -159,8 +156,15 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          * Drive back towards the grid until past the charging station
          * Set the Vision target so that it is ready
          */
-        addCommands(new DriveOnHeadingCommand(180.0, 0.6, 250, driveSubsystem)
-            .deadlineWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem)));
+        if (startingLane == AutoLane.BOTTOM) {
+            // bump - drive safely
+            addCommands(new DriveOnHeadingCommand(180.0, 0.6, 250, false, driveSubsystem)
+                .deadlineWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem)));
+        } else {
+            // no bump - drive fast
+            addCommands(new DriveFastOnHeadingCommand(180.0, forward, 250, false,  driveSubsystem)
+                .deadlineWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem)));
+        }
 
         /*
          * Track the April tag back to the scoring location.

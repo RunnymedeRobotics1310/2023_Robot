@@ -22,25 +22,21 @@ import frc.robot.subsystems.VisionSubsystem;
 
 public class HumberAutoAutoCommand extends SequentialCommandGroup {
 
-    private AutoLane startingLane = null;
-    private Alliance alliance     = null;
-
     public HumberAutoAutoCommand(DriveSubsystem driveSubsystem, ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem,
         SendableChooser<AutoLane> startinglanecChooser) {
 
-        startingLane = startinglanecChooser.getSelected();
-        alliance     = DriverStation.getAlliance();
+        final AutoLane startingLane = startinglanecChooser.getSelected();
+        final Alliance alliance     = DriverStation.getAlliance();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Auto Selections");
-        sb.append("\n   Starting Position :").append(startingLane);
-        sb.append("\nAlliance             :").append(alliance);
+        StringBuilder sb = new StringBuilder("Auto Selections: ");
+        sb.append("Starting Position:").append(startingLane).append(' ');
+        sb.append("Alliance:").append(alliance);
 
         System.out.println(sb.toString());
 
         // If any of these are null, then there was some kind of error.
         if (startingLane == null || startingLane == AutoLane.MIDDLE) {
-            System.out.println("*** ERROR *** null starting lane");
+            System.out.println("*** ERROR *** invalid starting lane");
         }
 
         // Print an error if the alliance is not set
@@ -69,11 +65,11 @@ public class HumberAutoAutoCommand extends SequentialCommandGroup {
             exitZoneDistance = 340;
         }
 
-        addCommands(new DriveOnHeadingCommand(180, .65, exitZoneDistance, driveSubsystem)
+        addCommands(new DriveOnHeadingCommand(180, -.65, exitZoneDistance, driveSubsystem)
             .deadlineWith(new CompactCommand(armSubsystem)));
 
-        if ((alliance == Alliance.Red && startingLane == startingLane.BOTTOM)
-            || (alliance == Alliance.Blue && startingLane == startingLane.TOP)) {
+        if ((alliance == Alliance.Red && startingLane == AutoLane.BOTTOM)
+            || (alliance == Alliance.Blue && startingLane == AutoLane.TOP)) {
             addCommands(new DriveOnHeadingCommand(90, .65, 180, driveSubsystem));
         }
         else {
