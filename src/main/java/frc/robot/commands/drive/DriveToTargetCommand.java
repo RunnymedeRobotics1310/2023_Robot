@@ -37,8 +37,6 @@ public class DriveToTargetCommand extends RunnymedeCommandBase {
 
     private long                               initializeTime          = 0;
 
-    private double                             targetDelaySec          = 0;
-
     private boolean                            targetFound             = false;
 
     private double                             lastKnownTargetHeading  = 0;
@@ -101,12 +99,6 @@ public class DriveToTargetCommand extends RunnymedeCommandBase {
             return;
         }
 
-        if (visionSubsystem.getCurrentVisionTarget() != target) {
-            targetDelaySec = VisionConstants.VISION_SWITCH_TIME_SEC;
-        }
-        else {
-            targetDelaySec = 0;
-        }
         setVisionTarget(target);
 
 
@@ -119,10 +111,8 @@ public class DriveToTargetCommand extends RunnymedeCommandBase {
     @Override
     public void execute() {
 
-        double executeTimeSec = (System.currentTimeMillis() - initializeTime) / 1000.0d;
-
         // If the target was switched, then wait before trying to track a target
-        if (executeTimeSec < targetDelaySec) {
+        if (!visionSubsystem.isCameraInPositionForTarget()) {
             return;
         }
 
@@ -147,6 +137,7 @@ public class DriveToTargetCommand extends RunnymedeCommandBase {
         // If a target has never been found, then keep driving straight.
         // Hopefully a target will be found on the next lap
         if (!targetFound) {
+            // fixme: this seems very dangerous... should we maybe cancel here?
             driveSubsystem.setMotorSpeeds(speed, speed);
             return;
         }
