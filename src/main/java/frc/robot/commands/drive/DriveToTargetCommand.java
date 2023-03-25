@@ -41,6 +41,8 @@ public class DriveToTargetCommand extends RunnymedeCommandBase {
 
     private double                             lastKnownTargetHeading  = 0;
 
+    private double                             startingToDriveAimlesslyEncoderCount = -1.0;
+
     /**
      * Drive to a cube vision target. If this command does not find a cube vision target,
      * then the command ends after 1 second.
@@ -137,7 +139,14 @@ public class DriveToTargetCommand extends RunnymedeCommandBase {
         // If a target has never been found, then keep driving straight.
         // Hopefully a target will be found on the next lap
         if (!targetFound) {
-            // fixme: this seems very dangerous... should we maybe cancel here?
+            if (startingToDriveAimlesslyEncoderCount < 0) {
+                startingToDriveAimlesslyEncoderCount = driveSubsystem.getEncoderDistanceCm();
+                log("Target not found - driving straight ahead hoping to find it.");
+            } else {
+                double dist = driveSubsystem.getEncoderDistanceCm() - startingToDriveAimlesslyEncoderCount;
+                log("Target not found - driving straight ahead hoping to find it. Distance driven: "+dist+"cm.");
+            }
+            // fixme: this seems very dangerous... should we maybe cancel here? What if the target is a wall!?!?
             driveSubsystem.setMotorSpeeds(speed, speed);
             return;
         }
