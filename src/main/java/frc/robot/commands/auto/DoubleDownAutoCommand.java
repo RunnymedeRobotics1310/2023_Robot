@@ -14,7 +14,6 @@ import frc.robot.commands.arm.CompactCommand;
 import frc.robot.commands.arm.PickupGamePieceCommand;
 import frc.robot.commands.arm.ReleaseCommand;
 import frc.robot.commands.arm.ScoreAutoCommand;
-import frc.robot.commands.arm.ScoreCommand;
 import frc.robot.commands.arm.StartIntakeCommand;
 import frc.robot.commands.drive.*;
 import frc.robot.commands.drive.RotateToHeadingCommand.DirectionOfRotation;
@@ -68,8 +67,6 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          * Step 1 - Score the cone in the top row
          */
         addCommands(new ScoreAutoCommand(ScoringRow.TOP, armSubsystem));
-
-        addCommands(new WaitCommand(.1));
         addCommands(new ReleaseCommand(armSubsystem));
 
         /*
@@ -83,14 +80,17 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         // StartIntakeCommand when the DriveOnHeading command is complete.
         if (startingLane == AutoLane.BOTTOM) {
             // drive over the bump
-            addCommands(new DriveOnHeadingCommand(0, -0.65, 340, driveSubsystem)
+            addCommands(new DriveOnHeadingCommand(180, -0.65, 340, driveSubsystem)
+                .deadlineWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))
+                .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
+        } else if (startingLane == AutoLane.TOP) {
+            // no bump
+            addCommands(new DriveFastOnHeadingCommand(180, backward, 330, false, driveSubsystem)
                 .deadlineWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))
                 .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
         } else {
-            // no bump
-            addCommands(new DriveFastOnHeadingCommand(0, backward, 330, false, driveSubsystem)
-                .deadlineWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))
-                .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
+            System.out.println("*** ERROR *** Invalid starting lane " + startingLane + ". Second piece not scored");
+            return;
         }
 
         /*
@@ -101,11 +101,6 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          * NOTE: The auto will at least score the cone and exit the zone if there was an error
          * in the auto chooser.
          */
-
-        if (startingLane != AutoLane.TOP && startingLane != AutoLane.BOTTOM) {
-            System.out.println("*** ERROR *** Invalid starting lane " + startingLane + ". Second piece not scored");
-            return;
-        }
 
         if (alliance != Alliance.Blue && alliance != Alliance.Red) {
             System.out.println("*** ERROR *** Unknown alliance " + alliance + ". Second piece not scored");
