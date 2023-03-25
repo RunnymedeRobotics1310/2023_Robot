@@ -39,7 +39,7 @@ public class HumberAutoAutoCommand extends SequentialCommandGroup {
         System.out.println(sb.toString());
 
         // If any of these are null, then there was some kind of error.
-        if (startingLane == null) {
+        if (startingLane == null || startingLane == AutoLane.MIDDLE) {
             System.out.println("*** ERROR *** null starting lane");
         }
 
