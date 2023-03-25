@@ -32,6 +32,7 @@ import frc.robot.commands.arm.ScoreCommand;
 import frc.robot.commands.arm.StartIntakeCommand;
 import frc.robot.commands.auto.AutonomousCommand;
 import frc.robot.commands.auto.DoubleDownAutoCommand;
+import frc.robot.commands.auto.HumberAutoAutoCommand;
 import frc.robot.commands.auto.MiddleMayhemAutoCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DefaultDriveCommand;
@@ -227,6 +228,13 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
 
         switch (autoPatternChooser.getSelected()) {
+
+        case HUMBER_AUTO:
+            return new HumberAutoAutoCommand(
+                driveSubsystem,
+                armSubsystem,
+                visionSubsystem,
+                startingLaneChooser);
 
         case DOUBLE_DOWN:
             return new DoubleDownAutoCommand(
