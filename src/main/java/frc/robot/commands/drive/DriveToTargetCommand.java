@@ -190,9 +190,15 @@ public class DriveToTargetCommand extends RunnymedeCommandBase {
         switch (target) {
         case CONE_GROUND:
         case CUBE_GROUND:
-            return armSubsystem.isGamePieceDetected();
+            boolean detected = armSubsystem.isGamePieceDetected();
+            if (detected) {
+                log("Game piece detected.");
+            }
+            return detected;
         case APRILTAG_GRID:
+            final double TARGET_AREA_THRESHOLD = 3.5;
             if (targetArea >= 3.5) {
+                log("April tag detected. Actual target area: "+targetArea+", required threshold: "+TARGET_AREA_THRESHOLD);
                 return true;
             }
             break;

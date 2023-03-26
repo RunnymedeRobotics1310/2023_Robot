@@ -32,9 +32,9 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         final Alliance alliance     = DriverStation.getAlliance();
 
         StringBuilder sb = new StringBuilder("Auto Selections: ");
+        sb.append("Pattern: The Double Down ");
         sb.append("Starting Position:").append(startingLane).append(' ');
         sb.append("Alliance:").append(alliance);
-
         System.out.println(sb.toString());
 
         // If any of these are null, then there was some kind of error.
@@ -80,13 +80,13 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         if (startingLane == AutoLane.BOTTOM) {
             // drive over the bump
             addCommands(new DriveOnHeadingCommand(180, -0.65, 340, driveSubsystem)
-                .deadlineWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))
-                .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
+                .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)
+                .deadlineWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))));
         } else if (startingLane == AutoLane.TOP) {
             // no bump
-            addCommands(new DriveFastOnHeadingCommand(180, backward, 330, false, driveSubsystem)
-                .deadlineWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))
-                .deadlineWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
+            addCommands(new DriveFastOnHeadingCommand(180, backward, 370, false, driveSubsystem)
+                .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)
+                .deadlineWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))));
         } else {
             System.out.println("*** ERROR *** Invalid starting lane " + startingLane + ". Second piece not scored");
             return;
@@ -124,7 +124,7 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          *
          * NOTE: The intake is already in the correct position
          */
-        addCommands(new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem,
+        addCommands(new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .1, driveSubsystem,
             visionSubsystem, armSubsystem)
             .andThen(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem)));
 
@@ -166,8 +166,8 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          * FIXME: should we use .alongWith instead of .deadlineWith to make sure both commands are
          * finished before dropping?
          */
-        addCommands(new DriveToTargetCommand(VisionTarget.APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem, armSubsystem)
-            .deadlineWith(new ScoreAutoCommand(ScoringRow.TOP, armSubsystem)));
+        addCommands(new ScoreAutoCommand(ScoringRow.TOP, armSubsystem));
+        addCommands(new DriveToTargetCommand(VisionTarget.APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem, armSubsystem));
 
         /*
          * Score the cube

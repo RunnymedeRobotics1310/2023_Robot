@@ -6,6 +6,8 @@ import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.subsystems.ArmSubsystem;
 
+import static frc.robot.Constants.GameConstants.GamePiece.NONE;
+
 public class ScoreAutoCommand extends BaseArmCommand {
 
     private final long       MAX_TIME_TO_SCORE_MILLIS = 4000L;
@@ -36,8 +38,12 @@ public class ScoreAutoCommand extends BaseArmCommand {
         stopArmMotors();
 
         commandStartTime = System.currentTimeMillis();
-        step             = Step.RETRACT;
-
+        if (gamePiece == NONE) {
+            logCommandStart("Cannot score NONE game piece.");
+            step = Step.FINISH;
+        } else {
+            step = Step.RETRACT;
+        }
         logCommandStart("Scoring row : " + scoringRow + ", Starting Step " + step);
     }
 
