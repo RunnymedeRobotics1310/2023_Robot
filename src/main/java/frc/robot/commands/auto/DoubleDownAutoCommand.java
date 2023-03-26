@@ -19,6 +19,7 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
+import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION;
 import static frc.robot.Constants.ArmConstants.getScoringPosition;
 import static frc.robot.Constants.VisionConstants.VisionTarget.APRILTAG_GRID;
 import static frc.robot.commands.drive.DriveFastOnHeadingCommand.Direction.*;
@@ -89,7 +90,10 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         }
         addCommands(driveOutCmd
             .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)
-                .alongWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))));
+            .alongWith(new MoveArmToPositionCommand(GROUND_PICKUP_AUTO_POSITION, armSubsystem)
+                .andThen(new OpenPincherCommand(armSubsystem)))
+            )
+        );
 
         /*
          * Rotate to face the cube
