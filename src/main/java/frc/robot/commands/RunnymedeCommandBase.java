@@ -88,6 +88,10 @@ public class RunnymedeCommandBase extends CommandBase {
         logCommandState(null, msg, false);
     }
 
+    public void log(String msg, boolean logSubsystems) {
+        logCommandState(null, msg, logSubsystems);
+    }
+
     private void logCommandState(String state, String msg, boolean logSubsystems) {
 
         StringBuilder sb = new StringBuilder();
