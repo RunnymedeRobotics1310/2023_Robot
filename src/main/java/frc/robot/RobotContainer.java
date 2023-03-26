@@ -36,8 +36,7 @@ import frc.robot.commands.auto.HumberAutoAutoCommand;
 import frc.robot.commands.auto.MiddleMayhemAutoCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DefaultDriveCommand;
-import frc.robot.commands.drive.DriveOnHeadingCommand;
-import frc.robot.commands.drive.DriveToTargetCommand;
+import frc.robot.commands.drive.DriveToGamePieceCommand;
 import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.commands.operator.OperatorInput;
@@ -213,7 +212,7 @@ public class RobotContainer {
             .onTrue(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem)
                 .deadlineWith(new WaitCommand(.5)
                     .andThen(
-                        new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)))
+                        new DriveToGamePieceCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)))
                 .andThen(new PickupGamePieceCommand(GamePiece.CUBE, operatorInput, armSubsystem)));
     }
 

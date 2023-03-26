@@ -21,7 +21,7 @@ import frc.robot.commands.arm.ScoreCommand;
 import frc.robot.commands.arm.StartIntakeCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
-import frc.robot.commands.drive.DriveToTargetCommand;
+import frc.robot.commands.drive.DriveToGamePieceCommand;
 import frc.robot.commands.drive.RotateToHeadingCommand;
 import frc.robot.commands.drive.RotateToHeadingCommand.DirectionOfRotation;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
@@ -279,7 +279,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
             addCommands(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem)
                 .deadlineWith(new WaitCommand(.5)
                     .andThen(
-                        new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)))
+                        new DriveToGamePieceCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)))
                 .andThen(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem)));
             currentGamePiece = GamePiece.CUBE;
         }
@@ -296,7 +296,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
             addCommands(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem)
                 .deadlineWith(new WaitCommand(.5)
                     .andThen(
-                        new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)))
+                        new DriveToGamePieceCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)))
                 .andThen(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem)));
             currentGamePiece = GamePiece.CONE;
 
@@ -366,7 +366,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
         addCommands(new RotateToHeadingCommand(180, DirectionOfRotation.COUNTER_CLOCKWISE, driveSubsystem));
         addCommands(new DriveOnHeadingCommand(180.0, 0.6, 250, driveSubsystem)
             .deadlineWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem)));
-        addCommands(new DriveToTargetCommand(VisionTarget.APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem, armSubsystem)
+        addCommands(new DriveToGamePieceCommand(VisionTarget.APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem, armSubsystem)
             .deadlineWith(new ScoreCommand(ScoringRow.TOP, armSubsystem)));
 
         // Drop piece & compact

@@ -11,7 +11,7 @@ import frc.robot.Constants.VisionConstants.VisionTarget;
 import frc.robot.commands.arm.*;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
-import frc.robot.commands.drive.DriveToTargetCommand;
+import frc.robot.commands.drive.DriveToGamePieceCommand;
 import frc.robot.commands.drive.RotateToHeadingCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.commands.vision.SetVisionTargetCommand;
@@ -85,7 +85,7 @@ public class MiddleMayhemAutoCommand extends SequentialCommandGroup {
         /*
          * Pick up the cube
          */
-        addCommands(new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)
+        addCommands(new DriveToGamePieceCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)
             .andThen(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem))
         );
 

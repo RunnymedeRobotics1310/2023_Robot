@@ -16,7 +16,7 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
-public class DriveToTargetCommand extends RunnymedeCommandBase {
+public class DriveToGamePieceCommand extends RunnymedeCommandBase {
 
     private static final List<VisionTarget>    SUPPORTED_DRIVE_TARGETS = Arrays.asList(
         VisionTarget.CONE_GROUND,
@@ -54,7 +54,7 @@ public class DriveToTargetCommand extends RunnymedeCommandBase {
      * @param driveSubsystem
      * @param visionSubsystem
      */
-    public DriveToTargetCommand(VisionConstants.VisionTarget target, double speed,
+    public DriveToGamePieceCommand(VisionConstants.VisionTarget target, double speed,
         DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem, ArmSubsystem armSubsystem) {
         this(target, speed, Constants.DEFAULT_COMMAND_TIMEOUT_SECONDS, driveSubsystem, visionSubsystem, armSubsystem);
     }
@@ -67,7 +67,7 @@ public class DriveToTargetCommand extends RunnymedeCommandBase {
      * @param driveSubsystem
      * @param visionSubsystem
      */
-    public DriveToTargetCommand(VisionTarget target, double speed, double timeoutSeconds,
+    public DriveToGamePieceCommand(VisionTarget target, double speed, double timeoutSeconds,
         DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem, ArmSubsystem armSubsystem) {
 
         this.target          = target;
