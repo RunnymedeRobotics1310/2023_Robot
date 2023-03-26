@@ -300,6 +300,7 @@ public final class Constants {
                                                                                                                   // confirm
 
         // Pickup constants
+        public static final ArmPosition GROUND_PICKUP_AUTO_POSITION       = new ArmPosition(40, 19);              // Confirmed
         public static final ArmPosition GROUND_PICKUP_POSITION       = new ArmPosition(34, 14);                   // Confirmed
         public static final ArmPosition SUBSTATION_PICKUP_POSITION   = new ArmPosition(86.5, 30);
 

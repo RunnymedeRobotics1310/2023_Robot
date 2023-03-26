@@ -124,7 +124,7 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          *
          * NOTE: The intake is already in the correct position
          */
-        addCommands(new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .1, driveSubsystem,
+        addCommands(new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .2, driveSubsystem,
             visionSubsystem, armSubsystem)
             .andThen(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem)));
 

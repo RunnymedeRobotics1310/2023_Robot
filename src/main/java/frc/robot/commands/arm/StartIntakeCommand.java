@@ -2,6 +2,7 @@ package frc.robot.commands.arm;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.VisionConstants.VisionTarget;
@@ -10,11 +11,15 @@ import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
+import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION;
+import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_POSITION;
+
 public class StartIntakeCommand extends BaseArmCommand {
 
     private final OperatorInput   operatorInput;
     private final VisionSubsystem visionSubsystem;
 
+    private final Constants.ArmPosition groundPickupPosition;
     private GamePiece             gamePiece    = null;
     private VisionTarget          visionTarget = null;
 
@@ -22,6 +27,7 @@ public class StartIntakeCommand extends BaseArmCommand {
 
         super(armSubsystem);
 
+        this.groundPickupPosition = GROUND_PICKUP_AUTO_POSITION;
         this.gamePiece       = gamePiece;
         this.operatorInput   = null;
         this.visionSubsystem = visionSubsystem;
@@ -30,6 +36,8 @@ public class StartIntakeCommand extends BaseArmCommand {
     public StartIntakeCommand(OperatorInput operatorInput, ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem) {
 
         super(armSubsystem);
+
+        this.groundPickupPosition = GROUND_PICKUP_POSITION;
 
         this.operatorInput   = operatorInput;
         this.visionSubsystem = visionSubsystem;
@@ -116,9 +124,9 @@ public class StartIntakeCommand extends BaseArmCommand {
         // Always open the pincher, there is no point in waiting
         openPincher();
 
-        if (moveArmExtendToEncoderCount(ArmConstants.GROUND_PICKUP_POSITION.extension, ArmConstants.MAX_EXTEND_SPEED)) {
+        if (moveArmExtendToEncoderCount(groundPickupPosition.extension, ArmConstants.MAX_EXTEND_SPEED)) {
 
-            moveArmLiftToAngle(ArmConstants.GROUND_PICKUP_POSITION.angle);
+            moveArmLiftToAngle(groundPickupPosition.angle);
         }
     }
 
@@ -134,7 +142,7 @@ public class StartIntakeCommand extends BaseArmCommand {
         }
 
         // If at the target position, and a game piece is detected.
-        if (armSubsystem.isInPosition(ArmConstants.GROUND_PICKUP_POSITION)) {
+        if (armSubsystem.isInPosition(groundPickupPosition)) {
 
             // If a game piece is detected
             if (armSubsystem.isGamePieceDetected()) {
