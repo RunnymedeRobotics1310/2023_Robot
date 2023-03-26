@@ -145,9 +145,15 @@ public class StartIntakeCommand extends BaseArmCommand {
         if (armSubsystem.isInPosition(groundPickupPosition)) {
 
             // If a game piece is detected
-            if (armSubsystem.isGamePieceDetected()) {
-                setFinishReason("Game piece detected in pickup");
+            if (DriverStation.isTeleopEnabled()) {
+                if (armSubsystem.isGamePieceDetected()) {
+                    setFinishReason("Game piece detected in pickup in teleop.");
+                    return true;
+                }
+            } else {
+                setFinishReason("Arm is in position in auto.");
                 return true;
+
             }
         }
 
