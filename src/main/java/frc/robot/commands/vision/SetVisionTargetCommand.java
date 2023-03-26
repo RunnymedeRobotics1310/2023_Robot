@@ -10,6 +10,7 @@ public class SetVisionTargetCommand extends RunnymedeCommandBase {
 
     private final VisionSubsystem                        visionSubsystem;
     private final Constants.VisionConstants.VisionTarget target;
+    private boolean targetValid = false;
 
     public SetVisionTargetCommand(Constants.VisionConstants.VisionTarget target, VisionSubsystem visionSubsystem) {
 
@@ -30,22 +31,29 @@ public class SetVisionTargetCommand extends RunnymedeCommandBase {
             // Only HIGH or LOW are valid for this command, otherwise cancel
             log("Unsupported camera view: " + target.getCameraView() + ". Cancelling.");
             this.cancel();
-
+            targetValid = false;
             return;
         }
 
+        targetValid = true;
         visionSubsystem.setVisionTarget(target);
     }
 
     @Override
     public boolean isFinished() {
 
-        if (visionSubsystem.getCurrentVisionTarget() == target && visionSubsystem.isCameraInPositionForTarget()) {
-            setFinishReason("Vision system positioned");
+        if (targetValid) {
+            if (visionSubsystem.getCurrentVisionTarget() == target && visionSubsystem.isCameraInPositionForTarget()) {
+                setFinishReason("Vision system positioned");
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            setFinishReason("Invalid target - finishing.");
             return true;
         }
 
-        return false;
     }
 
     @Override
