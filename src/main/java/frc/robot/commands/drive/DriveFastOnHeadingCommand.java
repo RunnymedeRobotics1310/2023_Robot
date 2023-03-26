@@ -165,12 +165,12 @@ public class DriveFastOnHeadingCommand extends RunnymedeCommandBase {
             // speeding up
             double pctDriven = (driven/ACCLERATING_DISTANCE);
             speed = Math.max(MIN_SPEED, pctDriven*MAX_SPEED);
-            log("Accelerating. "+pctDriven+"% driven, speed: "+speed+" dist/total: "+driven+"/"+target);
+            log("Accelerating. "+(int)(pctDriven*100)+"% driven, speed: "+speed+" dist/total: "+((int)driven)+"/"+target);
         } else if (remaining < DECELERATE_DISTANCE) {
             // slowing down
             double pctToGo = (remaining/DECELERATE_DISTANCE);
             speed = Math.max(MIN_SPEED, pctToGo*MAX_SPEED);
-            log("Decelerating. "+pctToGo+"% to go, speed: "+speed+" dist/total: "+driven+"/"+target);
+            log("Decelerating. "+(int)(pctToGo*100)+"% driven, speed: "+speed+" dist/total: "+((int)driven)+"/"+target);
         } else {
             // cruising
             speed = MAX_SPEED;
