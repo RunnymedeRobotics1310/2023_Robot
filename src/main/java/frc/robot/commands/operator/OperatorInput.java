@@ -145,12 +145,8 @@ public class OperatorInput {
         return operatorController.getRightY();
     }
 
-    public boolean driveForward() {
-        return operatorController.getPOV() == 0;
-    }
-
     public boolean balance() {
-        return operatorController.getPOV() == 180;
+        return operatorController.getPOV() == 0;
     }
 
     public boolean calibratePincher() {
@@ -163,7 +159,7 @@ public class OperatorInput {
     }
 
     public boolean isCameraViewLow() {
-        return driverController.getPOV() == 180;
+        return driverController.getPOV() == 180 || operatorController.getPOV() == 180;
     }
 
     public void startVibrate() {

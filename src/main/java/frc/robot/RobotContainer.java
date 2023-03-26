@@ -193,9 +193,6 @@ public class RobotContainer {
         new Trigger(() -> (operatorInput.isPickUpCube()))
             .onTrue(new StartIntakeCommand(operatorInput, armSubsystem, visionSubsystem));
 
-        new Trigger(() -> (operatorInput.driveForward()))
-            .onTrue(new DriveOnHeadingCommand(0, 0.2, 300, driveSubsystem));
-
         new Trigger(() -> (operatorInput.balance()))
             .onTrue(new BalanceCommand(driveSubsystem));
 
