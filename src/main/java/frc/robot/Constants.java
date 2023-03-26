@@ -31,7 +31,7 @@ public final class Constants {
         public static enum GamePiece {
 
             CUBE(65), // Confirmed
-            CONE(123), // Confirmed
+            CONE(121), // Confirmed
             NONE(ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE); // Confirmed
 
             public final double pincherEncoderCount;
