@@ -81,12 +81,12 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
             // drive over the bump
             addCommands(new DriveOnHeadingCommand(180, -0.65, 340, driveSubsystem)
                 .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)
-                .deadlineWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))));
+                .alongWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))));
         } else if (startingLane == AutoLane.TOP) {
             // no bump
             addCommands(new DriveFastOnHeadingCommand(180, backward, 370, false, driveSubsystem)
                 .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)
-                .deadlineWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))));
+                .alongWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))));
         } else {
             System.out.println("*** ERROR *** Invalid starting lane " + startingLane + ". Second piece not scored");
             return;
