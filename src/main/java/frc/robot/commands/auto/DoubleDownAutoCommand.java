@@ -20,6 +20,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 import static frc.robot.Constants.ArmConstants.getScoringPosition;
+import static frc.robot.Constants.VisionConstants.VisionTarget.APRILTAG_GRID;
 import static frc.robot.commands.drive.DriveFastOnHeadingCommand.Direction.*;
 
 public class DoubleDownAutoCommand extends SequentialCommandGroup {
@@ -152,29 +153,23 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         RunnymedeCommandBase driveBackCmd;
         if (startingLane == AutoLane.BOTTOM) {
             // bump - drive safely
-            driveBackCmd = new DriveOnHeadingCommand(180.0, 0.6, 250, false, driveSubsystem);
+            driveBackCmd = new DriveOnHeadingCommand(180.0, 0.6, 230, false, driveSubsystem);
         } else {
             // no bump - drive fast
-            driveBackCmd =new DriveFastOnHeadingCommand(180.0, forward, 250, false, driveSubsystem);
+            driveBackCmd =new DriveFastOnHeadingCommand(180.0, forward, 230, false, driveSubsystem);
         }
 
         addCommands(
             driveBackCmd
-                .alongWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem))
-                .alongWith(new MoveArmToAngleCommand(scorePosition.angle, armSubsystem)
-                    // start extending but can be interrupted
-                    .deadlineWith(new ExtendArmCommand(scorePosition.extension, armSubsystem))
-                )
+                .alongWith(new SetVisionTargetCommand(APRILTAG_GRID, visionSubsystem))
+                .deadlineWith(new MoveArmToPositionCommand(scorePosition, armSubsystem)) // interruptible
         );
 
             /*
              * Track the April tag back to the scoring location.
              */
-            addCommands(
-                new DriveToTargetCommand(VisionTarget.APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem, armSubsystem)
-                    // finish extending
-                    .alongWith(new ExtendArmCommand(scorePosition.extension, armSubsystem)
-                    )
+            addCommands(new DriveToTargetCommand(APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem, armSubsystem)
+                .alongWith(new MoveArmToPositionCommand(scorePosition, armSubsystem)) // must finish
             );
 
         /*
