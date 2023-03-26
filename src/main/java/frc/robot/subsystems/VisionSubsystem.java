@@ -387,6 +387,7 @@ public class VisionSubsystem extends SubsystemBase {
         sb.append(this.getClass().getSimpleName()).append(" : ")
             .append("Vision Target ").append(getCurrentVisionTarget())
             .append(", Camera View ").append(getCameraView())
+            .append(", Camera in position ").append(isCameraInPositionForTarget())
             .append(", Target Detected ").append(isVisionTargetFound())
             .append(", target angle ").append(Math.round(getTargetAngleOffset() * 10) / 10d);
 
