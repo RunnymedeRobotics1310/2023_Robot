@@ -124,16 +124,16 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          *
          * NOTE: The intake is already in the correct position
          */
-        addCommands(new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .2, driveSubsystem,
+        addCommands(new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .15, driveSubsystem,
             visionSubsystem, armSubsystem));
-        addCommands(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem));
+        // pickup cube needs you to drive through the piece or else it bounces away
+        addCommands(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem)
+            .deadlineWith(new DriveForwardCommand(.1, 30, true, driveSubsystem)));
 
         /*
          * Step 3 - Score the cube
          *
          * Turn around to face the grid
-         *
-         * FIXME: Does the direction of rotation matter? Can we use the shortest path?
          */
         if (alliance == Alliance.Red && startingLane == AutoLane.BOTTOM
             || alliance == Alliance.Blue && startingLane == AutoLane.TOP) {
