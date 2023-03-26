@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.AutoConstants.AutoLane;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;

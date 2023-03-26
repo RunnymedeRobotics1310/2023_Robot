@@ -13,11 +13,14 @@ import frc.robot.commands.arm.CompactCommand;
 import frc.robot.commands.arm.ReleaseCommand;
 import frc.robot.commands.arm.ScoreAutoCommand;
 import frc.robot.commands.drive.BalanceCommand;
+import frc.robot.commands.drive.DriveFastOnHeadingCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+
+import static frc.robot.commands.drive.DriveFastOnHeadingCommand.Direction.*;
 
 
 public class HumberAutoAutoCommand extends SequentialCommandGroup {
@@ -55,18 +58,23 @@ public class HumberAutoAutoCommand extends SequentialCommandGroup {
 
 
         addCommands(new ScoreAutoCommand(ScoringRow.TOP, armSubsystem));
-
-        addCommands(new WaitCommand(.1));
         addCommands(new ReleaseCommand(armSubsystem));
 
 
-        double exitZoneDistance = 330;
         if (startingLane == AutoLane.BOTTOM) {
-            exitZoneDistance = 340;
+            addCommands(new DriveOnHeadingCommand(180, -.65, 340, driveSubsystem)
+                .deadlineWith(new CompactCommand(armSubsystem)));
+        }
+        else if (startingLane == AutoLane.TOP) {
+            addCommands(new DriveFastOnHeadingCommand(180, backward, 330, true, driveSubsystem)
+                .deadlineWith(new CompactCommand(armSubsystem)));
         }
 
-        addCommands(new DriveOnHeadingCommand(180, -.65, exitZoneDistance, driveSubsystem)
-            .deadlineWith(new CompactCommand(armSubsystem)));
+        // Invalid starting lane (unsafe)
+        else {
+            return;
+        }
+
 
         if ((alliance == Alliance.Red && startingLane == AutoLane.BOTTOM)
             || (alliance == Alliance.Blue && startingLane == AutoLane.TOP)) {
