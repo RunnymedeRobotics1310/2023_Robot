@@ -43,7 +43,7 @@ public class MiddleMayhemAutoCommand extends SequentialCommandGroup {
         /*
          * Score the cone
          */
-        addCommands(new ScoreAutoCommand(ScoringRow.TOP, armSubsystem));
+        addCommands(new ScoreAutoCommand(ScoringRow.TOP, GamePiece.CONE, armSubsystem));
         addCommands(new ReleaseCommand(armSubsystem));
 
         /*

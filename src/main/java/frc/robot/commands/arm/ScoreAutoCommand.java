@@ -24,15 +24,15 @@ public class ScoreAutoCommand extends BaseArmCommand {
     private long commandStartTime  = 0;
     private long lowerArmStartTime = 0;
 
-    public ScoreAutoCommand(ScoringRow scoringRow, ArmSubsystem armSubsystem) {
+    public ScoreAutoCommand(ScoringRow scoringRow, GamePiece gamePiece, ArmSubsystem armSubsystem) {
         super(armSubsystem);
         this.scoringRow = scoringRow;
+        this.gamePiece = gamePiece;
     }
 
     @Override
     public void initialize() {
 
-        gamePiece       = armSubsystem.getHeldGamePiece();
         scoringPosition = ArmConstants.getScoringPosition(gamePiece, scoringRow);
 
         stopArmMotors();

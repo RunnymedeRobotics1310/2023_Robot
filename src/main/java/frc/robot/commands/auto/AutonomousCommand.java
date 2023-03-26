@@ -186,7 +186,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
                 break;
 
             }
-            addCommands(new ScoreAutoCommand(scoringRow, armSubsystem));
+            addCommands(new ScoreAutoCommand(scoringRow, currentGamePiece, armSubsystem));
             addCommands(new WaitCommand(.1));
             addCommands(new ReleaseCommand(armSubsystem));
         }

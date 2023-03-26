@@ -65,7 +65,7 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         /*
          * Step 1 - Score the cone in the top row
          */
-        addCommands(new ScoreAutoCommand(ScoringRow.TOP, armSubsystem));
+        addCommands(new ScoreAutoCommand(ScoringRow.TOP, GamePiece.CONE, armSubsystem));
         addCommands(new ReleaseCommand(armSubsystem));
 
         /*
@@ -153,10 +153,12 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         if (startingLane == AutoLane.BOTTOM) {
             // bump - drive safely
             addCommands(new DriveOnHeadingCommand(180.0, 0.6, 250, false, driveSubsystem)
+                .alongWith(new ScoreAutoCommand(ScoringRow.TOP, GamePiece.CUBE, armSubsystem))
                 .deadlineWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem)));
         } else {
             // no bump - drive fast
             addCommands(new DriveFastOnHeadingCommand(180.0, forward, 250, false,  driveSubsystem)
+                .alongWith(new ScoreAutoCommand(ScoringRow.TOP, GamePiece.CUBE, armSubsystem))
                 .deadlineWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem)));
         }
 
@@ -166,7 +168,6 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          * FIXME: should we use .alongWith instead of .deadlineWith to make sure both commands are
          * finished before dropping?
          */
-        addCommands(new ScoreAutoCommand(ScoringRow.TOP, armSubsystem));
         addCommands(new DriveToTargetCommand(VisionTarget.APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem, armSubsystem));
 
         /*
