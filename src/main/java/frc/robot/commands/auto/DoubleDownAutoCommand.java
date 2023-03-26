@@ -80,13 +80,17 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
             return;
         }
 
+        /*
+         * Leave and lower the arm
+         */
+        addCommands(new DriveOnHeadingCommand(180, -0.65, 60, driveSubsystem));
         RunnymedeCommandBase driveOutCmd;
         if (startingLane == AutoLane.BOTTOM) {
             // drive over the bump
-            driveOutCmd = new DriveOnHeadingCommand(180, -0.65, 340, driveSubsystem);
+            driveOutCmd = new DriveOnHeadingCommand(180, -0.65, 280, driveSubsystem);
         } else {
             // no bump
-            driveOutCmd = new DriveFastOnHeadingCommand(180, backward, 370, false, driveSubsystem);
+            driveOutCmd = new DriveFastOnHeadingCommand(180, backward, 310, false, driveSubsystem);
         }
         addCommands(driveOutCmd
             .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)
