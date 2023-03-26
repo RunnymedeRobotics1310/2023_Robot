@@ -6,22 +6,14 @@ import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.subsystems.ArmSubsystem;
 
-import static frc.robot.Constants.GameConstants.GamePiece.NONE;
-
 public class ScoreCommand extends BaseArmCommand {
 
-    private final long       MAX_TIME_TO_SCORE_MILLIS = 4000L;
+    private final long       MAX_TIME_TO_SCORE_MILLIS = 3000L;
 
     private final ScoringRow scoringRow;
     private ArmPosition      scoringPosition          = null;
     private GamePiece        gamePiece                = null;
-
-    private enum Step {
-        RETRACT, LIFT_TO_CLEAR, LIFT_AND_EXTEND, FINISH
-    }
-
-    private Step step              = null;
-    private long commandStartTime  = 0;
+    private long             startScoreTime           = 0L;
 
     public ScoreCommand(ScoringRow scoringRow, ArmSubsystem armSubsystem) {
         super(armSubsystem);
@@ -31,85 +23,72 @@ public class ScoreCommand extends BaseArmCommand {
     @Override
     public void initialize() {
 
-        commandStartTime = System.currentTimeMillis();
-
         gamePiece       = armSubsystem.getHeldGamePiece();
         scoringPosition = ArmConstants.getScoringPosition(gamePiece, scoringRow);
 
-        double armAngle = armSubsystem.getArmLiftAngle();
-        double armExtent = armSubsystem.getArmExtendEncoder();
-        if (gamePiece == NONE) {
-            logCommandStart("Scoring row : " + scoringRow + ", cancelling - no held game piece");
-            this.cancel();
-        } else if (armAngle >= ArmConstants.CLEAR_FRAME_ARM_ANGLE) {
-            step = Step.LIFT_AND_EXTEND;
-            logCommandStart("Scoring row : " + scoringRow + ", Starting Step " + step + " (arm above clear frame angle)");
-        } else if (armExtent >= ArmConstants.MAX_ARM_EXTEND_INSIDE_FRAME) {
-            step = Step.LIFT_TO_CLEAR;
-            logCommandStart("Scoring row : " + scoringRow + ", Starting Step " + step + " (arm already extended beyond frame but angle low)");
-        } else {
-            step = Step.RETRACT;
-            logCommandStart("Scoring row : " + scoringRow + ", Starting Step " + step + " (arm in unsafe position)");
-        }
+        stopArmMotors();
+        startScoreTime = System.currentTimeMillis();
+
+        logCommandStart("Scoring row : " + scoringRow);
     }
 
     @Override
     public void execute() {
 
-        switch (step) {
+        if (!armSubsystem.isGamePieceDetected()) {
+            return;
+        }
 
-        case RETRACT:
+        // If the arm is starting inside the frame, then
+        // retract before moving the arm.
+        if (armSubsystem.getArmLiftAngle() < ArmConstants.CLEAR_FRAME_ARM_ANGLE) {
 
-            // Ensure the arm is retracted before lifting
             if (!moveArmExtendToEncoderCount(0, 1)) {
                 return;
             }
-
-            logStateTransition("RETRACT -> LIFT_TO_CLEAR");
-
-            step = Step.LIFT_TO_CLEAR;
-            return;
-
-        case LIFT_TO_CLEAR:
-
-            // Lift the arm until in position
-            if (moveArmLiftToAngle(ArmConstants.CLEAR_FRAME_ARM_ANGLE)) {
-                step = Step.LIFT_AND_EXTEND;
-                logStateTransition("LIFT_TO_CLEAR -> LIFT_AND_EXTEND");
-
-            }
-            return;
-
-        case LIFT_AND_EXTEND:
-
-            boolean angleGood = moveArmLiftToAngle(scoringPosition.angle);
-            boolean extendGood = moveArmExtendToEncoderCount(scoringPosition.extension, .7);
-            if (angleGood && extendGood) {
-                step = Step.FINISH;
-
-                logStateTransition("LIFT_AND_EXTEND -> FINISH");
-
-                stopArmMotors();
-
-            }
-            return;
-
-        default:
         }
 
+        // If higher than target, retract first
+        if (armSubsystem.getArmLiftAngle() > scoringPosition.angle) {
+
+            // Move the extender until it is in position
+            if (moveArmExtendToEncoderCount(scoringPosition.extension, 1)) {
+
+                // Then lift
+                moveArmLiftToAngle(scoringPosition.angle);
+            }
+
+        }
+        else {
+
+            // Lift the arm until in position
+            if (moveArmLiftToAngle(scoringPosition.angle)) {
+
+                // Then extend
+                moveArmExtendToEncoderCount(scoringPosition.extension, .5);
+            }
+
+        }
     }
 
     @Override
     public boolean isFinished() {
 
-        if (step == Step.FINISH) {
-            setFinishReason("Arm in position");
+        if (System.currentTimeMillis() - startScoreTime > MAX_TIME_TO_SCORE_MILLIS) {
+            setFinishReason("Score timeout exceeded - aborting");
             return true;
         }
 
-        // If the command has been running for more than 3 seconds, then end.
-        if (System.currentTimeMillis() - commandStartTime > MAX_TIME_TO_SCORE_MILLIS) {
-            setFinishReason("Timed out after 3 seconds");
+        // ensure that we have a piece and haven't dropped it
+        if (!armSubsystem.isGamePieceDetected()) {
+            setFinishReason("Can not score, no piece is held.");
+            return true;
+        }
+
+        // Check position
+        if (armSubsystem.isInPosition(scoringPosition)) {
+
+            setFinishReason("ScoreCommand finished");
             return true;
         }
 
