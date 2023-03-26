@@ -70,7 +70,7 @@ public class DriveFastOnHeadingCommand extends RunnymedeCommandBase {
     public void initialize() {
 
         StringBuilder parms = new StringBuilder();
-        parms.append("Heading ").append(heading)
+        parms.append("DriveFastOnHeading: Heading ").append(heading)
             .append(", Direction ").append(direction)
             .append(", Distance ").append(distanceCm)
             .append(", Brake at end ").append(brakeAtEnd)
@@ -145,7 +145,7 @@ public class DriveFastOnHeadingCommand extends RunnymedeCommandBase {
         final double SHORT_DISTANCE_SPEED = 0.5;
 
         final double ACCLERATING_DISTANCE = 40;
-        final double DECELERATE_DISTANCE= 50;
+        final double DECELERATE_DISTANCE= 70;
 
         double driven = Math.abs(driveSubsystem.getEncoderDistanceCm());
         double target = Math.abs(distanceCm);
@@ -165,10 +165,12 @@ public class DriveFastOnHeadingCommand extends RunnymedeCommandBase {
             // speeding up
             double pctDriven = (driven/ACCLERATING_DISTANCE);
             speed = Math.max(MIN_SPEED, pctDriven*MAX_SPEED);
+            log("Accelerating. "+pctDriven+"% driven, speed: "+speed+" dist/total: "+driven+"/"+target);
         } else if (remaining < DECELERATE_DISTANCE) {
             // slowing down
             double pctToGo = (remaining/DECELERATE_DISTANCE);
             speed = Math.max(MIN_SPEED, pctToGo*MAX_SPEED);
+            log("Decelerating. "+pctToGo+"% to go, speed: "+speed+" dist/total: "+driven+"/"+target);
         } else {
             // cruising
             speed = MAX_SPEED;
