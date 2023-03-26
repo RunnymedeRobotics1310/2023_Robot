@@ -12,15 +12,14 @@ import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.commands.arm.CompactCommand;
 import frc.robot.commands.arm.ReleaseCommand;
 import frc.robot.commands.arm.ScoreAutoCommand;
-import frc.robot.commands.drive.BalanceCommand;
-import frc.robot.commands.drive.DriveFastOnHeadingCommand;
-import frc.robot.commands.drive.DriveOnHeadingCommand;
-import frc.robot.commands.drive.SetGyroHeadingCommand;
+import frc.robot.commands.drive.*;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 import static frc.robot.commands.drive.DriveFastOnHeadingCommand.Direction.*;
+import static frc.robot.commands.drive.RotateToHeadingCommand.DirectionOfRotation.CLOCKWISE;
+import static frc.robot.commands.drive.RotateToHeadingCommand.DirectionOfRotation.COUNTER_CLOCKWISE;
 
 
 public class HumberAutoAutoCommand extends SequentialCommandGroup {
@@ -32,9 +31,9 @@ public class HumberAutoAutoCommand extends SequentialCommandGroup {
         final Alliance alliance     = DriverStation.getAlliance();
 
         StringBuilder sb = new StringBuilder("Auto Selections: ");
+        sb.append("Pattern: The Humber Auto");
         sb.append("Starting Position:").append(startingLane).append(' ');
         sb.append("Alliance:").append(alliance);
-
         System.out.println(sb.toString());
 
         // If any of these are null, then there was some kind of error.
@@ -63,11 +62,11 @@ public class HumberAutoAutoCommand extends SequentialCommandGroup {
 
         if (startingLane == AutoLane.BOTTOM) {
             addCommands(new DriveOnHeadingCommand(180, -.65, 340, driveSubsystem)
-                .deadlineWith(new CompactCommand(armSubsystem)));
+                .alongWith(new CompactCommand(armSubsystem)));
         }
         else if (startingLane == AutoLane.TOP) {
-            addCommands(new DriveFastOnHeadingCommand(180, backward, 330, true, driveSubsystem)
-                .deadlineWith(new CompactCommand(armSubsystem)));
+            addCommands(new DriveFastOnHeadingCommand(180, backward, 360, true, driveSubsystem)
+                .alongWith(new CompactCommand(armSubsystem)));
         }
 
         // Invalid starting lane (unsafe)
@@ -78,14 +77,17 @@ public class HumberAutoAutoCommand extends SequentialCommandGroup {
 
         if ((alliance == Alliance.Red && startingLane == AutoLane.BOTTOM)
             || (alliance == Alliance.Blue && startingLane == AutoLane.TOP)) {
-            addCommands(new DriveOnHeadingCommand(90, .65, 180, driveSubsystem));
+            addCommands(new RotateToHeadingCommand(90, COUNTER_CLOCKWISE, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(90, .65, 210, driveSubsystem));
+            addCommands(new RotateToHeadingCommand(0, COUNTER_CLOCKWISE, driveSubsystem));
         }
         else {
-            addCommands(new DriveOnHeadingCommand(270, .65, 180, driveSubsystem));
+            addCommands(new RotateToHeadingCommand(270, CLOCKWISE, driveSubsystem));
+            addCommands(new DriveOnHeadingCommand(270, .65, 210, driveSubsystem));
+            addCommands(new RotateToHeadingCommand(0, CLOCKWISE, driveSubsystem));
         }
 
-
-        addCommands(new DriveOnHeadingCommand(0, -.5, 120, false, driveSubsystem)
+        addCommands(new DriveOnHeadingCommand(0, -.65, 180, false, driveSubsystem)
             .andThen(new DriveOnHeadingCommand(0, -.3, 50, driveSubsystem)));
 
         addCommands(new WaitCommand(1));
