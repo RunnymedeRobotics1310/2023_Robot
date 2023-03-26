@@ -108,6 +108,7 @@ public class DriveToTargetCommand extends RunnymedeCommandBase {
         // Assume the robot is lined up with the target.
         targetFound = false;
         driveSubsystem.setMotorSpeeds(speed, speed);
+        log("end of init", true);
     }
 
     @Override
