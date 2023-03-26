@@ -1,5 +1,6 @@
 package frc.robot.commands.auto;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -21,6 +22,11 @@ import frc.robot.subsystems.VisionSubsystem;
 public class MiddleMayhemAutoCommand extends SequentialCommandGroup {
 
     public MiddleMayhemAutoCommand(DriveSubsystem driveSubsystem, ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem) {
+
+        StringBuilder sb = new StringBuilder("Auto Selections: ");
+        sb.append("Pattern: Middle Mayhem ");
+        sb.append("Alliance: ").append(DriverStation.getAlliance());
+        System.out.println(sb.toString());
 
         /*
          * Set the to be facing the grid
