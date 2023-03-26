@@ -176,7 +176,7 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         /*
          * Track the April tag back to the scoring location.
          */
-        addCommands(new DriveToGamePieceCommand(APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem, armSubsystem)
+        addCommands(new DriveToFieldElementCommand(APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem)
             .alongWith(new MoveArmToPositionCommand(scorePosition, armSubsystem)) // must finish
         );
 

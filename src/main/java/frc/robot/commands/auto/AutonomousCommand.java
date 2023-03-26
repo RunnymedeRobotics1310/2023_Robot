@@ -19,12 +19,8 @@ import frc.robot.commands.arm.ReleaseCommand;
 import frc.robot.commands.arm.ScoreAutoCommand;
 import frc.robot.commands.arm.ScoreCommand;
 import frc.robot.commands.arm.StartIntakeCommand;
-import frc.robot.commands.drive.BalanceCommand;
-import frc.robot.commands.drive.DriveOnHeadingCommand;
-import frc.robot.commands.drive.DriveToGamePieceCommand;
-import frc.robot.commands.drive.RotateToHeadingCommand;
+import frc.robot.commands.drive.*;
 import frc.robot.commands.drive.RotateToHeadingCommand.DirectionOfRotation;
-import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -366,7 +362,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
         addCommands(new RotateToHeadingCommand(180, DirectionOfRotation.COUNTER_CLOCKWISE, driveSubsystem));
         addCommands(new DriveOnHeadingCommand(180.0, 0.6, 250, driveSubsystem)
             .deadlineWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem)));
-        addCommands(new DriveToGamePieceCommand(VisionTarget.APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem, armSubsystem)
+        addCommands(new DriveToFieldElementCommand(VisionTarget.APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem)
             .deadlineWith(new ScoreCommand(ScoringRow.TOP, armSubsystem)));
 
         // Drop piece & compact

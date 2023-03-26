@@ -1,25 +1,23 @@
 package frc.robot.commands.drive;
 
-import java.util.Arrays;
-import java.util.List;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants;
-import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.VisionTarget;
 import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.commands.vision.SetVisionTargetCommand;
-import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
-public class DriveToGamePieceCommand extends RunnymedeCommandBase {
+import java.util.Arrays;
+import java.util.List;
+
+public class DriveToFieldElementCommand extends RunnymedeCommandBase {
 
     private static final List<VisionTarget>    SUPPORTED_DRIVE_TARGETS = Arrays.asList(
-        VisionTarget.CONE_GROUND,
-        VisionTarget.CUBE_GROUND
-    );
+        VisionTarget.APRILTAG_GRID,
+        VisionTarget.POST_HIGH,
+        VisionTarget.POST_LOW);
 
     final double                               factor                  = 0.01;
 
@@ -27,9 +25,8 @@ public class DriveToGamePieceCommand extends RunnymedeCommandBase {
 
     private final DriveSubsystem               driveSubsystem;
     private final VisionSubsystem              visionSubsystem;
-    private final ArmSubsystem                 armSubsystem;
 
-    private final VisionConstants.VisionTarget target;
+    private final VisionTarget target;
 
     private long                               initializeTime          = 0;
 
@@ -50,9 +47,9 @@ public class DriveToGamePieceCommand extends RunnymedeCommandBase {
      * @param driveSubsystem
      * @param visionSubsystem
      */
-    public DriveToGamePieceCommand(VisionConstants.VisionTarget target, double speed,
-        DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem, ArmSubsystem armSubsystem) {
-        this(target, speed, Constants.DEFAULT_COMMAND_TIMEOUT_SECONDS, driveSubsystem, visionSubsystem, armSubsystem);
+    public DriveToFieldElementCommand(VisionTarget target, double speed,
+        DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
+        this(target, speed, Constants.DEFAULT_COMMAND_TIMEOUT_SECONDS, driveSubsystem, visionSubsystem);
     }
 
     /**
@@ -63,15 +60,14 @@ public class DriveToGamePieceCommand extends RunnymedeCommandBase {
      * @param driveSubsystem
      * @param visionSubsystem
      */
-    public DriveToGamePieceCommand(VisionTarget target, double speed, double timeoutSeconds,
-        DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem, ArmSubsystem armSubsystem) {
+    public DriveToFieldElementCommand(VisionTarget target, double speed, double timeoutSeconds,
+        DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
 
         this.target          = target;
         this.speed           = speed;
         this.timeoutSeconds  = timeoutSeconds;
         this.driveSubsystem  = driveSubsystem;
         this.visionSubsystem = visionSubsystem;
-        this.armSubsystem    = armSubsystem;
 
         addRequirements(driveSubsystem);
 
@@ -86,7 +82,7 @@ public class DriveToGamePieceCommand extends RunnymedeCommandBase {
             .append(", Speed ").append(speed)
             .append(", timeout ").append(timeoutSeconds);
 
-        logCommandStart(parms.toString(), driveSubsystem, visionSubsystem, armSubsystem);
+        logCommandStart(parms.toString(), driveSubsystem, visionSubsystem);
 
         initializeTime = System.currentTimeMillis();
 
@@ -185,13 +181,17 @@ public class DriveToGamePieceCommand extends RunnymedeCommandBase {
 
         double targetArea = visionSubsystem.getTargetAreaPercent();
         switch (target) {
-        case CONE_GROUND:
-        case CUBE_GROUND:
-            boolean detected = armSubsystem.isGamePieceDetected();
-            if (detected) {
-                log("Drive to target finished - game piece detected.");
+        case APRILTAG_GRID:
+            final double TARGET_AREA_THRESHOLD = 3.5;
+            if (targetArea >= 3.5) {
+                log("April tag detected. Actual target area: "+targetArea+", required threshold: "+TARGET_AREA_THRESHOLD);
+                return true;
             }
-            return detected;
+            break;
+        case POST_HIGH:
+        case POST_LOW:
+            log("Not yet supported");
+            return true;
         default:
             log("Don't know how to drive to target " + target);
             break;
