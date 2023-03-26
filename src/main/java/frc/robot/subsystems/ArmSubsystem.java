@@ -587,7 +587,7 @@ public class ArmSubsystem extends SubsystemBase {
             .append(getArmLiftAngle()).append("deg")
             .append(", Ext ").append(Math.round(armExtendEncoder.getPosition() * 100) / 100d)
             .append(", Pinch ").append(Math.round(pincherEncoder.getPosition() * 100) / 100d)
-            .append(", GamePiece ").append(getHeldGamePiece());
+            .append(", HeldGamePiece ").append(getHeldGamePiece());
 
         return sb.toString();
     }
