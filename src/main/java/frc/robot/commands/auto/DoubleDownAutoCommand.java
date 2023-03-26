@@ -5,15 +5,13 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants.AutoLane;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.VisionConstants.VisionTarget;
-import frc.robot.commands.arm.CompactCommand;
-import frc.robot.commands.arm.PickupGamePieceCommand;
-import frc.robot.commands.arm.ReleaseCommand;
-import frc.robot.commands.arm.ScoreAutoCommand;
-import frc.robot.commands.arm.StartIntakeCommand;
+import frc.robot.commands.RunnymedeCommandBase;
+import frc.robot.commands.arm.*;
 import frc.robot.commands.drive.*;
 import frc.robot.commands.drive.RotateToHeadingCommand.DirectionOfRotation;
 import frc.robot.commands.vision.SetVisionTargetCommand;
@@ -21,6 +19,7 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
+import static frc.robot.Constants.ArmConstants.getScoringPosition;
 import static frc.robot.commands.drive.DriveFastOnHeadingCommand.Direction.*;
 
 public class DoubleDownAutoCommand extends SequentialCommandGroup {
@@ -74,23 +73,22 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          * Drive out of the zone and switch camera view
          * and set the intake to pick up a cube.
          */
-
-        // Note: this command sets the intake to the correct position, but then cancels the
-        // StartIntakeCommand when the DriveOnHeading command is complete.
-        if (startingLane == AutoLane.BOTTOM) {
-            // drive over the bump
-            addCommands(new DriveOnHeadingCommand(180, -0.65, 340, driveSubsystem)
-                .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)
-                .alongWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))));
-        } else if (startingLane == AutoLane.TOP) {
-            // no bump
-            addCommands(new DriveFastOnHeadingCommand(180, backward, 370, false, driveSubsystem)
-                .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)
-                .alongWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))));
-        } else {
+        if (startingLane != AutoLane.BOTTOM && startingLane != AutoLane.TOP) {
             System.out.println("*** ERROR *** Invalid starting lane " + startingLane + ". Second piece not scored");
             return;
         }
+
+        RunnymedeCommandBase driveOutCmd;
+        if (startingLane == AutoLane.BOTTOM) {
+            // drive over the bump
+            driveOutCmd = new DriveOnHeadingCommand(180, -0.65, 340, driveSubsystem);
+        } else {
+            // no bump
+            driveOutCmd = new DriveFastOnHeadingCommand(180, backward, 370, false, driveSubsystem);
+        }
+        addCommands(driveOutCmd
+            .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)
+                .alongWith(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem))));
 
         /*
          * Rotate to face the cube
@@ -150,25 +148,34 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          * Drive back towards the grid until past the charging station
          * Set the Vision target so that it is ready
          */
+        Constants.ArmPosition scorePosition = getScoringPosition(GamePiece.CUBE, ScoringRow.TOP);
+        RunnymedeCommandBase driveBackCmd;
         if (startingLane == AutoLane.BOTTOM) {
             // bump - drive safely
-            addCommands(new DriveOnHeadingCommand(180.0, 0.6, 250, false, driveSubsystem)
-                .alongWith(new ScoreAutoCommand(ScoringRow.TOP, GamePiece.CUBE, armSubsystem))
-                .alongWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem)));
+            driveBackCmd = new DriveOnHeadingCommand(180.0, 0.6, 250, false, driveSubsystem);
         } else {
             // no bump - drive fast
-            addCommands(new DriveFastOnHeadingCommand(180.0, forward, 250, false,  driveSubsystem)
-                .alongWith(new ScoreAutoCommand(ScoringRow.TOP, GamePiece.CUBE, armSubsystem))
-                .alongWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem)));
+            driveBackCmd =new DriveFastOnHeadingCommand(180.0, forward, 250, false, driveSubsystem);
         }
 
-        /*
-         * Track the April tag back to the scoring location.
-         *
-         * FIXME: should we use .alongWith instead of .deadlineWith to make sure both commands are
-         * finished before dropping?
-         */
-        addCommands(new DriveToTargetCommand(VisionTarget.APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem, armSubsystem));
+        addCommands(
+            driveBackCmd
+                .alongWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem))
+                .alongWith(new MoveArmToAngleCommand(scorePosition.angle, armSubsystem)
+                    // start extending but can be interrupted
+                    .deadlineWith(new ExtendArmCommand(scorePosition.extension, armSubsystem))
+                )
+        );
+
+            /*
+             * Track the April tag back to the scoring location.
+             */
+            addCommands(
+                new DriveToTargetCommand(VisionTarget.APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem, armSubsystem)
+                    // finish extending
+                    .alongWith(new ExtendArmCommand(scorePosition.extension, armSubsystem)
+                    )
+            );
 
         /*
          * Score the cube
