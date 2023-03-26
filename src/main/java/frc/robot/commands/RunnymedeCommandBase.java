@@ -111,7 +111,9 @@ public class RunnymedeCommandBase extends CommandBase {
         if (logSubsystems) {
             // Print the subsystems as passed in on the command start
             for (Subsystem subsystem : subsystemList) {
-                sb.append("\n   ").append(subsystem.toString());
+                if (subsystem != null) {
+                    sb.append("\n   ").append(subsystem.toString());
+                }
             }
         }
 
