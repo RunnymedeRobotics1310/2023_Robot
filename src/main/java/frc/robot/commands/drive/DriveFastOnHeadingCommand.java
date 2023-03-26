@@ -4,6 +4,16 @@ import frc.robot.Constants;
 import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
+/**
+ * This command will drive on a heading as fast as it safely can.
+ * It accelerates smoothly and decelerates smoothly (though at
+ * different rates - because this is smoother). If the distance
+ * to drive is too short, acceleration, cruise, and deceleration
+ * will not occur and the command will drive at a more constant
+ * rate.
+ * <p>
+ * Tested successfully in the field March 26, 2023
+ */
 public class DriveFastOnHeadingCommand extends RunnymedeCommandBase {
 
     public enum Direction { forward, backward }
@@ -165,12 +175,14 @@ public class DriveFastOnHeadingCommand extends RunnymedeCommandBase {
             // speeding up
             double pctDriven = (driven/ACCLERATING_DISTANCE);
             speed = Math.max(MIN_SPEED, pctDriven*MAX_SPEED);
-            log("Accelerating. "+(int)(pctDriven*100)+"% driven, speed: "+speed+" dist/total: "+((int)driven)+"/"+target);
+            // verbose but handy if troubleshooting is required. comment out when not needed
+            log("Accelerating ("+(int)(pctDriven*100)+"% done). Speed: "+Double.toString(speed).substring(0, 4)+" dist/total: "+((int)driven)+"/"+target);
         } else if (remaining < DECELERATE_DISTANCE) {
             // slowing down
             double pctToGo = (remaining/DECELERATE_DISTANCE);
             speed = Math.max(MIN_SPEED, pctToGo*MAX_SPEED);
-            log("Decelerating. "+(int)(pctToGo*100)+"% driven, speed: "+speed+" dist/total: "+((int)driven)+"/"+target);
+            // verbose but handy if troubleshooting is required. comment out when not needed
+            log("Decelerating ("+(int)(pctToGo*100)+"% done). Speed: "+Double.toString(speed).substring(0, 4)+" dist/total: "+((int)driven)+"/"+target);
         } else {
             // cruising
             speed = MAX_SPEED;
