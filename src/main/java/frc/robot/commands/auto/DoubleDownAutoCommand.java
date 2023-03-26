@@ -81,7 +81,11 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         }
 
         /*
-         * Leave and lower the arm
+         * Leave and lower the arm.
+         * First back out to clear the grid
+         * Then, drive out as fast as is safe,
+         * while setting up the vision target
+         * and arm for intake
          */
         addCommands(new DriveOnHeadingCommand(180, -0.65, 60, driveSubsystem));
         RunnymedeCommandBase driveOutCmd;
@@ -186,11 +190,10 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         addCommands(new ReleaseCommand(armSubsystem));
 
         /*
-         * Back up while compacting to not hit the mid cube scoring spot.
+         * Back up to clear the grid then compact.
          */
-
-        addCommands(new CompactCommand(armSubsystem)
-            .deadlineWith(new DriveOnHeadingCommand(180, -.2, 10, driveSubsystem)));
+        addCommands(new DriveOnHeadingCommand(180, -.2, 10, driveSubsystem));
+        addCommands(new CompactCommand(armSubsystem));
 
     }
 }
