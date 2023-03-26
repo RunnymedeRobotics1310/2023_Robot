@@ -192,7 +192,7 @@ public class DriveToTargetCommand extends RunnymedeCommandBase {
         case CUBE_GROUND:
             boolean detected = armSubsystem.isGamePieceDetected();
             if (detected) {
-                log("Game piece detected.");
+                log("Drive to target finished - game piece detected.");
             }
             return detected;
         case APRILTAG_GRID:

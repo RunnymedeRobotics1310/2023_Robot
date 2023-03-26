@@ -125,8 +125,8 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          * NOTE: The intake is already in the correct position
          */
         addCommands(new DriveToTargetCommand(VisionTarget.CUBE_GROUND, .2, driveSubsystem,
-            visionSubsystem, armSubsystem)
-            .andThen(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem)));
+            visionSubsystem, armSubsystem));
+        addCommands(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem));
 
         /*
          * Step 3 - Score the cube
@@ -154,12 +154,12 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
             // bump - drive safely
             addCommands(new DriveOnHeadingCommand(180.0, 0.6, 250, false, driveSubsystem)
                 .alongWith(new ScoreAutoCommand(ScoringRow.TOP, GamePiece.CUBE, armSubsystem))
-                .deadlineWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem)));
+                .alongWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem)));
         } else {
             // no bump - drive fast
             addCommands(new DriveFastOnHeadingCommand(180.0, forward, 250, false,  driveSubsystem)
                 .alongWith(new ScoreAutoCommand(ScoringRow.TOP, GamePiece.CUBE, armSubsystem))
-                .deadlineWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem)));
+                .alongWith(new SetVisionTargetCommand(VisionTarget.APRILTAG_GRID, visionSubsystem)));
         }
 
         /*
