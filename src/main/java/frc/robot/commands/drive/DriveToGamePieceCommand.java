@@ -87,31 +87,32 @@ public class DriveToGamePieceCommand extends RunnymedeCommandBase {
             .append(", Speed ").append(speed)
             .append(", timeout ").append(timeoutSeconds);
 
-        logCommandStart(parms.toString(), driveSubsystem, visionSubsystem, armSubsystem);
+        logCommandStart(parms.toString(), driveSubsystem, visionSubsystem, armSubsystem); // FIXME: remove once required
 
         initializeTime = System.currentTimeMillis();
 
         if (!SUPPORTED_DRIVE_TARGETS.contains(target)) {
-            log("Cannot drive to target " + target + ". Cancelling.");
-            // FIXME: does this cancel the entire auto?
-            this.cancel();
-            return;
+            log("Cannot drive to target " + target + ".");
+        } else {
+            setVisionTarget(target);
+
+            // Start by driving straight towards the target.
+            // Assume the robot is lined up with the target.
+            targetFound = false;
+            driveSubsystem.setMotorSpeeds(speed, speed);
+            log("end of init", true);
         }
 
-        setVisionTarget(target);
-
-
-        // Start by driving straight towards the target.
-        // Assume the robot is lined up with the target.
-        targetFound = false;
-        driveSubsystem.setMotorSpeeds(speed, speed);
-        log("end of init", true);
     }
 
     @Override
     public void execute() {
 
-        // If the target was switched, then wait before trying to track a target
+        if (!SUPPORTED_DRIVE_TARGETS.contains(target)) {
+            return;
+        }
+
+            // If the target was switched, then wait before trying to track a target
         if (!visionSubsystem.isCameraInPositionForTarget()) {
             return;
         }
@@ -177,6 +178,11 @@ public class DriveToGamePieceCommand extends RunnymedeCommandBase {
     public boolean isFinished() {
 
         // This command can either reach the distance or time out
+
+        if (!SUPPORTED_DRIVE_TARGETS.contains(target)) {
+            setFinishReason("Invalid target: "+target);
+            return true;
+        }
 
         // Check the timeout
         if ((System.currentTimeMillis() - initializeTime) / 1000d > timeoutSeconds) {
