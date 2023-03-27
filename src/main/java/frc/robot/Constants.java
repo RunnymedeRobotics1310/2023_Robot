@@ -196,16 +196,8 @@ public final class Constants {
 
         /** The maximum speed to drive the arm lift - manually or automatically */
         public static final double  MAX_LIFT_DOWN_SPEED                 = .2;
-        public static final double  MAX_LIFT_UP_SPEED                   = .2;                                   // setting
-                                                                                                                // it
-                                                                                                                // to
-                                                                                                                // .3
-                                                                                                                // causes
-                                                                                                                // arm
-                                                                                                                // to
-                                                                                                                // overshoot
-                                                                                                                // target.
-
+        /** Setting MAX_LIFT_UP_SPEED to .3 causes arm to overshoot target */
+        public static final double  MAX_LIFT_UP_SPEED                   = .2;
         public static final double  MAX_LIFT_SLOW_ZONE_SPEED            = .1;
 
         public static final double  ARM_LIFT_LIMIT_ENCODER_VALUE        = 16;
@@ -294,20 +286,17 @@ public final class Constants {
         public static final ArmPosition SCORE_MIDDLE_CONE_POSITION   = new ArmPosition(85, 7);                    // Confirmed
         public static final ArmPosition SCORE_MIDDLE_CUBE_POSITION   = new ArmPosition(73, 13);                   // Confirmed
 
-        public static final ArmPosition SCORE_BOTTOM_CONE_POSITION   = new ArmPosition(43, 7);                    // todo:
-                                                                                                                  // confirm
-        public static final ArmPosition SCORE_BOTTOM_CUBE_POSITION   = new ArmPosition(43, 7);                    // todo:
-                                                                                                                  // confirm
+        public static final ArmPosition SCORE_BOTTOM_CONE_POSITION   = new ArmPosition(43, 7);
+        public static final ArmPosition SCORE_BOTTOM_CUBE_POSITION   = new ArmPosition(43, 7);
 
         // Pickup constants
-        public static final ArmPosition GROUND_PICKUP_AUTO_POSITION       = new ArmPosition(40, 19);              // Confirmed
+        public static final ArmPosition GROUND_PICKUP_AUTO_POSITION  = new ArmPosition(40, 19);                   // Confirmed
         public static final ArmPosition GROUND_PICKUP_POSITION       = new ArmPosition(34, 14);                   // Confirmed
         public static final ArmPosition SUBSTATION_PICKUP_POSITION   = new ArmPosition(86.5, 30);
 
         // Drive with Piece constants
-        public static final ArmPosition DRIVE_WITH_CONE_POSITION     = new ArmPosition(45, 0);                    // todo:
-                                                                                                                  // confirm
-        public static final ArmPosition DRIVE_WITH_CUBE_POSITION     = new ArmPosition(CLEAR_FRAME_ARM_ANGLE, 0); // Confirmed
+        public static final ArmPosition DRIVE_WITH_CONE_POSITION     = new ArmPosition(45, 0);                    // Confirmed
+        public static final ArmPosition DRIVE_WITH_CUBE_POSITION     = new ArmPosition(CLEAR_FRAME_ARM_ANGLE, 0);       // Confirmed
 
         public static ArmPosition getDrivePosition(GamePiece gamePiece) {
             if (gamePiece == GamePiece.CONE) {
@@ -316,8 +305,7 @@ public final class Constants {
             if (gamePiece == GamePiece.CUBE) {
                 return DRIVE_WITH_CUBE_POSITION;
             }
-            return DRIVE_WITH_CONE_POSITION; // FIXME (med): the default should be the value that
-                                             // works for both
+            return DRIVE_WITH_CONE_POSITION;
         }
 
         // Helper routine to get a scoring position

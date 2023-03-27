@@ -29,12 +29,7 @@ public class PickupGamePieceCommand extends BaseArmCommand {
 
         targetPincherEncoderCount = gamePiece.pincherEncoderCount;
 
-        if (gamePiece == GamePiece.CUBE) {
-            targetArmPosition = ArmConstants.DRIVE_WITH_CUBE_POSITION;
-        }
-        else if (gamePiece == GamePiece.CONE) {
-            targetArmPosition = ArmConstants.DRIVE_WITH_CONE_POSITION;
-        }
+        targetArmPosition = ArmConstants.getDrivePosition(gamePiece);
 
         StringBuilder commandParms = new StringBuilder();
         commandParms.append("GamePiece ").append(gamePiece)
