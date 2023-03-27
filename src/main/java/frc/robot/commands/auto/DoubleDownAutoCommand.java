@@ -1,5 +1,11 @@
 package frc.robot.commands.auto;
 
+import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION;
+import static frc.robot.Constants.ArmConstants.getScoringPosition;
+import static frc.robot.Constants.VisionConstants.VisionTarget.APRILTAG_GRID;
+import static frc.robot.commands.drive.DriveFastOnHeadingCommand.Direction.backward;
+import static frc.robot.commands.drive.DriveFastOnHeadingCommand.Direction.forward;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -11,18 +17,24 @@ import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.VisionConstants.VisionTarget;
 import frc.robot.commands.RunnymedeCommandBase;
-import frc.robot.commands.arm.*;
-import frc.robot.commands.drive.*;
+import frc.robot.commands.arm.CompactCommand;
+import frc.robot.commands.arm.MoveArmToPositionCommand;
+import frc.robot.commands.arm.OpenPincherCommand;
+import frc.robot.commands.arm.PickupGamePieceCommand;
+import frc.robot.commands.arm.ReleaseCommand;
+import frc.robot.commands.arm.ScoreAutoCommand;
+import frc.robot.commands.drive.DriveFastOnHeadingCommand;
+import frc.robot.commands.drive.DriveForwardCommand;
+import frc.robot.commands.drive.DriveOnHeadingCommand;
+import frc.robot.commands.drive.DriveToFieldElementCommand;
+import frc.robot.commands.drive.DriveToGamePieceCommand;
+import frc.robot.commands.drive.RotateToHeadingCommand;
 import frc.robot.commands.drive.RotateToHeadingCommand.DirectionOfRotation;
+import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
-
-import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION;
-import static frc.robot.Constants.ArmConstants.getScoringPosition;
-import static frc.robot.Constants.VisionConstants.VisionTarget.APRILTAG_GRID;
-import static frc.robot.commands.drive.DriveFastOnHeadingCommand.Direction.*;
 
 public class DoubleDownAutoCommand extends SequentialCommandGroup {
 
@@ -32,7 +44,7 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         final AutoLane startingLane = startingLaneChooser.getSelected();
         final Alliance alliance     = DriverStation.getAlliance();
 
-        StringBuilder sb = new StringBuilder("Auto Selections: ");
+        StringBuilder  sb           = new StringBuilder("Auto Selections: ");
         sb.append("Pattern: The Double Down ");
         sb.append("Starting Position:").append(startingLane).append(' ');
         sb.append("Alliance:").append(alliance);
@@ -92,17 +104,15 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         if (startingLane == AutoLane.BOTTOM) {
             // drive over the bump
             driveOutCmd = new DriveOnHeadingCommand(180, -0.65, 280, driveSubsystem);
-        } else {
+        }
+        else {
             // no bump
             driveOutCmd = new DriveFastOnHeadingCommand(180, backward, 310, false, driveSubsystem);
         }
         addCommands(driveOutCmd
             .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)
-            .alongWith(new OpenPincherCommand(armSubsystem)
-                .andThen(new MoveArmToPositionCommand(GROUND_PICKUP_AUTO_POSITION, armSubsystem))
-                )
-            )
-        );
+                .alongWith(new OpenPincherCommand(armSubsystem)
+                    .andThen(new MoveArmToPositionCommand(GROUND_PICKUP_AUTO_POSITION, armSubsystem)))));
 
         /*
          * Rotate to face the cube
@@ -162,13 +172,14 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          * Set the Vision target so that it is ready
          */
         Constants.ArmPosition scorePosition = getScoringPosition(GamePiece.CUBE, ScoringRow.TOP);
-        RunnymedeCommandBase driveBackCmd;
+        RunnymedeCommandBase  driveBackCmd;
         if (startingLane == AutoLane.BOTTOM) {
             // bump - drive safely
             driveBackCmd = new DriveOnHeadingCommand(180.0, 0.6, 230, false, driveSubsystem);
-        } else {
+        }
+        else {
             // no bump - drive fast
-            driveBackCmd =new DriveFastOnHeadingCommand(180.0, forward, 230, false, driveSubsystem);
+            driveBackCmd = new DriveFastOnHeadingCommand(180.0, forward, 230, false, driveSubsystem);
         }
 
         addCommands(
