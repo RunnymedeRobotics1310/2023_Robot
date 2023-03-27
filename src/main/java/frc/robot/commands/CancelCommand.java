@@ -29,7 +29,7 @@ public class CancelCommand extends RunnymedeCommandBase {
         this.armSubsystem    = armSubsystem;
         this.visionSubsystem = visionSubsystem;
 
-        addRequirements(driveSubsystem, armSubsystem);
+        addRequirements(driveSubsystem, armSubsystem, visionSubsystem);
     }
 
     @Override
