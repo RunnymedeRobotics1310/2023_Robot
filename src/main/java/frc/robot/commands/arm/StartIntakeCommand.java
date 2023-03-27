@@ -31,6 +31,7 @@ public class StartIntakeCommand extends BaseArmCommand {
         this.gamePiece       = gamePiece;
         this.operatorInput   = null;
         this.visionSubsystem = visionSubsystem;
+        // todo: fixme: add vision subsystem as requirement
     }
 
     public StartIntakeCommand(OperatorInput operatorInput, ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem) {
@@ -43,6 +44,7 @@ public class StartIntakeCommand extends BaseArmCommand {
         this.visionSubsystem = visionSubsystem;
 
         this.gamePiece       = GamePiece.NONE;
+        // todo: fixme: add vision subsystem as requirement
     }
 
     @Override
