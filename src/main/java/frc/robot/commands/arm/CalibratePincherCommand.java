@@ -11,11 +11,6 @@ public class CalibratePincherCommand extends BaseArmCommand {
 
     }
 
-    @Override
-    public void initialize() {
-
-        logCommandStart();
-    }
 
     @Override
     public void execute() {

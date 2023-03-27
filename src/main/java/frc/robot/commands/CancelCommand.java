@@ -56,9 +56,4 @@ public class CancelCommand extends RunnymedeCommandBase {
         return false;
     }
 
-    @Override
-    public void end(boolean interrupted) {
-        logCommandEnd(interrupted);
-    }
-
 }

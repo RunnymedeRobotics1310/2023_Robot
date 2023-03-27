@@ -82,7 +82,7 @@ public class DriveToFieldElementCommand extends RunnymedeCommandBase {
             .append(", Speed ").append(speed)
             .append(", timeout ").append(timeoutSeconds);
 
-        logCommandStart(parms.toString(), driveSubsystem, visionSubsystem);
+        logCommandStart(parms.toString());
 
         initializeTime = System.currentTimeMillis();
 

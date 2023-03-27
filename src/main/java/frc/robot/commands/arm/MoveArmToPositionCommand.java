@@ -13,7 +13,7 @@ public class MoveArmToPositionCommand extends BaseArmCommand {
 
     @Override
     public void initialize() {
-        logCommandStart("Moving arm to position "+position, armSubsystem);
+        logCommandStart("Moving arm to position "+position);
     }
 
     @Override
@@ -26,9 +26,5 @@ public class MoveArmToPositionCommand extends BaseArmCommand {
     @Override
     public boolean isFinished() {
         return armSubsystem.isArmAtLiftAngle(position.angle) && armSubsystem.isAtExtendPosition(position.extension);
-    }
-
-    public void end(boolean interrupted) {
-        logCommandEnd(interrupted);
     }
 }
