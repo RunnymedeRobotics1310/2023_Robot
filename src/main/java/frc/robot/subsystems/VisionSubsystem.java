@@ -388,8 +388,10 @@ public class VisionSubsystem extends SubsystemBase {
             .append("Vision Target ").append(getCurrentVisionTarget())
             .append(", Camera View ").append(getCameraView())
             .append(", Camera in position ").append(isCameraInPositionForTarget())
+            .append(", (encoder ").append(getCameraEncoder()).append(") ")
             .append(", Target Detected ").append(isVisionTargetFound())
-            .append(", target angle ").append(Math.round(getTargetAngleOffset() * 10) / 10d);
+            .append(", target angle ").append(Math.round(getTargetAngleOffset() * 10) / 10d)
+            ;
 
         return sb.toString();
     }
@@ -448,6 +450,8 @@ public class VisionSubsystem extends SubsystemBase {
                 return Math.min(inputSpeed, VisionConstants.MAX_CAMERA_SLOW_ZONE_SPEED);
             }
         }
+
+        // FIXME (low) add slow zone for MID.
 
         /*
          * Low

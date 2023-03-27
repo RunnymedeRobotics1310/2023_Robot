@@ -160,8 +160,8 @@ public final class Constants {
 
         public static final double CAMERA_DOWN_LIMIT_ENCODER_VALUE = -200;
         public static final double CAMERA_MID_ENCODER_VALUE        = -70;
-        public static final double CAMERA_POSITION_TOLERANCE       = 3;
-        public static final double CAMERA_POSITION_SLOW_ZONE       = 15;
+        public static final double CAMERA_POSITION_TOLERANCE       = 8;
+        public static final double CAMERA_POSITION_SLOW_ZONE       = 25;
     }
 
     public static class ArmPosition {
@@ -290,7 +290,7 @@ public final class Constants {
         public static final ArmPosition SCORE_BOTTOM_CUBE_POSITION   = new ArmPosition(43, 7);
 
         // Pickup constants
-        public static final ArmPosition GROUND_PICKUP_AUTO_POSITION  = new ArmPosition(40, 19);                   // Confirmed
+        public static final ArmPosition GROUND_PICKUP_AUTO_POSITION  = new ArmPosition(34, 9.5);
         public static final ArmPosition GROUND_PICKUP_POSITION       = new ArmPosition(34, 14);                   // Confirmed
         public static final ArmPosition SUBSTATION_PICKUP_POSITION   = new ArmPosition(86.5, 30);
 

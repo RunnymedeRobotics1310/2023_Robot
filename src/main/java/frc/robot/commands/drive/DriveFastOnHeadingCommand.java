@@ -176,18 +176,24 @@ public class DriveFastOnHeadingCommand extends RunnymedeCommandBase {
             double pctDriven = (driven/ACCLERATING_DISTANCE);
             speed = Math.max(MIN_SPEED, pctDriven*MAX_SPEED);
             // verbose but handy if troubleshooting is required. comment out when not needed
-            log("Accelerating ("+(int)(pctDriven*100)+"% done). Speed: "+Double.toString(speed).substring(0, 4)+" dist/total: "+((int)driven)+"/"+target);
+            log("Accelerating ("+(int)(pctDriven*100)+"% done). Speed: "+fmt(speed)+" dist/total: "+((int)driven)+"/"+target);
         } else if (remaining < DECELERATE_DISTANCE) {
             // slowing down
             double pctToGo = (remaining/DECELERATE_DISTANCE);
             speed = Math.max(MIN_SPEED, pctToGo*MAX_SPEED);
             // verbose but handy if troubleshooting is required. comment out when not needed
-            log("Decelerating ("+(int)(pctToGo*100)+"% done). Speed: "+Double.toString(speed).substring(0, 4)+" dist/total: "+((int)driven)+"/"+target);
+            log("Decelerating ("+(int)(pctToGo*100)+"% done). Speed: "+fmt(speed)+" dist/total: "+((int)driven)+"/"+target);
         } else {
             // cruising
             speed = MAX_SPEED;
         }
 
         return speed;
+    }
+    private static final String fmt(double d) {
+        String s = Double.toString(d);
+        if (s.length() > 4)
+            return s.substring(0, 4);
+        else return s;
     }
 }

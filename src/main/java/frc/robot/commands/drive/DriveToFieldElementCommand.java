@@ -104,15 +104,18 @@ public class DriveToFieldElementCommand extends RunnymedeCommandBase {
     public void execute() {
 
         if (!SUPPORTED_DRIVE_TARGETS.contains(target)) {
+//            log("Unsupported vision target in execute: "+target);
             return;
         }
 
         // If the target was switched, then wait before trying to track a target
         if (!visionSubsystem.isCameraInPositionForTarget()) {
+//            log("Camera not in position in execute");
             return;
         }
 
         if (visionSubsystem.isVisionTargetFound()) {
+//            log("Vision target found in execute");
 
             // FIXME: Is this correct - how do we get the angle to the target?
             lastKnownTargetHeading  = driveSubsystem.getHeading() + visionSubsystem.getTargetAngleOffset();

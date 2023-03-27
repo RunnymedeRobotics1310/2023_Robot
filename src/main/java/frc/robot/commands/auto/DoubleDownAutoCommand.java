@@ -99,15 +99,14 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          * while setting up the vision target
          * and arm for intake
          */
-        addCommands(new DriveOnHeadingCommand(180, -0.65, 60, driveSubsystem));
         RunnymedeCommandBase driveOutCmd;
         if (startingLane == AutoLane.BOTTOM) {
             // drive over the bump
-            driveOutCmd = new DriveOnHeadingCommand(180, -0.65, 280, driveSubsystem);
+            driveOutCmd = new DriveFastOnHeadingCommand(180, backward, 350, false, driveSubsystem);
         }
         else {
             // no bump
-            driveOutCmd = new DriveFastOnHeadingCommand(180, backward, 310, false, driveSubsystem);
+            driveOutCmd = new DriveFastOnHeadingCommand(180, backward, 370, false, driveSubsystem);
         }
         addCommands(driveOutCmd
             .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)
@@ -146,10 +145,11 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          *
          * NOTE: The intake is already in the correct position
          */
-        addCommands(new DriveToGamePieceCommand(VisionTarget.CUBE_GROUND, .15, driveSubsystem, visionSubsystem, armSubsystem));
+        addCommands(new DriveToGamePieceCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem));
         // pickup cube needs you to drive through the piece or else it bounces away
         addCommands(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem)
-            .deadlineWith(new DriveForwardCommand(.1, 30, true, driveSubsystem)));
+//            .deadlineWith(new DriveForwardCommand(.1, 30, true, driveSubsystem))
+        );
 
         /*
          * Step 3 - Score the cube
@@ -175,7 +175,8 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         RunnymedeCommandBase  driveBackCmd;
         if (startingLane == AutoLane.BOTTOM) {
             // bump - drive safely
-            driveBackCmd = new DriveOnHeadingCommand(180.0, 0.6, 230, false, driveSubsystem);
+            driveBackCmd = new DriveFastOnHeadingCommand(180.0, forward, 230, false, driveSubsystem);
+//            driveBackCmd = new DriveOnHeadingCommand(180.0, 0.6, 230, false, driveSubsystem);
         }
         else {
             // no bump - drive fast
@@ -191,6 +192,7 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         /*
          * Track the April tag back to the scoring location.
          */
+        addCommands(new SetVisionTargetCommand(APRILTAG_GRID, visionSubsystem));
         addCommands(new DriveToFieldElementCommand(APRILTAG_GRID, 0.35, driveSubsystem, visionSubsystem)
             .alongWith(new MoveArmToPositionCommand(scorePosition, armSubsystem)) // must finish
         );
