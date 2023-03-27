@@ -69,7 +69,7 @@ public class DriveToFieldElementCommand extends RunnymedeCommandBase {
         this.driveSubsystem  = driveSubsystem;
         this.visionSubsystem = visionSubsystem;
 
-        addRequirements(driveSubsystem);
+        addRequirements(driveSubsystem, visionSubsystem);
 
     }
 
