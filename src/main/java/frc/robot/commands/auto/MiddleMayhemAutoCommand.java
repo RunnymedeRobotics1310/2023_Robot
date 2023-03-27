@@ -66,10 +66,15 @@ public class MiddleMayhemAutoCommand extends SequentialCommandGroup {
          * Get the camera ready
          * Get the arm close to ready
          */
-        addCommands(new DriveOnHeadingCommand(0, .65, 360, false, driveSubsystem)
-            .alongWith(new OpenPincherCommand(armSubsystem)
-                .andThen(new MoveArmToAngleCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION.angle+5, armSubsystem)))
+        addCommands(new DriveOnHeadingCommand(0, .65, 180, false, driveSubsystem)
+            .alongWith(new OpenPincherCommand(armSubsystem))
             .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem))
+        ); // approach
+        addCommands(new DriveOnHeadingCommand(0, .3, 70, false, driveSubsystem) // cross
+            .deadlineWith(new MoveArmToAngleCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION.angle+5, armSubsystem))
+        );
+        addCommands(new DriveOnHeadingCommand(0, .65, 110, false, driveSubsystem) // descend
+            .deadlineWith(new MoveArmToAngleCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION.angle+5, armSubsystem))
         );
 
         /*
@@ -77,8 +82,8 @@ public class MiddleMayhemAutoCommand extends SequentialCommandGroup {
          * Now that we're clear, it's safe to get the arm into the final intake position
          */
         addCommands(new DriveOnHeadingCommand(0, .65, 30, driveSubsystem)
-            .alongWith(new ExtendArmCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION.extension, armSubsystem)
-                .andThen(new MoveArmToAngleCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION.angle, armSubsystem))
+            .alongWith(new MoveArmToAngleCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION.angle+5, armSubsystem))
+            .andThen(new ExtendArmCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION.extension, armSubsystem)
             )
         );
 
