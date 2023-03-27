@@ -74,6 +74,7 @@ public class DriveToGamePieceCommand extends RunnymedeCommandBase {
         this.armSubsystem    = armSubsystem;
 
         addRequirements(driveSubsystem);
+        // todo: fixme: add vision and arm subsystems as requirements
 
     }
 
