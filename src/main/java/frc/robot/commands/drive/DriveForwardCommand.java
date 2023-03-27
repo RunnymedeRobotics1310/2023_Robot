@@ -3,6 +3,9 @@ package frc.robot.commands.drive;
 import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
+/**
+ * Drive the robot forward at a specific speed for a specific distance. Orientation does not matter.
+ */
 public class DriveForwardCommand extends RunnymedeCommandBase {
     private final DriveSubsystem driveSubsystem;
     private final double speed, distance;
@@ -10,6 +13,7 @@ public class DriveForwardCommand extends RunnymedeCommandBase {
     private double startEncoderCount;
     private double driven = 0;
     public DriveForwardCommand(double speed, double distance, boolean brakeAtEnd, DriveSubsystem driveSubsystem) {
+        addRequirements(driveSubsystem);
         this.driveSubsystem = driveSubsystem;
         this.speed = speed;
         this.distance = distance;
