@@ -68,7 +68,7 @@ public class BalanceCommand extends RunnymedeCommandBase {
          */
         double pitch = driveSubsystem.getPitch();
 
-        // Balance if within 4 degrees. FIXME: 4 deg may not be the right number? not tested
+        // Balance if within 4 degrees.
         if (Math.abs(pitch) > 4) {
             currentState = State.CLIMB;
         }
