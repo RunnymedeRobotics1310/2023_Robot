@@ -186,7 +186,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public double getTargetOffset() {
-        // fixme: do proper trigonometry and compute the offset in
+        // FIXME: do proper trigonometry and compute the offset in
         // degrees between the target and "straight ahead".
         // For now, the code will just return -10 if it's to the left of
         // center, +10 if it's to the right of center, but we should be
@@ -209,7 +209,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public boolean isConeTargetAcquired() {
-        // fixme: finish this
+        // FIXME: finish this
         if (PIPELINE_CONE_DETECT != pipeline.getInteger(-1)) {
             return false;
         }
@@ -224,12 +224,12 @@ public class VisionSubsystem extends SubsystemBase {
         if (tgt[0] < 0 || tgt[1] < 0)
             return false;
 
-        // fixme: more checks
+        // FIXME: more checks
         return true;
     }
 
     public boolean isCubeTargetAcquired() {
-        // fixme: finish this
+        // FIXME: finish this
         if (PIPELINE_CUBE_DETECT != pipeline.getInteger(-1)) {
             return false;
         }
@@ -249,7 +249,7 @@ public class VisionSubsystem extends SubsystemBase {
         if (tgt[0] < 0 || tgt[1] < 0)
             return false;
 
-        // fixme: more checks
+        // FIXME: more checks
         return true;
     }
 
@@ -263,7 +263,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     public boolean isVisionTargetClose() {
-        // fixme: finish this
+        // FIXME: finish this
         if (PIPELINE_APRIL_TAG_DETECT != pipeline.getInteger(-1)) {
             return false;
         }

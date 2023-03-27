@@ -74,7 +74,7 @@ public class DriveToGamePieceCommand extends RunnymedeCommandBase {
         this.armSubsystem    = armSubsystem;
 
         addRequirements(driveSubsystem);
-        // todo: fixme: add vision and arm subsystems as requirements
+        // FIXME: add vision and arm subsystems as requirements
 
     }
 
@@ -144,7 +144,7 @@ public class DriveToGamePieceCommand extends RunnymedeCommandBase {
                 double dist = driveSubsystem.getEncoderDistanceCm() - startingToDriveAimlesslyEncoderCount;
                 log("Target not found - driving straight ahead hoping to find it. Distance driven: "+dist+"cm.");
             }
-            // fixme: this seems very dangerous... should we maybe cancel here? What if the target is a wall!?!?
+            // FIXME: this seems very dangerous... should we maybe cancel here? What if the target is a wall!?!?
             driveSubsystem.setMotorSpeeds(speed, speed);
             return;
         }
