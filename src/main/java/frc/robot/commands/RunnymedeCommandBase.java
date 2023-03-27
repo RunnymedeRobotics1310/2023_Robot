@@ -17,19 +17,21 @@ public class RunnymedeCommandBase extends CommandBase {
 
     List<Subsystem> subsystemList  = new ArrayList<>();
 
+    /**
+     * Default implementation automatically logs start of command with required subsystems
+     */
+    public void initialize() {
+        logCommandStart();
+    }
+
     public void logCommandStart() {
 
-        logCommandStart(new Subsystem[0]);
+        logCommandStart(null, new Subsystem[0]);
     }
 
     public void logCommandStart(String msg) {
 
         logCommandStart(msg, new Subsystem[0]);
-    }
-
-    public void logCommandStart(Subsystem... subsystemList) {
-
-        logCommandStart(null, subsystemList);
     }
 
     public void logCommandStart(String commandParms, Subsystem... subsystemList) {
@@ -52,6 +54,14 @@ public class RunnymedeCommandBase extends CommandBase {
         initializeTime = System.currentTimeMillis();
     }
 
+    /**
+     * Default implementation logs command end
+     * @param interrupted whether the command was interrupted/canceled
+     */
+    public void end(boolean interrupted) {
+        logCommandEnd(interrupted);
+    }
+
     public void logCommandEnd(boolean interrupted) {
 
         logCommandEnd(interrupted, null);
@@ -62,7 +72,7 @@ public class RunnymedeCommandBase extends CommandBase {
         String state = "ENDED";
 
         if (interrupted) {
-            state = "INTERUPTED";
+            state = "INTERRUPTED";
         }
 
         logCommandState(state, endMsg, true);
