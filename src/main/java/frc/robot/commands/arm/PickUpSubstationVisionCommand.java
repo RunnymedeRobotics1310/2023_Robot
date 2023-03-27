@@ -51,6 +51,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
         this.operatorInput   = operatorInput;
 
         addRequirements(driveSubsystem);
+        // todo: fixme: add visionSubsystem as requirement? Most likely mandatory.
     }
 
     @Override
