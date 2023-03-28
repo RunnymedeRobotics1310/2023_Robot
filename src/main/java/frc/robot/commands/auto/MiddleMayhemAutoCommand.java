@@ -9,15 +9,13 @@ import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.VisionConstants.VisionTarget;
 import frc.robot.commands.arm.*;
-import frc.robot.commands.drive.BalanceCommand;
-import frc.robot.commands.drive.DriveOnHeadingCommand;
-import frc.robot.commands.drive.DriveToGamePieceCommand;
-import frc.robot.commands.drive.RotateToHeadingCommand;
-import frc.robot.commands.drive.SetGyroHeadingCommand;
+import frc.robot.commands.drive.*;
 import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+
+import static frc.robot.commands.drive.DriveFastOnHeadingCommand.Direction.backward;
 
 public class MiddleMayhemAutoCommand extends SequentialCommandGroup {
 
@@ -49,42 +47,29 @@ public class MiddleMayhemAutoCommand extends SequentialCommandGroup {
         /*
          * Move to compact pose while backing up a bit to give some room to spin
          */
-        addCommands(new ExtendArmCommand(0, armSubsystem)
-            .deadlineWith(new DriveOnHeadingCommand(180, -.2, 20, driveSubsystem)));
+        // mount charger
+        addCommands(new DriveFastOnHeadingCommand(180, backward, 200, false, driveSubsystem)
+            .alongWith(new CompactCommand(armSubsystem)));
 
-        /*
-         * Rotate to face the field
-         */
+        // traverse charger
+        addCommands(new DriveOnHeadingCommand(180, -.3, 70, false, driveSubsystem));
+
+        // exit charger
+        addCommands(new DriveOnHeadingCommand(180, -.65, 50, false, driveSubsystem));
+
+        // rotate to cube
         addCommands(new RotateToHeadingCommand(0, driveSubsystem));
 
-        /*
-         * Step 2 - Exit the zone, and pick up a cube
-         */
+        // get ready for intake --> FIXME --> THIS OPENS IN FRAME
+        addCommands(new MoveArmToPositionCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION, armSubsystem));
 
-        /*
-         * Drive over the charger
-         * Get the camera ready
-         * Get the arm close to ready
-         */
-        addCommands(new DriveOnHeadingCommand(0, .65, 180, false, driveSubsystem)
-            .alongWith(new OpenPincherCommand(armSubsystem))
-            .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem))
-        ); // approach
-        addCommands(new DriveOnHeadingCommand(0, .3, 70, false, driveSubsystem) // cross
-            .deadlineWith(new MoveArmToAngleCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION.angle+5, armSubsystem))
-        );
-        addCommands(new DriveOnHeadingCommand(0, .65, 110, false, driveSubsystem) // descend
-            .deadlineWith(new MoveArmToAngleCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION.angle+5, armSubsystem))
-        );
 
         /*
          * We are now over the charge station. Finish the drive.
          * Now that we're clear, it's safe to get the arm into the final intake position
          */
         addCommands(new DriveOnHeadingCommand(0, .65, 30, driveSubsystem)
-            .alongWith(new MoveArmToAngleCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION.angle+5, armSubsystem))
-            .andThen(new ExtendArmCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION.extension, armSubsystem)
-            )
+            .alongWith(new OpenPincherCommand( armSubsystem))
         );
 
         /*
