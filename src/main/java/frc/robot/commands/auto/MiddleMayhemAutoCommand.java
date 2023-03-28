@@ -60,7 +60,7 @@ public class MiddleMayhemAutoCommand extends SequentialCommandGroup {
         // rotate to cube
         addCommands(new RotateToHeadingCommand(0, driveSubsystem));
 
-        // get ready for intake --> FIXME --> THIS OPENS IN FRAME
+        // get ready for intake
         addCommands(new MoveArmToPositionCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION, armSubsystem));
 
 
