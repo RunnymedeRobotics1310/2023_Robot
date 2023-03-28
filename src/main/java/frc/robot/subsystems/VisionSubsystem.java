@@ -388,7 +388,7 @@ public class VisionSubsystem extends SubsystemBase {
             .append("Vision Target ").append(getCurrentVisionTarget())
             .append(", Camera View ").append(getCameraView())
             .append(", Camera in position ").append(isCameraInPositionForTarget())
-            .append(", (encoder ").append(getCameraEncoder()).append(") ")
+            .append(", (encoder ").append(Math.round(getCameraEncoder() * 10) / 10d).append(")")
             .append(", Target Detected ").append(isVisionTargetFound())
             .append(", target angle ").append(Math.round(getTargetAngleOffset() * 10) / 10d)
             ;
