@@ -1,5 +1,9 @@
 package frc.robot.commands.auto;
 
+import static frc.robot.commands.drive.DriveFastOnHeadingCommand.Direction.backward;
+import static frc.robot.commands.drive.RotateToHeadingCommand.DirectionOfRotation.CLOCKWISE;
+import static frc.robot.commands.drive.RotateToHeadingCommand.DirectionOfRotation.COUNTER_CLOCKWISE;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -12,14 +16,14 @@ import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.commands.arm.CompactCommand;
 import frc.robot.commands.arm.ReleaseCommand;
 import frc.robot.commands.arm.ScoreAutoCommand;
-import frc.robot.commands.drive.*;
+import frc.robot.commands.drive.BalanceCommand;
+import frc.robot.commands.drive.DriveFastOnHeadingCommand;
+import frc.robot.commands.drive.DriveOnHeadingCommand;
+import frc.robot.commands.drive.RotateToHeadingCommand;
+import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
-
-import static frc.robot.commands.drive.DriveFastOnHeadingCommand.Direction.*;
-import static frc.robot.commands.drive.RotateToHeadingCommand.DirectionOfRotation.CLOCKWISE;
-import static frc.robot.commands.drive.RotateToHeadingCommand.DirectionOfRotation.COUNTER_CLOCKWISE;
 
 
 public class HumberAutoAutoCommand extends SequentialCommandGroup {
@@ -30,7 +34,7 @@ public class HumberAutoAutoCommand extends SequentialCommandGroup {
         final AutoLane startingLane = startinglanecChooser.getSelected();
         final Alliance alliance     = DriverStation.getAlliance();
 
-        StringBuilder sb = new StringBuilder("Auto Selections: ");
+        StringBuilder  sb           = new StringBuilder("Auto Selections: ");
         sb.append("Pattern: The Humber Auto");
         sb.append("Starting Position:").append(startingLane).append(' ');
         sb.append("Alliance:").append(alliance);
@@ -87,7 +91,7 @@ public class HumberAutoAutoCommand extends SequentialCommandGroup {
             addCommands(new RotateToHeadingCommand(0, CLOCKWISE, driveSubsystem));
         }
 
-        addCommands(new DriveOnHeadingCommand(0, -.65, 180, false, driveSubsystem)
+        addCommands(new DriveOnHeadingCommand(0, -.65, 115, false, driveSubsystem) // changed from 180 cn
             .andThen(new DriveOnHeadingCommand(0, -.3, 50, driveSubsystem)));
 
         addCommands(new WaitCommand(1));
