@@ -8,6 +8,67 @@ import static org.junit.Assert.assertEquals;
 public class RunnymedeUtilsTests {
 
     @Test
+    public void testSpeedSubsystemExample() {
+
+        // this example shows how a subsystem may use this code
+
+        // initial conditions
+        double initialEncoderCount = 23.1;
+        double targetEncoderCount = 97;
+        double toTravel = targetEncoderCount - initialEncoderCount;
+
+        // progress tracking
+        double currentEncoderCount = 28;
+        double travelled = toTravel - currentEncoderCount;
+
+        // get the new speed using the method exposed by the subsystem
+        double speed = getSpeedForArmAngleMotor(toTravel, travelled);
+        assertEquals("angle speed is as expected", 1, speed, .05);
+
+    }
+
+    @Test
+    public void testSpeedAngleSampleUsage() {
+        // more simplified tests - using degrees, for example
+        testSampleUsage(.2, 69, 0);
+        testSampleUsage(.33, 69, 5);
+        testSampleUsage(.53, 69, 8);
+        testSampleUsage(.66, 69, 10);
+        testSampleUsage(1, 69, 15);
+        testSampleUsage(1, 69, 20);
+        testSampleUsage(1, 69, 30);
+        testSampleUsage(1, 69, 40);
+        testSampleUsage(.76, 69, 50);
+        testSampleUsage(.36, 69, 60);
+        testSampleUsage(0, 69, 69);
+    }
+
+    /**
+     * Sample method that a subsystem could use to compute the speed for a
+     * particular motor.  Note only <code>distanceToTravel</code> and
+     * <code>distanceTravelled</code> are exposed - the rest are
+     * "the business" of the subsystem. The user will simply get the
+     * fastest possible speed that the subsystem allows
+     * @param distanceToTravel the total distance to travel
+     * @param distanceTravelled the distance travelled along the journey
+     * @return the speed to travel
+     */
+    private double getSpeedForArmAngleMotor(double distanceToTravel, double distanceTravelled) {
+        double startSpeed = 0.2; // starting from 0 to .2 is fine
+        double endSpeed = 0; // gradually slow down to 0
+        double maxSpeed = 1.0; // max speed
+        double accelDist = 15; // accelerate to max speed over 15 degrees
+        double decelDist = 25; // allow lots of time to slow down
+        return calculateFastestSpeed(distanceToTravel, distanceTravelled, startSpeed, maxSpeed, endSpeed, accelDist, decelDist);
+    }
+
+    private void testSampleUsage(double expected, double distanceToTravel, double distanceTravelled) {
+        String msg = "Distance to travel: "+distanceToTravel+", distanceTravelled: "+distanceTravelled;
+        double speed = getSpeedForArmAngleMotor(distanceToTravel, distanceTravelled);
+        assertEquals(msg, expected, speed, 0.075);
+    }
+
+    @Test
     public void testCalculateFastestSpeedShortDistance() {
         // configuration
         double startSpeed = 0.3;
@@ -30,6 +91,8 @@ public class RunnymedeUtilsTests {
         test(0, goal, 40, startSpeed, maxSpeed, endSpeed, accelDist, decelDist);
         test(0, goal, 45, startSpeed, maxSpeed, endSpeed, accelDist, decelDist);
     }
+
+
 
     @Test
     public void testCalculateFastestSpeedMidDistance() {
