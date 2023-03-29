@@ -420,10 +420,10 @@ public class DriveSubsystem extends SubsystemBase {
             }
 
             if (rightSpeed > center) {
-                rightSpeed = center + turnLimit / 2;
+                rightSpeed = center - turnLimit / 2;
             }
             else {
-                rightSpeed = center - turnLimit / 2;
+                rightSpeed = center + turnLimit / 2;
             }
         }
 
