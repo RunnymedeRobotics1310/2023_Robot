@@ -1,8 +1,11 @@
 package frc.robot.commands.drive;
 
 import frc.robot.Constants;
+import frc.robot.RunnymedeUtils;
 import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.subsystems.DriveSubsystem;
+
+import static frc.robot.RunnymedeUtils.calculateFastestSpeed;
 
 /**
  * This command will drive on a heading as fast as it safely can.
@@ -152,42 +155,13 @@ public class DriveFastOnHeadingCommand extends RunnymedeCommandBase {
 
         final double MIN_SPEED = 0.3;
         final double MAX_SPEED = 1.0;
-        final double SHORT_DISTANCE_SPEED = 0.5;
-
         final double ACCLERATING_DISTANCE = 40;
         final double DECELERATE_DISTANCE= 70;
 
         double driven = Math.abs(driveSubsystem.getEncoderDistanceCm());
         double target = Math.abs(distanceCm);
 
-        if (driven > target) {
-            return 0;
-        }
+        return calculateFastestSpeed(target, driven, MIN_SPEED, MAX_SPEED, MIN_SPEED, ACCLERATING_DISTANCE, DECELERATE_DISTANCE);
 
-        if (target < (ACCLERATING_DISTANCE + DECELERATE_DISTANCE)) {
-            return SHORT_DISTANCE_SPEED;
-        }
-
-        double remaining = target - driven;
-        final double speed;
-
-        if (driven < ACCLERATING_DISTANCE) {
-            // speeding up
-            double pctDriven = (driven/ACCLERATING_DISTANCE);
-            speed = Math.max(MIN_SPEED, pctDriven*MAX_SPEED);
-            // verbose but handy if troubleshooting is required. comment out when not needed
-            log("Accelerating ("+Math.round(pctDriven*100)+"% done). Speed: "+(Math.round(speed*100)/100d)+" dist/total: "+(Math.round(driven))+"/"+target);
-        } else if (remaining < DECELERATE_DISTANCE) {
-            // slowing down
-            double pctToGo = (remaining/DECELERATE_DISTANCE);
-            speed = Math.max(MIN_SPEED, pctToGo*MAX_SPEED);
-            // verbose but handy if troubleshooting is required. comment out when not needed
-            log("Decelerating ("+Math.round(pctToGo*100)+"% done). Speed: "+(Math.round(speed*100)/100d)+" dist/total: "+(Math.round(driven))+"/"+target);
-        } else {
-            // cruising
-            speed = MAX_SPEED;
-        }
-
-        return speed;
     }
 }
