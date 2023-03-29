@@ -62,7 +62,9 @@ public class MiddleMayhemAutoCommand extends SequentialCommandGroup {
         addCommands(new RotateToHeadingCommand(0, driveSubsystem));
 
         // get ready for intake
-        addCommands(new MoveArmToPositionCommand(Constants.ArmConstants.SAFELY_ABOVE_FRAME_AUTO_POSITION, armSubsystem));
+        addCommands(new MoveArmToPositionCommand(Constants.ArmConstants.SAFELY_ABOVE_FRAME_AUTO_POSITION, armSubsystem)
+            .andThen(new OpenPincherCommand( armSubsystem))
+        );
 
 
         /*
@@ -70,7 +72,6 @@ public class MiddleMayhemAutoCommand extends SequentialCommandGroup {
          * Now that we're clear, it's safe to get the arm into the final intake position
          */
         addCommands(new DriveOnHeadingCommand(0, .65, 30, driveSubsystem)
-            .alongWith(new OpenPincherCommand( armSubsystem))
             .andThen(new MoveArmToPositionCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION, armSubsystem))
         );
 
