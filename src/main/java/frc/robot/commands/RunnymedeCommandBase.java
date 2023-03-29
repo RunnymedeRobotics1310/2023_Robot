@@ -1,7 +1,9 @@
 package frc.robot.commands;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -11,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
  * The Base Runnymede Command implements command helpers to aid with logging
  */
 public class RunnymedeCommandBase extends CommandBase {
+
+    SimpleDateFormat START_TIMESTAMP_FMT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     protected long  initializeTime = 0;
     private String  finishReason   = null;
@@ -48,7 +52,7 @@ public class RunnymedeCommandBase extends CommandBase {
             this.subsystemList.addAll(getRequirements());
         }
 
-        logCommandState("STARTING", commandParms, true);
+        logCommandState("STARTING at "+ START_TIMESTAMP_FMT.format(new Date()), commandParms, true);
 
         // Set the initialize time after logging of the start message.
         initializeTime = System.currentTimeMillis();

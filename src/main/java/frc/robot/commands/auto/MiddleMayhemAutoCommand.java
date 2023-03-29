@@ -49,21 +49,22 @@ public class MiddleMayhemAutoCommand extends SequentialCommandGroup {
          */
         // mount charger
         addCommands(new DriveFastOnHeadingCommand(180, backward, 200, false, driveSubsystem)
-            .alongWith(new CompactCommand(armSubsystem))
-            .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
+            .alongWith(new ExtendArmCommand(0, armSubsystem)
+                .andThen(new MoveArmToPositionCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION, armSubsystem))
+            .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)))
+        );
 
         // traverse charger
         addCommands(new DriveOnHeadingCommand(180, -.3, 70, false, driveSubsystem));
 
         // exit charger
-        addCommands(new DriveOnHeadingCommand(180, -.5, 20, false, driveSubsystem));
+        addCommands(new DriveOnHeadingCommand(180, -.5, 20, false, driveSubsystem)
+            .deadlineWith(new OpenPincherCommand(armSubsystem))
+        );
 
         // rotate to cube
-        addCommands(new RotateToHeadingCommand(0, driveSubsystem));
-
-        // get ready for intake
-        addCommands(new MoveArmToPositionCommand(Constants.ArmConstants.SAFELY_ABOVE_FRAME_AUTO_POSITION, armSubsystem)
-            .andThen(new OpenPincherCommand( armSubsystem))
+        addCommands(new RotateToHeadingCommand(0, driveSubsystem)
+            .deadlineWith(new OpenPincherCommand(armSubsystem))
         );
 
 
@@ -72,7 +73,7 @@ public class MiddleMayhemAutoCommand extends SequentialCommandGroup {
          * Now that we're clear, it's safe to get the arm into the final intake position
          */
         addCommands(new DriveOnHeadingCommand(0, .65, 30, driveSubsystem)
-            .andThen(new MoveArmToPositionCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION, armSubsystem))
+            .andThen(new OpenPincherCommand(armSubsystem))
         );
 
         /*
