@@ -49,19 +49,20 @@ public class MiddleMayhemAutoCommand extends SequentialCommandGroup {
          */
         // mount charger
         addCommands(new DriveFastOnHeadingCommand(180, backward, 200, false, driveSubsystem)
-            .alongWith(new CompactCommand(armSubsystem)));
+            .alongWith(new CompactCommand(armSubsystem))
+            .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
 
         // traverse charger
         addCommands(new DriveOnHeadingCommand(180, -.3, 70, false, driveSubsystem));
 
         // exit charger
-        addCommands(new DriveOnHeadingCommand(180, -.65, 50, false, driveSubsystem));
+        addCommands(new DriveOnHeadingCommand(180, -.5, 20, false, driveSubsystem));
 
         // rotate to cube
         addCommands(new RotateToHeadingCommand(0, driveSubsystem));
 
         // get ready for intake
-        addCommands(new MoveArmToPositionCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION, armSubsystem));
+        addCommands(new MoveArmToPositionCommand(Constants.ArmConstants.SAFELY_ABOVE_FRAME_AUTO_POSITION, armSubsystem));
 
 
         /*
@@ -70,6 +71,7 @@ public class MiddleMayhemAutoCommand extends SequentialCommandGroup {
          */
         addCommands(new DriveOnHeadingCommand(0, .65, 30, driveSubsystem)
             .alongWith(new OpenPincherCommand( armSubsystem))
+            .andThen(new MoveArmToPositionCommand(Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION, armSubsystem))
         );
 
         /*

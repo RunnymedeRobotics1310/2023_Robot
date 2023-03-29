@@ -290,6 +290,7 @@ public final class Constants {
         public static final ArmPosition SCORE_BOTTOM_CUBE_POSITION   = new ArmPosition(43, 7);
 
         // Pickup constants
+        public static final ArmPosition SAFELY_ABOVE_FRAME_AUTO_POSITION  = new ArmPosition(CLEAR_FRAME_ARM_ANGLE+10, 9.5);
         public static final ArmPosition GROUND_PICKUP_AUTO_POSITION  = new ArmPosition(CLEAR_FRAME_ARM_ANGLE, 9.5);
         public static final ArmPosition GROUND_PICKUP_POSITION       = new ArmPosition(CLEAR_FRAME_ARM_ANGLE, 14);                   // Confirmed
         public static final ArmPosition SUBSTATION_PICKUP_POSITION   = new ArmPosition(86.5, 30);
