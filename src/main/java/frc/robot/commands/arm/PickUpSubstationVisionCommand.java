@@ -150,7 +150,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
             if (System.currentTimeMillis() - pauseStartTime > 250) {
 
                 // Set the required extension distance based on the following formula
-                double requiredExtensionEncoderPosition = ultrasonicDistanceCm * .88 - 53.1;
+                double requiredExtensionEncoderPosition = ultrasonicDistanceCm * .88 - 50.1;
 
                 double pickupAngle                      = ArmConstants.SUBSTATION_PICKUP_POSITION.angle;
 
