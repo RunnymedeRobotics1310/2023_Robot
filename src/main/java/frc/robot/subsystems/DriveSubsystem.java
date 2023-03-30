@@ -391,10 +391,15 @@ public class DriveSubsystem extends SubsystemBase {
         if (armSubsystem.getArmExtendEncoder() >= ArmConstants.MAX_ARM_EXTEND_INSIDE_FRAME
             && DriverStation.isTeleopEnabled()) {
 
-            // Limit each side
+            // Scale each side of the robot to a max of .35
+            double scalingFactor = 1.0;
 
-            leftSpeed  = Math.min(Math.abs(leftSpeed), .35) * Math.signum(leftSpeed);
-            rightSpeed = Math.min(Math.abs(rightSpeed), .35) * Math.signum(rightSpeed);
+            if (Math.abs(leftSpeed) > .35 || Math.abs(rightSpeed) > .35) {
+                scalingFactor = .35 / Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
+            }
+
+            leftSpeed  *= scalingFactor;
+            rightSpeed *= scalingFactor;
 
             // Watch out for sharp turns
             limitTurning(0.35);
