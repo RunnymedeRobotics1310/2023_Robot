@@ -83,16 +83,15 @@ public class HumberAutoAutoCommand extends SequentialCommandGroup {
             || (alliance == Alliance.Blue && startingLane == AutoLane.TOP)) {
             addCommands(new RotateToHeadingCommand(90, COUNTER_CLOCKWISE, driveSubsystem));
             addCommands(new DriveOnHeadingCommand(90, .65, 210, driveSubsystem));
-            addCommands(new RotateToHeadingCommand(0, COUNTER_CLOCKWISE, driveSubsystem));
+            addCommands(new RotateToHeadingCommand(180, CLOCKWISE, driveSubsystem));
         }
         else {
             addCommands(new RotateToHeadingCommand(270, CLOCKWISE, driveSubsystem));
             addCommands(new DriveOnHeadingCommand(270, .65, 210, driveSubsystem));
-            addCommands(new RotateToHeadingCommand(0, CLOCKWISE, driveSubsystem));
+            addCommands(new RotateToHeadingCommand(180, COUNTER_CLOCKWISE, driveSubsystem));
         }
 
-        addCommands(new DriveOnHeadingCommand(0, -.65, 115, false, driveSubsystem) // changed from 180 cn
-            .andThen(new DriveOnHeadingCommand(0, -.3, 50, driveSubsystem)));
+        addCommands(new DriveOnHeadingCommand(180, .3, 230, driveSubsystem));
 
         addCommands(new WaitCommand(1));
         addCommands(new BalanceCommand(driveSubsystem));
