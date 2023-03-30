@@ -238,6 +238,7 @@ public final class Constants {
          * Arm Extender Constants
          */
         public static final int     ARM_EXTEND_MOTOR_PORT               = 35;
+        public static final int     ARM_EXTEND_LIMIT_SWITCH_PORT        = 2;
         public static final boolean ARM_EXTEND_MOTOR_REVERSED           = true;
 
         public static final double  MAX_EXTEND_SPEED                    = 1;
