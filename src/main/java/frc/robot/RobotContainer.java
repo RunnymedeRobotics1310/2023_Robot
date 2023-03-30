@@ -33,7 +33,7 @@ import frc.robot.commands.arm.StartIntakeCommand;
 import frc.robot.commands.auto.AutonomousCommand;
 import frc.robot.commands.auto.DoubleDownAutoCommand;
 import frc.robot.commands.auto.HumberAutoAutoCommand;
-import frc.robot.commands.auto.MiddleMayhemAutoCommand;
+import frc.robot.commands.auto.MiddleMayhem1AutoCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DefaultDriveCommand;
 import frc.robot.commands.drive.DriveToGamePieceCommand;
@@ -240,7 +240,7 @@ public class RobotContainer {
                 startingLaneChooser);
 
         case MIDDLE_MAYHEM:
-            return new MiddleMayhemAutoCommand(
+            return new MiddleMayhem1AutoCommand(
                 driveSubsystem,
                 armSubsystem,
                 visionSubsystem);
