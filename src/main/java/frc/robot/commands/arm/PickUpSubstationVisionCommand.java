@@ -283,7 +283,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
         double leftSpeed = driveSpeed + turn;
         double rightSpeed = driveSpeed - turn;
-        log("alignToVisionTarget drive speeds: left: "+leftSpeed+" right:"+rightSpeed);
+        log("alignToVisionTarget leftSpeed: "+(Math.round(leftSpeed*1000)/1000d)+" rightSpeed:"+(Math.round(rightSpeed*1000)/1000d));
         driveSubsystem.setMotorSpeeds(leftSpeed, rightSpeed);
 
         return turn == 0;
