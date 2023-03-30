@@ -109,7 +109,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
                 visionTargetHeadingError = visionSubsystem.getTargetAngleOffset();
             }
 
-            if (System.currentTimeMillis() - alignStartTime > 1000) {
+            if (System.currentTimeMillis() - alignStartTime > 2000) {
                 currentState = State.PAUSE;
                 // Stop the motors
                 driveSubsystem.setMotorSpeeds(0, 0);
@@ -283,7 +283,7 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
         double leftSpeed = driveSpeed + turn;
         double rightSpeed = driveSpeed - turn;
-        log("alignToVisionTarget leftSpeed: "+(Math.round(leftSpeed*1000)/1000d)+" rightSpeed:"+(Math.round(rightSpeed*1000)/1000d));
+        log("alignToVisionTarget leftSpeed: "+(Math.round(leftSpeed*1000)/1000d)+" rightSpeed:"+(Math.round(rightSpeed*1000)/1000d)+" ultrasonicDistance: "+driveSubsystem.getUltrasonicDistanceCm());
         driveSubsystem.setMotorSpeeds(leftSpeed, rightSpeed);
 
         return turn == 0;
