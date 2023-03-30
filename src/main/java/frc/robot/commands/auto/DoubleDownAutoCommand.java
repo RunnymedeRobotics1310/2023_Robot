@@ -18,13 +18,13 @@ import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.VisionConstants.VisionTarget;
 import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.commands.arm.CompactCommand;
+import frc.robot.commands.arm.ExtendArmCommand;
 import frc.robot.commands.arm.MoveArmToPositionCommand;
 import frc.robot.commands.arm.OpenPincherCommand;
 import frc.robot.commands.arm.PickupGamePieceCommand;
 import frc.robot.commands.arm.ReleaseCommand;
 import frc.robot.commands.arm.ScoreAutoCommand;
 import frc.robot.commands.drive.DriveFastOnHeadingCommand;
-import frc.robot.commands.drive.DriveForwardCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
 import frc.robot.commands.drive.DriveToFieldElementCommand;
 import frc.robot.commands.drive.DriveToGamePieceCommand;
@@ -106,12 +106,13 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         }
         else {
             // no bump
-            driveOutCmd = new DriveFastOnHeadingCommand(180, backward, 370, false, driveSubsystem);
+            driveOutCmd = new DriveFastOnHeadingCommand(180, backward, 330, false, driveSubsystem);
         }
         addCommands(driveOutCmd
-            .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)
-                .alongWith(new OpenPincherCommand(armSubsystem)
-                    .andThen(new MoveArmToPositionCommand(GROUND_PICKUP_AUTO_POSITION, armSubsystem)))));
+            .alongWith(new ExtendArmCommand(0, armSubsystem)
+                .andThen(new MoveArmToPositionCommand(GROUND_PICKUP_AUTO_POSITION, armSubsystem)
+                    .andThen(new OpenPincherCommand(armSubsystem))))
+            .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
 
         /*
          * Rotate to face the cube
@@ -148,7 +149,7 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         addCommands(new DriveToGamePieceCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem));
         // pickup cube needs you to drive through the piece or else it bounces away
         addCommands(new PickupGamePieceCommand(GamePiece.CUBE, null, armSubsystem)
-//            .deadlineWith(new DriveForwardCommand(.1, 30, true, driveSubsystem))
+        // .deadlineWith(new DriveForwardCommand(.1, 30, true, driveSubsystem))
         );
 
         /*
@@ -176,7 +177,7 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         if (startingLane == AutoLane.BOTTOM) {
             // bump - drive safely
             driveBackCmd = new DriveFastOnHeadingCommand(180.0, forward, 230, false, driveSubsystem);
-//            driveBackCmd = new DriveOnHeadingCommand(180.0, 0.6, 230, false, driveSubsystem);
+            // driveBackCmd = new DriveOnHeadingCommand(180.0, 0.6, 230, false, driveSubsystem);
         }
         else {
             // no bump - drive fast
