@@ -52,7 +52,7 @@ public class RunnymedeCommandBase extends CommandBase {
             this.subsystemList.addAll(getRequirements());
         }
 
-        logCommandState("STARTING at "+ START_TIMESTAMP_FMT.format(new Date()), commandParms, true);
+        logCommandState("STARTING", commandParms, true);
 
         // Set the initialize time after logging of the start message.
         initializeTime = System.currentTimeMillis();
@@ -116,7 +116,11 @@ public class RunnymedeCommandBase extends CommandBase {
             sb.append(" : ").append(state);
         }
 
-        sb.append(" at ").append(System.currentTimeMillis() - initializeTime).append("ms");
+        if (initializeTime == 0) {
+            sb.append(" at ").append(START_TIMESTAMP_FMT.format(new Date()));
+        } else {
+            sb.append(" at ").append(System.currentTimeMillis() - initializeTime).append("ms");
+        }
 
         if (finishReason != null) {
             sb.append(" : ").append(finishReason);
