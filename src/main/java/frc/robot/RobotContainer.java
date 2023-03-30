@@ -8,43 +8,22 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.AutoConstants.AutoAction;
-import frc.robot.Constants.AutoConstants.AutoLane;
-import frc.robot.Constants.AutoConstants.AutoPattern;
-import frc.robot.Constants.AutoConstants.Orientation;
+import frc.robot.Constants.AutoConstants.*;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.OiConstants;
 import frc.robot.Constants.VisionConstants.VisionTarget;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.SystemTestCommand;
-import frc.robot.commands.arm.CalibratePincherCommand;
-import frc.robot.commands.arm.CompactCommand;
-import frc.robot.commands.arm.DefaultArmCommand;
-import frc.robot.commands.arm.PickUpSubstationVisionCommand;
-import frc.robot.commands.arm.PickupGamePieceCommand;
-import frc.robot.commands.arm.ReleaseCommand;
-import frc.robot.commands.arm.ScoreCommand;
-import frc.robot.commands.arm.StartIntakeCommand;
-import frc.robot.commands.auto.AutonomousCommand;
-import frc.robot.commands.auto.DoubleDownAutoCommand;
-import frc.robot.commands.auto.HumberAutoAutoCommand;
-import frc.robot.commands.auto.MiddleMayhem1AutoCommand;
-import frc.robot.commands.drive.BalanceCommand;
-import frc.robot.commands.drive.DefaultDriveCommand;
-import frc.robot.commands.drive.DriveToGamePieceCommand;
-import frc.robot.commands.drive.ResetGyroPitchCommand;
-import frc.robot.commands.drive.SetGyroHeadingCommand;
+import frc.robot.commands.arm.*;
+import frc.robot.commands.auto.*;
+import frc.robot.commands.drive.*;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.vision.DefaultVisionCommand;
 import frc.robot.commands.vision.SetVisionTargetCommand;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -108,6 +87,7 @@ public class RobotContainer {
         autoPatternChooser.addOption("Middle Mayhem", AutoPattern.MIDDLE_MAYHEM);
         autoPatternChooser.addOption("Auto Builder", AutoPattern.AUTO_BUILDER);
         autoPatternChooser.addOption("Humber Auto", AutoPattern.HUMBER_AUTO);
+        autoPatternChooser.addOption("Old Humber Auto", AutoPattern.OLD_HUMBER_AUTO);
 
 
         startingLaneChooser.setDefaultOption("Substation", AutoLane.TOP);
@@ -224,6 +204,13 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
 
         switch (autoPatternChooser.getSelected()) {
+
+        case OLD_HUMBER_AUTO:
+            return new HumberAutoOldAutoCommand(
+                driveSubsystem,
+                armSubsystem,
+                visionSubsystem,
+                startingLaneChooser);
 
         case HUMBER_AUTO:
             return new HumberAutoAutoCommand(
