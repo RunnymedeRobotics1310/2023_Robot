@@ -277,11 +277,14 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
 
         double turn = visionTargetHeadingError * .01;
 
-        if (visionTargetHeadingError < VISION_TARGET_HEADING_TOLERANCE) {
+        if (Math.abs(visionTargetHeadingError) < VISION_TARGET_HEADING_TOLERANCE) {
             turn = 0;
         }
 
-        driveSubsystem.setMotorSpeeds(driveSpeed + turn, driveSpeed - turn);
+        double leftSpeed = driveSpeed + turn;
+        double rightSpeed = driveSpeed - turn;
+        log("alignToVisionTarget drive speeds: left: "+leftSpeed+" right:"+rightSpeed);
+        driveSubsystem.setMotorSpeeds(leftSpeed, rightSpeed);
 
         return turn == 0;
     }
