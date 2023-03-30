@@ -41,6 +41,7 @@ public class VisionSubsystem extends SubsystemBase {
     private static final long            PIPELINE_CUBE_DETECT        = 1;
     private static final long            PIPELINE_APRIL_TAG_DETECT   = 3;
     private static final long            PIPELINE_POST_DETECT        = 4;
+    private static final long            PIPELINE_VISUAL             = 5;
 
     private static final LinearFilter    CONE_LOW_PASS_FILTER        = LinearFilter.singlePoleIIR(.1, .02);
     private static final int             CAMERA_UP_LIMIT_SWITCH_PORT = 1;
@@ -324,6 +325,7 @@ public class VisionSubsystem extends SubsystemBase {
         case FIELD:
         case NONE:
         default:
+            this.pipeline.setNumber(PIPELINE_VISUAL);
             this.camMode.setInteger(CAM_MODE_DRIVER);
             this.ledMode.setInteger(LED_MODE_OFF);
             break;
