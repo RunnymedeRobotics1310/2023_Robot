@@ -69,7 +69,8 @@ public class ArmSubsystem extends SubsystemBase {
      * the arm extender SparkMAX
      * reverse limit.
      */
-    private SparkMaxLimitSwitch    armExtendLimitDetector  = armExtendMotor.getForwardLimitSwitch(Type.kNormallyOpen);
+    // private SparkMaxLimitSwitch armExtendLimitDetector = armExtendMotor.getForwardLimitSwitch(Type.kNormallyOpen);
+    private DigitalInput           armExtendLimitDetector  = new DigitalInput(ArmConstants.ARM_EXTEND_LIMIT_SWITCH_PORT);
 
     /**
      * The pincher open detector is a hall effect limit switch that is normally open, plugged into
@@ -112,12 +113,6 @@ public class ArmSubsystem extends SubsystemBase {
 
         // Set the arm extender to always brake
         armExtendMotor.setIdleMode(IdleMode.kBrake);
-
-        // The arm extend limit detector will have two magnets and one
-        // limit switch that will detect both forward and reverse limits
-        // NOTE: Not the ideal configuration - a true limit detector
-        // will have one magnet and two limit switches.
-        armExtendLimitDetector.enableLimitSwitch(false);
 
         // Set the arm as slightly extended on power up.
         setArmExtendEncoder(2);
@@ -337,7 +332,7 @@ public class ArmSubsystem extends SubsystemBase {
         // This sensor is not inverted because the CANLimitSwitch
         // is configured for a normally open switch.
 
-        return armExtendLimitDetector.isPressed();
+        return !armExtendLimitDetector.get();
     }
 
     /** Determine if a game piece is detected in the pincher */
