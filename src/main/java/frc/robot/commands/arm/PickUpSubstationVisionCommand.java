@@ -281,9 +281,10 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
             turn = 0;
         }
 
-        double leftSpeed = driveSpeed + turn;
+        double leftSpeed  = driveSpeed + turn;
         double rightSpeed = driveSpeed - turn;
-        log("alignToVisionTarget leftSpeed: "+(Math.round(leftSpeed*1000)/1000d)+" rightSpeed:"+(Math.round(rightSpeed*1000)/1000d)+" ultrasonicDistance: "+driveSubsystem.getUltrasonicDistanceCm());
+        // log("alignToVisionTarget leftSpeed: "+(Math.round(leftSpeed*1000)/1000d)+"
+        // rightSpeed:"+(Math.round(rightSpeed*1000)/1000d)+" ultrasonicDistance: "+driveSubsystem.getUltrasonicDistanceCm());
         driveSubsystem.setMotorSpeeds(leftSpeed, rightSpeed);
 
         return turn == 0;
