@@ -1,5 +1,8 @@
 package frc.robot.commands.drive;
 
+import java.util.Arrays;
+import java.util.List;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants;
@@ -9,32 +12,29 @@ import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class DriveToFieldElementCommand extends RunnymedeCommandBase {
 
-    private static final List<VisionTarget>    SUPPORTED_DRIVE_TARGETS = Arrays.asList(
+    private static final List<VisionTarget> SUPPORTED_DRIVE_TARGETS              = Arrays.asList(
         VisionTarget.APRILTAG_GRID,
         VisionTarget.POST_HIGH,
         VisionTarget.POST_LOW);
 
-    final double                               factor                  = 0.01;
+    final double                            factor                               = 0.01;
 
-    private final double                       speed, timeoutSeconds;
+    private final double                    speed, timeoutSeconds;
 
-    private final DriveSubsystem               driveSubsystem;
-    private final VisionSubsystem              visionSubsystem;
+    private final DriveSubsystem            driveSubsystem;
+    private final VisionSubsystem           visionSubsystem;
 
-    private final VisionTarget target;
+    private final VisionTarget              target;
 
-    private long                               initializeTime          = 0;
+    private long                            initializeTime                       = 0;
 
-    private boolean                            targetFound             = false;
+    private boolean                         targetFound                          = false;
 
-    private double                             lastKnownTargetHeading  = 0;
+    private double                          lastKnownTargetHeading               = 0;
 
-    private double                             startingToDriveAimlesslyEncoderCount = -1.0;
+    private double                          startingToDriveAimlesslyEncoderCount = -1.0;
 
     /**
      * Drive to a cube vision target. If this command does not find a cube vision target,
@@ -88,7 +88,8 @@ public class DriveToFieldElementCommand extends RunnymedeCommandBase {
 
         if (!SUPPORTED_DRIVE_TARGETS.contains(target)) {
             log("Cannot drive to target " + target + ".");
-        } else {
+        }
+        else {
             setVisionTarget(target);
 
             // Start by driving straight towards the target.
@@ -104,18 +105,18 @@ public class DriveToFieldElementCommand extends RunnymedeCommandBase {
     public void execute() {
 
         if (!SUPPORTED_DRIVE_TARGETS.contains(target)) {
-//            log("Unsupported vision target in execute: "+target);
+            // log("Unsupported vision target in execute: "+target);
             return;
         }
 
         // If the target was switched, then wait before trying to track a target
         if (!visionSubsystem.isCameraInPositionForTarget()) {
-//            log("Camera not in position in execute");
+            // log("Camera not in position in execute");
             return;
         }
 
         if (visionSubsystem.isVisionTargetFound()) {
-//            log("Vision target found in execute");
+            // log("Vision target found in execute");
 
             // FIXME: Is this correct - how do we get the angle to the target?
             lastKnownTargetHeading  = driveSubsystem.getHeading() + visionSubsystem.getTargetAngleOffset();
@@ -138,10 +139,11 @@ public class DriveToFieldElementCommand extends RunnymedeCommandBase {
         if (!targetFound) {
             if (startingToDriveAimlesslyEncoderCount < 0) {
                 startingToDriveAimlesslyEncoderCount = driveSubsystem.getEncoderDistanceCm();
-                log("Target not found - driving straight ahead hoping to find it.");
-            } else {
+                // log("Target not found - driving straight ahead hoping to find it.");
+            }
+            else {
                 double dist = driveSubsystem.getEncoderDistanceCm() - startingToDriveAimlesslyEncoderCount;
-                log("Target not found - driving straight ahead hoping to find it. Distance driven: "+dist+"cm.");
+                // log("Target not found - driving straight ahead hoping to find it. Distance driven: "+dist+"cm.");
             }
             // FIXME: this seems very dangerous... should we maybe cancel here? What if the target is a wall!?!?
             driveSubsystem.setMotorSpeeds(speed, speed);
@@ -178,7 +180,7 @@ public class DriveToFieldElementCommand extends RunnymedeCommandBase {
         // This command can either reach the distance or time out
 
         if (!SUPPORTED_DRIVE_TARGETS.contains(target)) {
-            setFinishReason("Invalid target: "+target);
+            setFinishReason("Invalid target: " + target);
             return true;
         }
 
@@ -193,7 +195,7 @@ public class DriveToFieldElementCommand extends RunnymedeCommandBase {
         case APRILTAG_GRID:
             final double TARGET_AREA_THRESHOLD = 3.5;
             if (targetArea >= 3.5) {
-                log("April tag detected. Actual target area: "+targetArea+", required threshold: "+TARGET_AREA_THRESHOLD);
+                log("April tag detected. Actual target area: " + targetArea + ", required threshold: " + TARGET_AREA_THRESHOLD);
                 return true;
             }
             break;

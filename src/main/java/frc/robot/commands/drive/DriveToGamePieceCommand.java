@@ -16,12 +16,11 @@ import frc.robot.subsystems.VisionSubsystem;
 
 public class DriveToGamePieceCommand extends RunnymedeCommandBase {
 
-    private static final List<VisionTarget>    SUPPORTED_DRIVE_TARGETS = Arrays.asList(
+    private static final List<VisionTarget>    SUPPORTED_DRIVE_TARGETS              = Arrays.asList(
         VisionTarget.CONE_GROUND,
-        VisionTarget.CUBE_GROUND
-    );
+        VisionTarget.CUBE_GROUND);
 
-    final double                               factor                  = 0.01;
+    final double                               factor                               = 0.01;
 
     private final double                       speed, timeoutSeconds;
 
@@ -31,11 +30,11 @@ public class DriveToGamePieceCommand extends RunnymedeCommandBase {
 
     private final VisionConstants.VisionTarget target;
 
-    private long                               initializeTime          = 0;
+    private long                               initializeTime                       = 0;
 
-    private boolean                            targetFound             = false;
+    private boolean                            targetFound                          = false;
 
-    private double                             lastKnownTargetHeading  = 0;
+    private double                             lastKnownTargetHeading               = 0;
 
     private double                             startingToDriveAimlesslyEncoderCount = -1.0;
 
@@ -93,7 +92,8 @@ public class DriveToGamePieceCommand extends RunnymedeCommandBase {
 
         if (!SUPPORTED_DRIVE_TARGETS.contains(target)) {
             log("Cannot drive to target " + target + ".");
-        } else {
+        }
+        else {
             setVisionTarget(target);
 
             // Start by driving straight towards the target.
@@ -112,7 +112,7 @@ public class DriveToGamePieceCommand extends RunnymedeCommandBase {
             return;
         }
 
-            // If the target was switched, then wait before trying to track a target
+        // If the target was switched, then wait before trying to track a target
         if (!visionSubsystem.isCameraInPositionForTarget()) {
             return;
         }
@@ -140,10 +140,11 @@ public class DriveToGamePieceCommand extends RunnymedeCommandBase {
         if (!targetFound) {
             if (startingToDriveAimlesslyEncoderCount < 0) {
                 startingToDriveAimlesslyEncoderCount = driveSubsystem.getEncoderDistanceCm();
-                log("Target not found - driving straight ahead hoping to find it.");
-            } else {
+                // log("Target not found - driving straight ahead hoping to find it.");
+            }
+            else {
                 double dist = driveSubsystem.getEncoderDistanceCm() - startingToDriveAimlesslyEncoderCount;
-                log("Target not found - driving straight ahead hoping to find it. Distance driven: "+dist+"cm.");
+                // log("Target not found - driving straight ahead hoping to find it. Distance driven: "+dist+"cm.");
             }
             // FIXME: this seems very dangerous... should we maybe cancel here? What if the target is a wall!?!?
             driveSubsystem.setMotorSpeeds(speed, speed);
@@ -180,7 +181,7 @@ public class DriveToGamePieceCommand extends RunnymedeCommandBase {
         // This command can either reach the distance or time out
 
         if (!SUPPORTED_DRIVE_TARGETS.contains(target)) {
-            setFinishReason("Invalid target: "+target);
+            setFinishReason("Invalid target: " + target);
             return true;
         }
 
