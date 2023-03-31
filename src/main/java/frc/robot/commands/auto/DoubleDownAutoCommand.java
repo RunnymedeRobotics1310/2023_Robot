@@ -110,9 +110,8 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         }
         addCommands(driveOutCmd
             .alongWith(new ExtendArmCommand(0, armSubsystem)
-                .andThen(new MoveArmToPositionCommand(GROUND_PICKUP_AUTO_POSITION, armSubsystem)
-                    .deadlineWith(new OpenPincherCommand(armSubsystem))
-                    .andThen(new OpenPincherCommand(armSubsystem))))
+                .andThen(new OpenPincherCommand(armSubsystem)
+                    .andThen(new MoveArmToPositionCommand(GROUND_PICKUP_AUTO_POSITION, armSubsystem))))
             .alongWith(new SetVisionTargetCommand(VisionTarget.CUBE_GROUND, visionSubsystem)));
 
         /*
