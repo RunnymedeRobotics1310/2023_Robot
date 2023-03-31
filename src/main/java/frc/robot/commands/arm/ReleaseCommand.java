@@ -53,7 +53,7 @@ public class ReleaseCommand extends BaseArmCommand {
         logCommandEnd(interrupted);
 
         // If in teleop, then automatically schedule the robot move to compact state
-        if (DriverStation.isTeleopEnabled()) {
+        if (DriverStation.isTeleopEnabled() && !interrupted) {
             CommandScheduler.getInstance().schedule(new CompactCommand(armSubsystem));
         }
     }
