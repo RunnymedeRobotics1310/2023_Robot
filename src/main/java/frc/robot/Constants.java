@@ -30,7 +30,7 @@ public final class Constants {
 
         public static enum GamePiece {
 
-            CUBE(65), // Confirmed
+            CUBE(72), // Confirmed
             CONE(121), // Confirmed
             NONE(ArmConstants.PINCHER_CLOSE_LIMIT_ENCODER_VALUE); // Confirmed
 
@@ -279,13 +279,13 @@ public final class Constants {
         // rocking wheels and the weighting in the back
         // therefore compensate for this by bringing the angle down a bit.
         // For our first qual match we will try 100 degrees
-        public static final ArmPosition SCORE_TOP_CONE_AUTO_POSITION     = new ArmPosition(101, 55);                        // Confirmed
-        public static final ArmPosition SCORE_TOP_CONE_POSITION          = new ArmPosition(99, 54);                         // Confirmed
+        public static final ArmPosition SCORE_TOP_CONE_AUTO_POSITION     = new ArmPosition(101, 55);                            // Confirmed
+        public static final ArmPosition SCORE_TOP_CONE_POSITION          = new ArmPosition(99, 54);                             // Confirmed
         public static final ArmPosition SCORE_TOP_CUBE_AUTO_POSITION     = new ArmPosition(101, 50);
-        public static final ArmPosition SCORE_TOP_CUBE_POSITION          = new ArmPosition(90, 50);                         // Confirmed
+        public static final ArmPosition SCORE_TOP_CUBE_POSITION          = new ArmPosition(90, 50);                             // Confirmed
 
-        public static final ArmPosition SCORE_MIDDLE_CONE_POSITION       = new ArmPosition(85, 7);                          // Confirmed
-        public static final ArmPosition SCORE_MIDDLE_CUBE_POSITION       = new ArmPosition(73, 13);                         // Confirmed
+        public static final ArmPosition SCORE_MIDDLE_CONE_POSITION       = new ArmPosition(85, 7);                              // Confirmed
+        public static final ArmPosition SCORE_MIDDLE_CUBE_POSITION       = new ArmPosition(73, 13);                             // Confirmed
 
         public static final ArmPosition SCORE_BOTTOM_CONE_POSITION       = new ArmPosition(43, 7);
         public static final ArmPosition SCORE_BOTTOM_CUBE_POSITION       = new ArmPosition(43, 7);
@@ -293,7 +293,7 @@ public final class Constants {
         // Pickup constants
         public static final ArmPosition SAFELY_ABOVE_FRAME_AUTO_POSITION = new ArmPosition(CLEAR_FRAME_ARM_ANGLE + 10, 9.5);
         public static final ArmPosition GROUND_PICKUP_AUTO_POSITION      = new ArmPosition(CLEAR_FRAME_ARM_ANGLE, 9.5);
-        public static final ArmPosition GROUND_PICKUP_POSITION           = new ArmPosition(CLEAR_FRAME_ARM_ANGLE, 14);      // Confirmed
+        public static final ArmPosition GROUND_PICKUP_POSITION           = new ArmPosition(CLEAR_FRAME_ARM_ANGLE, 14);          // Confirmed
         public static final ArmPosition SUBSTATION_PICKUP_POSITION       = new ArmPosition(86.5, 30);
 
         // Drive with Piece constants
