@@ -19,11 +19,11 @@ public class RunnymedeUtilsTests {
 
         // progress tracking
         double currentEncoderCount = 28;
-        double travelled = toTravel - currentEncoderCount;
+        double travelled = toTravel - (currentEncoderCount - initialEncoderCount);
 
         // get the new speed using the method exposed by the subsystem
         double speed = getSpeedForArmAngleMotor(toTravel, travelled);
-        assertEquals("angle speed is as expected", 1, speed, .05);
+        assertEquals("angle speed is as expected", .19, speed, .05);
 
     }
 
