@@ -44,8 +44,8 @@ public class MiddleMayhem1AutoCommand extends SequentialCommandGroup {
         addCommands(new ReleaseCommand(armSubsystem));
 
         // Drive over charger & compact
-        addCommands(new DriveOnHeadingCommand(180, -.4, 230, false, driveSubsystem)
-            .andThen(new DriveOnHeadingCommand(180, -.3, 70, false, driveSubsystem)
+        addCommands(new DriveOnHeadingCommand(180, -.4, 245, false, driveSubsystem)
+            .andThen(new DriveOnHeadingCommand(180, -.3, 85, false, driveSubsystem)
                 .andThen(new DriveOnHeadingCommand(180, -.5, 80, driveSubsystem)))
             .alongWith(new CompactCommand(armSubsystem)));
 
