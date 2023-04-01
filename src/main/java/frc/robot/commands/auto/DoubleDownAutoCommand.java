@@ -102,11 +102,11 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         RunnymedeCommandBase driveOutCmd;
         if (startingLane == AutoLane.BOTTOM) {
             // drive over the bump
-            driveOutCmd = new DriveFastOnHeadingCommand(180, backward, 350, false, driveSubsystem);
+            driveOutCmd = new DriveFastOnHeadingCommand(180, backward, 380, false, driveSubsystem);
         }
         else {
             // no bump
-            driveOutCmd = new DriveFastOnHeadingCommand(180, backward, 330, false, driveSubsystem);
+            driveOutCmd = new DriveFastOnHeadingCommand(180, backward, 360, false, driveSubsystem);
         }
         addCommands(driveOutCmd
             .alongWith(new ExtendArmCommand(0, armSubsystem)
