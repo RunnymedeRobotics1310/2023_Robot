@@ -197,12 +197,12 @@ public final class Constants {
         /** The maximum speed to drive the arm lift - manually or automatically */
         public static final double  MAX_LIFT_DOWN_SPEED                 = .2;
         /** Setting MAX_LIFT_UP_SPEED to .3 causes arm to overshoot target */
-        public static final double  MAX_LIFT_UP_SPEED                   = .2;
-        public static final double  MAX_LIFT_SLOW_ZONE_SPEED            = .1;
+        public static final double  MAX_LIFT_UP_SPEED                   = .4;
+        public static final double  MAX_LIFT_SLOW_ZONE_SPEED            = .2;
 
         public static final double  ARM_LIFT_LIMIT_ENCODER_VALUE        = 16;
         public static final double  ARM_LIFT_ANGLE_TOLERANCE_DEGREES    = 2;
-        public static final double  ARM_LIFT_SLOW_ZONE_DEGREES          = 5;
+        public static final double  ARM_LIFT_SLOW_ZONE_DEGREES          = 10;
 
         public static final double  CLEAR_FRAME_ARM_ANGLE               = 36;
 

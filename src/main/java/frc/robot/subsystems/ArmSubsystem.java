@@ -644,8 +644,16 @@ public class ArmSubsystem extends SubsystemBase {
             }
 
             // Slow down if approaching the limit
+            // if 3/4 through the slow zone, use 1/4 the max slow zone speed
+            if (Math.abs(getArmLiftAngle() - ArmConstants.ARM_LIFT_LIMIT_DEGREES) < (ArmConstants.ARM_LIFT_SLOW_ZONE_DEGREES/4)) {
+                return Math.min(inputSpeed, ArmConstants.MAX_LIFT_SLOW_ZONE_SPEED/4);
+            }
+            // if halfway through the slow zone, use half the max slow zone speed
+            if (Math.abs(getArmLiftAngle() - ArmConstants.ARM_LIFT_LIMIT_DEGREES) < (ArmConstants.ARM_LIFT_SLOW_ZONE_DEGREES/2)) {
+                return Math.min(inputSpeed, ArmConstants.MAX_LIFT_SLOW_ZONE_SPEED/2);
+            }
+            // if in the upper-half of the slow zone, use the slow zone max speed
             if (Math.abs(getArmLiftAngle() - ArmConstants.ARM_LIFT_LIMIT_DEGREES) < ArmConstants.ARM_LIFT_SLOW_ZONE_DEGREES) {
-
                 return Math.min(inputSpeed, ArmConstants.MAX_LIFT_SLOW_ZONE_SPEED);
             }
 
