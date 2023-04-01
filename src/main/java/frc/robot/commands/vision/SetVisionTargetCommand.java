@@ -1,16 +1,18 @@
 package frc.robot.commands.vision;
 
+import static frc.robot.Constants.VisionConstants.CameraView.HIGH;
+import static frc.robot.Constants.VisionConstants.CameraView.LOW;
+import static frc.robot.Constants.VisionConstants.CameraView.MID;
+
 import frc.robot.Constants;
 import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.subsystems.VisionSubsystem;
-
-import static frc.robot.Constants.VisionConstants.CameraView.*;
 
 public class SetVisionTargetCommand extends RunnymedeCommandBase {
 
     private final VisionSubsystem                        visionSubsystem;
     private final Constants.VisionConstants.VisionTarget target;
-    private boolean targetValid = false;
+    private boolean                                      targetValid = false;
 
     public SetVisionTargetCommand(Constants.VisionConstants.VisionTarget target, VisionSubsystem visionSubsystem) {
 
@@ -40,16 +42,27 @@ public class SetVisionTargetCommand extends RunnymedeCommandBase {
     }
 
     @Override
+    public void execute() {
+        if (targetValid) {
+            if (!(visionSubsystem.getCurrentVisionTarget() == target && visionSubsystem.isCameraInPositionForTarget())) {
+                visionSubsystem.setVisionTarget(target);
+            }
+        }
+    }
+
+    @Override
     public boolean isFinished() {
 
         if (targetValid) {
             if (visionSubsystem.getCurrentVisionTarget() == target && visionSubsystem.isCameraInPositionForTarget()) {
                 setFinishReason("Vision system positioned");
                 return true;
-            } else {
+            }
+            else {
                 return false;
             }
-        } else {
+        }
+        else {
             setFinishReason("Invalid target - finishing.");
             return true;
         }
