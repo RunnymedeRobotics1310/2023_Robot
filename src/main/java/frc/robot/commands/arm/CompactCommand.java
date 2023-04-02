@@ -31,7 +31,6 @@ public class CompactCommand extends BaseArmCommand {
         else {
             state = State.RETRACT;
         }
-        commandStart = new System.currentTimeMillis();
 
         logCommandStart("Starting State " + state);
     }
