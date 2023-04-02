@@ -9,6 +9,7 @@ import static frc.robot.commands.drive.DriveFastOnHeadingCommand.Direction.forwa
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
@@ -201,6 +202,7 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         /*
          * Score the cube
          */
+        addCommands(new WaitCommand(.1));
         addCommands(new ReleaseCommand(armSubsystem));
 
         /*
