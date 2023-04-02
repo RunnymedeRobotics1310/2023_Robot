@@ -31,6 +31,7 @@ public class CompactCommand extends BaseArmCommand {
         else {
             state = State.RETRACT;
         }
+        commandStart = new System.currentTimeMillis();
 
         logCommandStart("Starting State " + state);
     }
@@ -99,6 +100,13 @@ public class CompactCommand extends BaseArmCommand {
 
     @Override
     public boolean isFinished() {
+
+        long timeout = 3000;
+        if (System.currentTimeMillis() - initializeTime > timeout) {
+            setFinishReason("Command timed out after " + timeout + "ms");
+            return true;
+        }
+
 
         if (isCompactPose()) {
             setFinishReason("in Compact Pose");
