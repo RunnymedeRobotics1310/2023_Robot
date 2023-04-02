@@ -281,7 +281,7 @@ public final class Constants {
         // For our first qual match we will try 100 degrees
         public static final ArmPosition SCORE_TOP_CONE_AUTO_POSITION     = new ArmPosition(101, 55);                            // Confirmed
         public static final ArmPosition SCORE_TOP_CONE_POSITION          = new ArmPosition(99, 54);                             // Confirmed
-        public static final ArmPosition SCORE_TOP_CUBE_AUTO_POSITION     = new ArmPosition(101, 50);
+        public static final ArmPosition SCORE_TOP_CUBE_AUTO_POSITION     = new ArmPosition(101, 55);
         public static final ArmPosition SCORE_TOP_CUBE_POSITION          = new ArmPosition(90, 50);                             // Confirmed
 
         public static final ArmPosition SCORE_MIDDLE_CONE_POSITION       = new ArmPosition(85, 7);                              // Confirmed
