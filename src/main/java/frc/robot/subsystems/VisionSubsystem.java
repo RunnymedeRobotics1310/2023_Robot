@@ -167,8 +167,8 @@ public class VisionSubsystem extends SubsystemBase {
             return 0;
         }
 
-        // Return the angle offset based on a the target
-        if (getCurrentVisionTarget() == VisionTarget.CUBE_GROUND) {
+        // Return the angle offset based on the target
+        if (currentVisionTarget == CUBE_GROUND) {
 
             // CUBE offset measurements.
 
@@ -177,8 +177,12 @@ public class VisionSubsystem extends SubsystemBase {
 
             return getTargetX() - 10 + (14 + getTargetY()) / 10;
         }
-        else if (getCurrentVisionTarget() == VisionTarget.APRILTAG_GRID) {
+        else if (currentVisionTarget == APRILTAG_GRID) {
             return getTargetX() - 10;
+        } else if (getCurrentVisionTarget() == POST_HIGH) {
+            return getTargetX() - 10; // FIXME: This is an untested guess 2023-04-02
+        } else if (currentVisionTarget == CONE_GROUND) {
+            // not yet implemented
         }
 
         // FIXME: return the filtered cone value if a cone.
@@ -186,27 +190,12 @@ public class VisionSubsystem extends SubsystemBase {
         return getTarget()[0];
     }
 
-    public double getTargetOffset() {
-        // FIXME: do proper trigonometry and compute the offset in
-        // degrees between the target and "straight ahead".
-        // For now, the code will just return -10 if it's to the left of
-        // center, +10 if it's to the right of center, but we should be
-        // able to be much more precise than this
-        if (isConeTargetAcquired() || isCubeTargetAcquired()) {
-            // note... we MIGHT switch between having a valid target and not
-            // having a valid target between the is*TargetAcquired() and the
-            // subsequent call to getTarget(). Measure to see if this is a
-            // problem, and if so, code more defensively.
-            double[] tgt = getTarget();
-            if (tgt[0] < 0)
-                return -3.0;
-            if (tgt[0] > 0)
-                return 3.0;
-            return 0.0;
-        }
-        else {
-            throw new IllegalStateException("Cannot get an offset because no target has been acquired");
-        }
+    public double getTargetDistance() {
+        return -1.0; // fixme: calculate distance
+    }
+
+    public double getTargetVerticalOffset() {
+        return getTargetY(); // fixme: verify that this is correct - perhaps switch on target type?
     }
 
     public boolean isConeTargetAcquired() {
