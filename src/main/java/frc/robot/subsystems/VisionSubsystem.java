@@ -1,13 +1,6 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.VisionConstants.VisionTarget.APRILTAG_GRID;
-import static frc.robot.Constants.VisionConstants.VisionTarget.CONE_GROUND;
-import static frc.robot.Constants.VisionConstants.VisionTarget.CONE_SUBSTATION;
-import static frc.robot.Constants.VisionConstants.VisionTarget.CUBE_GROUND;
-import static frc.robot.Constants.VisionConstants.VisionTarget.CUBE_SUBSTATION;
-import static frc.robot.Constants.VisionConstants.VisionTarget.NONE;
-import static frc.robot.Constants.VisionConstants.VisionTarget.POST_HIGH;
-import static frc.robot.Constants.VisionConstants.VisionTarget.POST_LOW;
+import static frc.robot.Constants.VisionConstants.VisionTarget.*;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -15,9 +8,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -180,7 +171,7 @@ public class VisionSubsystem extends SubsystemBase {
             return getTargetX() - 10;
         }
         else if (getCurrentVisionTarget() == POST_HIGH) {
-            return getTargetX() - 10; // FIXME: This is an untested guess 2023-04-02
+            return getTargetX() - 11;
         }
         else if (currentVisionTarget == CONE_GROUND) {
             // not yet implemented
@@ -199,8 +190,7 @@ public class VisionSubsystem extends SubsystemBase {
         double ty = getTargetY();
         switch (currentVisionTarget) {
         case POST_HIGH:
-            // fixme: measure this and return offset angle for expected ty values
-            return ty * 0;
+            return 14 - ty;
         case POST_LOW:
         case APRILTAG_GRID:
         case CONE_GROUND:

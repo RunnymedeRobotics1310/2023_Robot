@@ -158,7 +158,8 @@ public class RobotContainer {
 
         // scoring (a/b/y/x)
         new Trigger(() -> (operatorInput.isHigh()))
-            .onTrue(new ScoreCommand(ScoringRow.TOP, armSubsystem));
+            .onTrue(new ScoreCommand(ScoringRow.TOP, armSubsystem)
+                .alongWith(new SetVisionTargetCommand(VisionTarget.POST_HIGH, visionSubsystem)));
 
         new Trigger(() -> (operatorInput.isMid()))
             .onTrue(new ScoreCommand(ScoringRow.MIDDLE, armSubsystem));
@@ -167,7 +168,7 @@ public class RobotContainer {
             .onTrue(new ScoreCommand(ScoringRow.BOTTOM, armSubsystem));
 
         new Trigger(() -> (operatorInput.autoTune()))
-            .onTrue(new AutoTuneScore(ScoringRow.TOP, armSubsystem, visionSubsystem, driveSubsystem));
+            .onTrue(new AutoTuneScore(ScoringRow.TOP, visionSubsystem, driveSubsystem));
 
         new Trigger(() -> (operatorInput.isDrop()))
             .onTrue(new ReleaseCommand(armSubsystem));
