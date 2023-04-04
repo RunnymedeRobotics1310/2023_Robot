@@ -178,9 +178,11 @@ public class VisionSubsystem extends SubsystemBase {
         }
         else if (currentVisionTarget == APRILTAG_GRID) {
             return getTargetX() - 10;
-        } else if (getCurrentVisionTarget() == POST_HIGH) {
+        }
+        else if (getCurrentVisionTarget() == POST_HIGH) {
             return getTargetX() - 10; // FIXME: This is an untested guess 2023-04-02
-        } else if (currentVisionTarget == CONE_GROUND) {
+        }
+        else if (currentVisionTarget == CONE_GROUND) {
             // not yet implemented
         }
 
@@ -195,7 +197,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     public double getTargetVerticalAngleOffset() {
         double ty = getTargetY();
-        switch(currentVisionTarget) {
+        switch (currentVisionTarget) {
         case POST_HIGH:
             // fixme: measure this and return offset angle for expected ty values
             return ty * 0;
@@ -328,7 +330,7 @@ public class VisionSubsystem extends SubsystemBase {
         case NONE:
         default:
             this.pipeline.setNumber(PIPELINE_VISUAL);
-            this.camMode.setInteger(CAM_MODE_DRIVER);
+            this.camMode.setInteger(CAM_MODE_VISION);
             this.ledMode.setInteger(LED_MODE_OFF);
             break;
         }
@@ -394,8 +396,7 @@ public class VisionSubsystem extends SubsystemBase {
             .append(", Camera in position ").append(isCameraInPositionForTarget())
             .append(", (encoder ").append(Math.round(getCameraEncoder() * 10) / 10d).append(")")
             .append(", Target Detected ").append(isVisionTargetFound())
-            .append(", target angle ").append(Math.round(getTargetAngleOffset() * 10) / 10d)
-            ;
+            .append(", target angle ").append(Math.round(getTargetAngleOffset() * 10) / 10d);
 
         return sb.toString();
     }
@@ -522,17 +523,19 @@ public class VisionSubsystem extends SubsystemBase {
             setCameraMotorSpeed(VisionConstants.MAX_CAMERA_MOTOR_SPEED);
 
         }
-        else if (desiredView == CameraView.LOW){
+        else if (desiredView == CameraView.LOW) {
 
             // Run the motor in reverse to lower the camera view
             setCameraMotorSpeed(-VisionConstants.MAX_CAMERA_MOTOR_SPEED);
 
-        } else if (desiredView == CameraView.MID) {
+        }
+        else if (desiredView == CameraView.MID) {
             double cameraEncoderPosition = getCameraEncoder();
 
             if (cameraEncoderPosition < VisionConstants.CAMERA_MID_ENCODER_VALUE) {
                 setCameraMotorSpeed(VisionConstants.MAX_CAMERA_MOTOR_SPEED);
-            } else {
+            }
+            else {
                 setCameraMotorSpeed(-VisionConstants.MAX_CAMERA_MOTOR_SPEED);
             }
         }
