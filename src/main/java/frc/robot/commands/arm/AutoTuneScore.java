@@ -1,5 +1,6 @@
 package frc.robot.commands.arm;
 
+import frc.robot.Constants;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.subsystems.ArmSubsystem;
@@ -7,84 +8,152 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 import static frc.robot.Constants.GameConstants.GamePiece.NONE;
-import static frc.robot.Constants.GameConstants.GamePiece.CONE;
-import static frc.robot.Constants.GameConstants.GamePiece.CUBE;
 
 public class AutoTuneScore extends BaseArmCommand {
-    private final DriveSubsystem driveSubsystem;
+    private final DriveSubsystem  driveSubsystem;
     private final VisionSubsystem visionSubsystem;
 
-    private GamePiece heldGamePiece = NONE;
+    private ScoringRow scoringRow    = ScoringRow.TOP;
+    private GamePiece  heldGamePiece = NONE;
 
-    private double visionTargetHeadingError = 0;
+    private double visionTargetHeadingAngleError = 0;
 
-    private double visionTargetHeightError = 0;
+    private double visionTargetVerticalAngleError = 0;
 
-    private double visionTargetExtendError = 0;
+    private double visionTargetDistanceError = 0;
 
-    private double ultrasonicDistanceCm = 0;
 
-    // fixme; once these are fully established, move them to Constants in a reasonable location
-    /**
-     * Exactly how far off the target angle offset from the vision subsystem we want to be when perfectly aligned
-     */
-    private static final double SCORE_CONE_HIGH_IDEAL_HEADING_ERROR = 0;
-    /**
-     * Exactly how far from the target height we want the arm to be raised to, in order to
-     * be perfectly aligned
-     */
-    private static final double SCORE_CONE_HIGH_IDEAL_TARGET_HEIGHT_ERROR = 0;
-    /**
-     * Exactly how much difference between the arm extension and the distance from vision
-     * we want to be
-     */
-    private static final double SCORE_CONE_HIGH_IDEAL_EXTEND_ERROR = 0;
-    private static final double SCORE_CONE_HIGH_IDEAL_ULTRASONIC_DISTANCE_ERROR = 0;
+    private static final double SCORE_CONE_HIGH_MAX_HEADING_ERROR       = 1; // fixme: correct the value
+    private static final double SCORE_CONE_HIGH_TARGET_VISION_ANGLE     = 32; // fixme: measure and set
+    private static final double SCORE_CONE_HIGH_MAX_TARGET_HEIGHT_ERROR = 1; // fixme: correct the value
+    private static final double SCORE_CONE_HIGH_TARGET_DISTANCE         = 99; // fixme: measure and set
+    private static final double SCORE_CONE_HIGH_MAX_EXTEND_ERROR        = 1; // fixme: correct the value
 
-    public AutoTuneScore(ScoringRow scoringRow, ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem, DriveSubsystem driveSubsystem) {
+    public AutoTuneScore(ScoringRow scoringRow, ArmSubsystem armSubsystem, VisionSubsystem visionSubsystem,
+        DriveSubsystem driveSubsystem) {
         super(armSubsystem);
-        this.driveSubsystem = driveSubsystem;
+        this.driveSubsystem  = driveSubsystem;
         this.visionSubsystem = visionSubsystem;
         addRequirements(driveSubsystem, visionSubsystem); // arm subsystem is automatically added as a requirement
+        this.scoringRow = scoringRow;
     }
 
     @Override
     public void initialize() {
         super.initialize();
-        heldGamePiece = armSubsystem.getHeldGamePiece();
-        if (heldGamePiece == CONE) {
-            visionTargetHeadingError = visionSubsystem.getTargetAngleOffset();
-            visionTargetHeightError = visionSubsystem.getTargetVerticalOffset();
-            visionTargetExtendError = visionSubsystem.getTargetDistance();
-            ultrasonicDistanceCm    = driveSubsystem.getUltrasonicDistanceCm();
-        }
+        heldGamePiece                  = armSubsystem.getHeldGamePiece();
+        visionTargetHeadingAngleError  = 0;
+        visionTargetVerticalAngleError = 0;
+        visionTargetDistanceError      = 0;
     }
 
     @Override
     public void execute() {
-        switch (heldGamePiece) {
-        case CONE:
-            // fixme: align wheels - back up to correct, drive forward to correct
-            // fixme: align height - if not in a suitable scoring position, raise/lower arm
-            // fixme: align extend - if not in suitable position, extend a bit
-            break;
-        case CUBE:
-            setFinishReason("cannot auto-tune positioning for cube");
-            break;
-        case NONE:
-            setFinishReason("no game piece detected");
-            break;
-        default:
-            setFinishReason("invalid game piece: "+heldGamePiece);
-            break;
-    }
+        align();
+        adjustHeight();
+        adjustExtension();
     }
 
     @Override
     public boolean isFinished() {
-        if (heldGamePiece == CUBE) {
-            return true;
+        boolean tuned = isAligned() && isHeightOk() && isExtendOk();
+        setFinishReason("Robot in position to score");
+        return tuned;
+    }
+
+    private void align() {
+
+        // compute the error
+        switch (heldGamePiece) {
+        case CONE:
+            // any offset is bad
+            visionTargetHeadingAngleError = visionSubsystem.getTargetAngleOffset();
+            break;
+        case CUBE:
+        default:
+            return;
         }
 
+        // fix if out of alignment
+        if (!isAligned()) {
+            final double ADJUST_DRIVE_SPEED = 0.01;
+            double       turn               = visionTargetHeadingAngleError * .01;
+            double       leftSpeed          = ADJUST_DRIVE_SPEED + turn;
+            double       rightSpeed         = ADJUST_DRIVE_SPEED - turn;
+            // NOTE: the robot may already be pushed right up against the grid
+            driveSubsystem.setMotorSpeeds(leftSpeed, rightSpeed);
+        }
+        else {
+            driveSubsystem.stop();
+        }
+    }
+
+    private boolean isAligned() {
+        switch (heldGamePiece) {
+        case CONE:
+            return Math.abs(visionTargetHeadingAngleError) > SCORE_CONE_HIGH_MAX_HEADING_ERROR;
+        case CUBE:
+        default:
+            return true;
+        }
+    }
+
+    private void adjustHeight() {
+        // compute error
+        switch (heldGamePiece) {
+        case CONE:
+            visionTargetVerticalAngleError = SCORE_CONE_HIGH_TARGET_VISION_ANGLE - visionSubsystem.getTargetVerticalAngleOffset();
+            break;
+        case CUBE:
+        default:
+            visionTargetVerticalAngleError = 0;
+        }
+
+        // fix if incorrect
+        if (!isHeightOk()) {
+            // move arm one degree at a time to correct angle (note vision angle is not the same as arm angle)
+            double correction = Math.signum(visionTargetVerticalAngleError);
+            armSubsystem.moveArmLiftToAngle(armSubsystem.getArmLiftAngle() + correction);
+        }
+    }
+
+    private boolean isHeightOk() {
+
+        switch (heldGamePiece) {
+        case CONE:
+            return Math.abs(visionTargetVerticalAngleError) > SCORE_CONE_HIGH_MAX_TARGET_HEIGHT_ERROR;
+        case CUBE:
+        default:
+            return true;
+        }
+    }
+
+    private void adjustExtension() {
+        // compute error
+        switch (heldGamePiece) {
+        case CONE:
+            visionTargetDistanceError = SCORE_CONE_HIGH_TARGET_DISTANCE - visionSubsystem.getTargetDistanceCm();
+            break;
+        case CUBE:
+        default:
+            visionTargetDistanceError = 0;
+        }
+        // fix if incorrect
+        if (!isExtendOk()) {
+            // move extend one encoder count at a time until it is in position
+            double correction = Math.signum(visionTargetDistanceError);
+            moveArmExtendToEncoderCount(armSubsystem.getArmExtendEncoder() + correction,
+                Constants.ArmConstants.MAX_LIFT_SLOW_ZONE_SPEED);
+        }
+    }
+
+    private boolean isExtendOk() {
+        switch (heldGamePiece) {
+        case CONE:
+            return Math.abs(visionTargetDistanceError) > SCORE_CONE_HIGH_MAX_EXTEND_ERROR;
+        case CUBE:
+        default:
+            return true;
+        }
     }
 }

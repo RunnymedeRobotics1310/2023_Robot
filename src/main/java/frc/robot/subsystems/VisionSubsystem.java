@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.CameraView;
-import frc.robot.Constants.VisionConstants.VisionTarget;
 
 public class VisionSubsystem extends SubsystemBase {
 
@@ -190,12 +189,26 @@ public class VisionSubsystem extends SubsystemBase {
         return getTarget()[0];
     }
 
-    public double getTargetDistance() {
+    public double getTargetDistanceCm() {
         return -1.0; // fixme: calculate distance
     }
 
-    public double getTargetVerticalOffset() {
-        return getTargetY(); // fixme: verify that this is correct - perhaps switch on target type?
+    public double getTargetVerticalAngleOffset() {
+        double ty = getTargetY();
+        switch(currentVisionTarget) {
+        case POST_HIGH:
+            // fixme: measure this and return offset angle for expected ty values
+            return ty * 0;
+        case POST_LOW:
+        case APRILTAG_GRID:
+        case CONE_GROUND:
+        case CUBE_GROUND:
+            return 0; // not presently supported
+        case FIELD:
+        case NONE:
+        default:
+            return 0;
+        }
     }
 
     public boolean isConeTargetAcquired() {

@@ -162,6 +162,9 @@ public class RobotContainer {
         new Trigger(() -> (operatorInput.isLow()))
             .onTrue(new ScoreCommand(ScoringRow.BOTTOM, armSubsystem));
 
+        new Trigger(() -> (operatorInput.autoTune()))
+            .onTrue(new AutoTuneScore(ScoringRow.TOP, armSubsystem, visionSubsystem, driveSubsystem));
+
         new Trigger(() -> (operatorInput.isDrop()))
             .onTrue(new ReleaseCommand(armSubsystem));
 
