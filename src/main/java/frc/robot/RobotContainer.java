@@ -152,6 +152,10 @@ public class RobotContainer {
             .onTrue(new SetGyroHeadingCommand(0, driveSubsystem)
                 .andThen(new ResetGyroPitchCommand(driveSubsystem)));
 
+        // Compact the robot (safe for game piece)
+        new Trigger(() -> operatorInput.isCompact())
+            .onTrue(new CompactCommand_SafeForGamePiece(armSubsystem));
+
         // scoring (a/b/y/x)
         new Trigger(() -> (operatorInput.isHigh()))
             .onTrue(new ScoreCommand(ScoringRow.TOP, armSubsystem));

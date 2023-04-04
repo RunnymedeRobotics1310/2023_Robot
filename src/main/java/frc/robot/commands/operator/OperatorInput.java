@@ -96,6 +96,10 @@ public class OperatorInput {
         return driverController.getStartButton() || operatorController.getStartButton();
     }
 
+    public boolean isCompact() {
+        return operatorController.getBackButton();
+    }
+
     public boolean isVisionReset() {
         return shift() && driverController.getBackButton() && !driverController.getStartButton();
     }
@@ -149,7 +153,9 @@ public class OperatorInput {
         return operatorController.getPOV() == 0;
     }
 
-    public boolean autoTune() { return operatorController.getPOV() == 90; }
+    public boolean autoTune() {
+        return operatorController.getPOV() == 90;
+    }
 
     public boolean calibratePincher() {
         return operatorController.getPOV() == 270;
