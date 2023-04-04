@@ -1,10 +1,9 @@
 package frc.robot.commands.vision;
 
-import static frc.robot.Constants.VisionConstants.CameraView.HIGH;
-import static frc.robot.Constants.VisionConstants.CameraView.LOW;
-import static frc.robot.Constants.VisionConstants.CameraView.MID;
+import static frc.robot.Constants.VisionConstants.CameraView.*;
 
 import frc.robot.Constants;
+import frc.robot.Constants.VisionConstants.CameraView;
 import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.subsystems.VisionSubsystem;
 
@@ -26,13 +25,12 @@ public class SetVisionTargetCommand extends RunnymedeCommandBase {
     public void initialize() {
 
         logCommandStart("Vision target : " + target);
-        Constants.VisionConstants.CameraView tv = target.getCameraView();
+        CameraView targetCameraView = target.getCameraView();
 
-        if (!(tv == HIGH || tv == MID || tv == LOW)) {
+        if (!(targetCameraView == HIGH || targetCameraView == MID || targetCameraView == LOW)) {
 
-            // Only HIGH or LOW are valid for this command, otherwise cancel
+            // Only HIGH, LOW and MID are valid for this command, otherwise cancel
             log("Unsupported camera view: " + target.getCameraView() + ". Cancelling.");
-            this.cancel();
             targetValid = false;
             return;
         }
@@ -43,8 +41,12 @@ public class SetVisionTargetCommand extends RunnymedeCommandBase {
 
     @Override
     public void execute() {
+
         if (targetValid) {
-            if (!(visionSubsystem.getCurrentVisionTarget() == target && visionSubsystem.isCameraInPositionForTarget())) {
+
+            if (!(visionSubsystem.getCurrentVisionTarget() == target
+                && visionSubsystem.isCameraInPositionForTarget())) {
+
                 visionSubsystem.setVisionTarget(target);
             }
         }
