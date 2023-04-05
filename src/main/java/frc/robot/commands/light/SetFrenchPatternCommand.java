@@ -1,9 +1,9 @@
 package frc.robot.commands.light;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.subsystems.LightSubsystem;
 
-public class SetFrenchPatternCommand extends CommandBase {
+public class SetFrenchPatternCommand extends RunnymedeCommandBase {
 
     private final LightSubsystem lightSubsystem;
 
@@ -17,7 +17,13 @@ public class SetFrenchPatternCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        lightSubsystem.setPattern(0, Patterns.FRENCH);
+
+        LightPattern p = new LightPattern();
+        p.append(Patterns.FRENCH)
+            .append(Patterns.FRENCH);
+
+        this.lightSubsystem.setPattern(0, p);
+
     }
 
     @Override

@@ -1,11 +1,11 @@
 package frc.robot.commands.light;
 
-import edu.wpi.first.wpilibj.util.Color;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import edu.wpi.first.wpilibj.util.Color;
 
 public class LightPattern {
   private final List<Color> lights = new ArrayList<>();
@@ -16,6 +16,13 @@ public class LightPattern {
 
   public LightPattern append(Color color) {
     lights.add(color);
+    return this;
+  }
+
+  public LightPattern append(LightPattern pattern) {
+    for (Color c : pattern.getLights()) {
+      lights.add(c);
+    }
     return this;
   }
 

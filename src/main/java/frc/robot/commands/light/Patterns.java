@@ -2,14 +2,24 @@ package frc.robot.commands.light;
 
 import static edu.wpi.first.wpilibj.util.Color.kBlack;
 import static edu.wpi.first.wpilibj.util.Color.kBlue;
+import static edu.wpi.first.wpilibj.util.Color.kBlueViolet;
+import static edu.wpi.first.wpilibj.util.Color.kLightPink;
+import static edu.wpi.first.wpilibj.util.Color.kOrangeRed;
 import static edu.wpi.first.wpilibj.util.Color.kRed;
 import static edu.wpi.first.wpilibj.util.Color.kWhite;
+import static edu.wpi.first.wpilibj.util.Color.kYellow;
 
 import edu.wpi.first.wpilibj.util.Color;
 
 public class Patterns {
-    public static final LightPattern FRENCH    = new LightPattern(kBlue, kRed, kWhite);
-    public static final LightPattern RUNNYMEDE = new LightPattern(kRed, kBlack);
+    public static final LightPattern FRENCH       = new LightPattern(kBlue, kRed, kWhite);
+    public static final LightPattern RUNNYMEDE    = new LightPattern(kRed, kBlack);
+    public static final LightPattern CONE_PICKUP  = new LightPattern(kYellow);
+    public static final LightPattern CUBE_PICKUP  = new LightPattern(kBlueViolet);
+    public static final LightPattern ARM_UP       = new LightPattern(kOrangeRed);
+    public static final LightPattern GYRO_ZERO    = new LightPattern(kLightPink);
+    public static final LightPattern DEFAULT_GLOW = new LightPattern(kRed);
+    public static final LightPattern OFF          = new LightPattern(kBlack);
 
     public static LightPattern createSolidPattern(int length, Color color) {
 
