@@ -1,6 +1,13 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.VisionConstants.VisionTarget.*;
+import static frc.robot.Constants.VisionConstants.VisionTarget.APRILTAG_GRID;
+import static frc.robot.Constants.VisionConstants.VisionTarget.CONE_GROUND;
+import static frc.robot.Constants.VisionConstants.VisionTarget.CONE_SUBSTATION;
+import static frc.robot.Constants.VisionConstants.VisionTarget.CUBE_GROUND;
+import static frc.robot.Constants.VisionConstants.VisionTarget.CUBE_SUBSTATION;
+import static frc.robot.Constants.VisionConstants.VisionTarget.NONE;
+import static frc.robot.Constants.VisionConstants.VisionTarget.POST_HIGH;
+import static frc.robot.Constants.VisionConstants.VisionTarget.POST_LOW;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -8,7 +15,9 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.networktables.*;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

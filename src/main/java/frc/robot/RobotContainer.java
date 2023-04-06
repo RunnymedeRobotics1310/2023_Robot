@@ -42,6 +42,9 @@ import frc.robot.commands.drive.DefaultDriveCommand;
 import frc.robot.commands.drive.DriveToGamePieceCommand;
 import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
+import frc.robot.commands.light.DefaultLightCommand;
+import frc.robot.commands.light.SetConePickUpLightsCommand;
+import frc.robot.commands.light.SetCubePickUpLightsCommand;
 import frc.robot.commands.light.SetHoldingConeLightsCommand;
 import frc.robot.commands.light.SetHoldingCubeLightsCommand;
 import frc.robot.commands.operator.OperatorInput;
@@ -51,7 +54,6 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LightSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
-import main.java.frc.robot.commands.light.DefaultLightCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -207,10 +209,12 @@ public class RobotContainer {
 
         // grab things
         new Trigger(() -> (operatorInput.isPickUpCone()))
-            .onTrue(new StartIntakeCommand(operatorInput, armSubsystem, visionSubsystem));
+            .onTrue(new StartIntakeCommand(operatorInput, armSubsystem, visionSubsystem)
+                .deadlineWith(new SetConePickUpLightsCommand(lightSubsystem)));
 
         new Trigger(() -> (operatorInput.isPickUpCube()))
-            .onTrue(new StartIntakeCommand(operatorInput, armSubsystem, visionSubsystem));
+            .onTrue(new StartIntakeCommand(operatorInput, armSubsystem, visionSubsystem)
+                .deadlineWith(new SetCubePickUpLightsCommand(lightSubsystem)));
 
         new Trigger(() -> (operatorInput.balance()))
             .onTrue(new BalanceCommand(driveSubsystem));

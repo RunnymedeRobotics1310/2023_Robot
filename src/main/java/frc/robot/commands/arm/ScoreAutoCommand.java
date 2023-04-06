@@ -1,12 +1,12 @@
 package frc.robot.commands.arm;
 
+import static frc.robot.Constants.GameConstants.GamePiece.NONE;
+
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ArmPosition;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.subsystems.ArmSubsystem;
-
-import static frc.robot.Constants.GameConstants.GamePiece.NONE;
 
 public class ScoreAutoCommand extends BaseArmCommand {
 

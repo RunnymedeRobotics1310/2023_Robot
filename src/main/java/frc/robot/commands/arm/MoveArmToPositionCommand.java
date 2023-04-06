@@ -1,11 +1,12 @@
 package frc.robot.commands.arm;
 
+import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_ARM_ANGLE;
+import static frc.robot.Constants.ArmConstants.MAX_ARM_EXTEND_INSIDE_FRAME;
+import static frc.robot.Constants.ArmConstants.SAFELY_CLEAR_FRAME_POSITION;
+
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.ArmSubsystem;
-
-import static frc.robot.Constants.ArmConstants.*;
-import static frc.robot.Constants.ArmConstants.CLEAR_FRAME_ARM_ANGLE;
 
 
 public class MoveArmToPositionCommand extends BaseArmCommand {

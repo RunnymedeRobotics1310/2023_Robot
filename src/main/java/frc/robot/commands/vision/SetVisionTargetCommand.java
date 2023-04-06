@@ -1,6 +1,8 @@
 package frc.robot.commands.vision;
 
-import static frc.robot.Constants.VisionConstants.CameraView.*;
+import static frc.robot.Constants.VisionConstants.CameraView.HIGH;
+import static frc.robot.Constants.VisionConstants.CameraView.LOW;
+import static frc.robot.Constants.VisionConstants.CameraView.MID;
 
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants.CameraView;

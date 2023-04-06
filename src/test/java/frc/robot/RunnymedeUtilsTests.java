@@ -1,9 +1,9 @@
 package frc.robot;
 
-import org.junit.Test;
-
 import static frc.robot.RunnymedeUtils.calculateFastestSpeed;
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 public class RunnymedeUtilsTests {
 

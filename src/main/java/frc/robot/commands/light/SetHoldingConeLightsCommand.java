@@ -16,74 +16,33 @@ public class SetHoldingConeLightsCommand extends CommandBase {
         addRequirements(lightSubsystem);
     }
 
-    double       executeStartTime;
-    double       startTime;
-    double       period;
-    double       endTime    = 5000;
-    LightPattern lightsOn   = new LightPattern();
-    LightPattern lightsGlow = new LightPattern();
+
+    LightPattern lightsOn = new LightPattern();
 
     @Override
     public void initialize() {
 
-        startTime        = System.currentTimeMillis();
-        executeStartTime = System.currentTimeMillis();
-        period           = 500;
-        lightsOn         = new LightPattern();
-        lightsGlow       = new LightPattern();
 
-        /*
-         * lightsOn.append(Patterns.CONE_PICKUP)
-         * .append(Patterns.CONE_PICKUP)
-         * .append(Patterns.CONE_PICKUP)
-         * .append(Patterns.CONE_PICKUP)
-         * .append(Patterns.CONE_PICKUP)
-         * .append(Patterns.CONE_PICKUP)
-         * .append(Patterns.CONE_PICKUP)
-         * .append(Patterns.CONE_PICKUP)
-         * .append(Patterns.CONE_PICKUP)
-         * .append(Patterns.CONE_PICKUP);
-         */
+        lightsOn = new LightPattern();
 
-        lightsOn.append(Patterns.ARM_UP)
-            .append(Patterns.ARM_UP)
-            .append(Patterns.ARM_UP)
-            .append(Patterns.ARM_UP)
-            .append(Patterns.ARM_UP)
-            .append(Patterns.ARM_UP)
-            .append(Patterns.ARM_UP)
-            .append(Patterns.ARM_UP)
-            .append(Patterns.ARM_UP)
-            .append(Patterns.ARM_UP);
 
-        lightsGlow.append(Patterns.DEFAULT_GLOW)
-            .append(Patterns.DEFAULT_GLOW)
-            .append(Patterns.DEFAULT_GLOW)
-            .append(Patterns.DEFAULT_GLOW)
-            .append(Patterns.DEFAULT_GLOW)
-            .append(Patterns.DEFAULT_GLOW)
-            .append(Patterns.DEFAULT_GLOW)
-            .append(Patterns.DEFAULT_GLOW)
-            .append(Patterns.DEFAULT_GLOW)
-            .append(Patterns.DEFAULT_GLOW);
+        lightsOn.append(Patterns.CONE_PICKUP)
+            .append(Patterns.CONE_PICKUP)
+            .append(Patterns.CONE_PICKUP)
+            .append(Patterns.CONE_PICKUP)
+            .append(Patterns.CONE_PICKUP)
+            .append(Patterns.CONE_PICKUP)
+            .append(Patterns.CONE_PICKUP)
+            .append(Patterns.CONE_PICKUP)
+            .append(Patterns.CONE_PICKUP)
+            .append(Patterns.CONE_PICKUP);
+
+        lightSubsystem.setPattern(0, lightsOn);
+
+
 
     }
 
-    @Override
-    public void execute() {
-
-        if (System.currentTimeMillis() - executeStartTime < period) {
-            lightSubsystem.setPattern(0, lightsOn);
-
-        }
-        else if (System.currentTimeMillis() - executeStartTime > period) {
-            lightSubsystem.setPattern(0, lightsGlow);
-        }
-
-        if (System.currentTimeMillis() - executeStartTime >= period * 2) {
-            executeStartTime = System.currentTimeMillis();
-        }
-    }
 
     @Override
     public boolean isFinished() {

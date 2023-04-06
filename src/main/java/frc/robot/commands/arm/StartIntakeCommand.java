@@ -1,5 +1,8 @@
 package frc.robot.commands.arm;
 
+import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION;
+import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_POSITION;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants;
@@ -10,9 +13,6 @@ import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
-
-import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_AUTO_POSITION;
-import static frc.robot.Constants.ArmConstants.GROUND_PICKUP_POSITION;
 
 public class StartIntakeCommand extends BaseArmCommand {
 

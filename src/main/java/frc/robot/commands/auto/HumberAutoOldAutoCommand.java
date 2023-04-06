@@ -3,12 +3,22 @@ package frc.robot.commands.auto;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.AutoConstants.AutoLane;
-import frc.robot.Constants.GameConstants.*;
-import frc.robot.commands.auto.oldHumberCommands.*;
+import frc.robot.Constants.GameConstants.GamePiece;
+import frc.robot.Constants.GameConstants.ScoringRow;
+import frc.robot.Constants.GameConstants.Zone;
+import frc.robot.commands.auto.oldHumberCommands.HA_BalanceCommand;
+import frc.robot.commands.auto.oldHumberCommands.HA_CompactCommand;
+import frc.robot.commands.auto.oldHumberCommands.HA_DriveOnHeadingCommand;
+import frc.robot.commands.auto.oldHumberCommands.HA_ReleaseCommand;
+import frc.robot.commands.auto.oldHumberCommands.HA_ScoreAutoCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
-import frc.robot.subsystems.*;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 
 public class HumberAutoOldAutoCommand extends SequentialCommandGroup {
 

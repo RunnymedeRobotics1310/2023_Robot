@@ -1,11 +1,10 @@
 package frc.robot.commands.drive;
 
+import static frc.robot.RunnymedeUtils.calculateFastestSpeed;
+
 import frc.robot.Constants;
-import frc.robot.RunnymedeUtils;
 import frc.robot.commands.RunnymedeCommandBase;
 import frc.robot.subsystems.DriveSubsystem;
-
-import static frc.robot.RunnymedeUtils.calculateFastestSpeed;
 
 /**
  * This command will drive on a heading as fast as it safely can.

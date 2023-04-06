@@ -1,8 +1,8 @@
 package frc.robot.commands.arm;
 
-import frc.robot.subsystems.ArmSubsystem;
-
 import static frc.robot.Constants.ArmConstants.MAX_EXTEND_SPEED;
+
+import frc.robot.subsystems.ArmSubsystem;
 
 public class ExtendArmCommand extends BaseArmCommand {
 
