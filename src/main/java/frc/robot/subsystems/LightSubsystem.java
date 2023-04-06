@@ -55,7 +55,7 @@ public class LightSubsystem extends SubsystemBase {
          * Less if the LEDs are dimly lit. Single colour,
          * we can safely light 100 LEDs, Full white, about 33 LEDs.
          */
-        double               MAX_MILLIAMPS = 2000;
+        double               MAX_MILLIAMPS = 10000;
 
         // don't destroy the desired levels by overwriting buffer
         AddressableLEDBuffer dimmedBuffer  = null;

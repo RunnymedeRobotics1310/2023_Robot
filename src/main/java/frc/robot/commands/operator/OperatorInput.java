@@ -182,7 +182,6 @@ public class OperatorInput {
         return driverController.getPOV() == 90;
     }
 
-
     /**
      * return the raw underlying {@link RunnymedeGameController}. ONLY FOR USE IN TEST MODE.
      */

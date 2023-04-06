@@ -32,10 +32,39 @@ public class SetHoldingConeLightsCommand extends CommandBase {
         lightsOn         = new LightPattern();
         lightsGlow       = new LightPattern();
 
-        lightsOn.append(Patterns.CONE_PICKUP)
-            .append(Patterns.CONE_PICKUP);
+        /*
+         * lightsOn.append(Patterns.CONE_PICKUP)
+         * .append(Patterns.CONE_PICKUP)
+         * .append(Patterns.CONE_PICKUP)
+         * .append(Patterns.CONE_PICKUP)
+         * .append(Patterns.CONE_PICKUP)
+         * .append(Patterns.CONE_PICKUP)
+         * .append(Patterns.CONE_PICKUP)
+         * .append(Patterns.CONE_PICKUP)
+         * .append(Patterns.CONE_PICKUP)
+         * .append(Patterns.CONE_PICKUP);
+         */
+
+        lightsOn.append(Patterns.ARM_UP)
+            .append(Patterns.ARM_UP)
+            .append(Patterns.ARM_UP)
+            .append(Patterns.ARM_UP)
+            .append(Patterns.ARM_UP)
+            .append(Patterns.ARM_UP)
+            .append(Patterns.ARM_UP)
+            .append(Patterns.ARM_UP)
+            .append(Patterns.ARM_UP)
+            .append(Patterns.ARM_UP);
 
         lightsGlow.append(Patterns.DEFAULT_GLOW)
+            .append(Patterns.DEFAULT_GLOW)
+            .append(Patterns.DEFAULT_GLOW)
+            .append(Patterns.DEFAULT_GLOW)
+            .append(Patterns.DEFAULT_GLOW)
+            .append(Patterns.DEFAULT_GLOW)
+            .append(Patterns.DEFAULT_GLOW)
+            .append(Patterns.DEFAULT_GLOW)
+            .append(Patterns.DEFAULT_GLOW)
             .append(Patterns.DEFAULT_GLOW);
 
     }
@@ -59,13 +88,9 @@ public class SetHoldingConeLightsCommand extends CommandBase {
     @Override
     public boolean isFinished() {
 
-        if (System.currentTimeMillis() - startTime >= endTime) {
-            System.out.println("Cone Light Command ended");
-            return true;
-        }
-        else {
-            return false;
-        }
+        // This command ends when the piece is dropped
+        return false;
+
     }
 
     @Override

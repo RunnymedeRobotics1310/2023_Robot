@@ -33,9 +33,25 @@ public class SetHoldingCubeLightsCommand extends CommandBase {
         lightsGlow       = new LightPattern();
 
         lightsOn.append(Patterns.CUBE_PICKUP)
+            .append(Patterns.CUBE_PICKUP)
+            .append(Patterns.CUBE_PICKUP)
+            .append(Patterns.CUBE_PICKUP)
+            .append(Patterns.CUBE_PICKUP)
+            .append(Patterns.CUBE_PICKUP)
+            .append(Patterns.CUBE_PICKUP)
+            .append(Patterns.CUBE_PICKUP)
+            .append(Patterns.CUBE_PICKUP)
             .append(Patterns.CUBE_PICKUP);
 
         lightsGlow.append(Patterns.DEFAULT_GLOW)
+            .append(Patterns.DEFAULT_GLOW)
+            .append(Patterns.DEFAULT_GLOW)
+            .append(Patterns.DEFAULT_GLOW)
+            .append(Patterns.DEFAULT_GLOW)
+            .append(Patterns.DEFAULT_GLOW)
+            .append(Patterns.DEFAULT_GLOW)
+            .append(Patterns.DEFAULT_GLOW)
+            .append(Patterns.DEFAULT_GLOW)
             .append(Patterns.DEFAULT_GLOW);
 
     }
@@ -59,13 +75,9 @@ public class SetHoldingCubeLightsCommand extends CommandBase {
     @Override
     public boolean isFinished() {
 
-        if (System.currentTimeMillis() - startTime >= endTime) {
-            System.out.println("Cube Light Command ended");
-            return true;
-        }
-        else {
-            return false;
-        }
+        // This command ends when the piece is dropped
+        return false;
+
     }
 
     @Override
