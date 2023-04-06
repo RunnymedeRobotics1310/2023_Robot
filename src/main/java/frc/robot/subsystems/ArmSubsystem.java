@@ -47,6 +47,11 @@ public class ArmSubsystem extends SubsystemBase {
     // Arm lift encoder
     private RelativeEncoder        armExtendEncoder        = armExtendMotor.getEncoder();
     private double                 armExtendEncoderOffset  = 0;
+    /**
+     * Note the last time the arm speed was changed
+     */
+    private long   extendMotorSpeedSetTime = 0;
+
 
     /*
      * Pincher motor and encoder
@@ -462,6 +467,7 @@ public class ArmSubsystem extends SubsystemBase {
 
         armExtendSpeed = checkArmExtendLimits(speed);
         armExtendMotor.set(armExtendSpeed);
+        extendMotorSpeedSetTime = System.currentTimeMillis();
     }
 
     /**
@@ -679,6 +685,29 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     /**
+     * Set the maximum acceleration of the arm extension in encoder-motor-speed/second.
+     */
+    private static final double MAX_EXTEND_ACCEL = 5.0;
+
+    private double getSafeExtendSpeed(double inputSpeed, double distanceAvailable) {
+        double minStoppingDistance = Math.pow(inputSpeed, 2) / (2 * -MAX_EXTEND_ACCEL);
+        double seconds = (double)(System.currentTimeMillis() - extendMotorSpeedSetTime)/1000;
+        double prevSpeed = armExtendMotor.get();
+        if (distanceAvailable <= minStoppingDistance) {
+            // override - going to crash
+            return prevSpeed - (MAX_EXTEND_ACCEL * seconds);
+        } else {
+            double requestedAccel = (prevSpeed - inputSpeed)/seconds;
+            if (Math.abs(requestedAccel) > MAX_EXTEND_ACCEL) {
+                // too much accel - reduce it
+                return prevSpeed + (Math.signum(requestedAccel) * MAX_EXTEND_ACCEL) * seconds;
+            } else {
+                return inputSpeed;
+            }
+        }
+    }
+
+    /**
      * Check the arm extend limits and return the appropriate output speed based on the limits
      *
      * @param inputSpeed
@@ -705,11 +734,8 @@ public class ArmSubsystem extends SubsystemBase {
             }
 
             // Slow down if approaching the limit
-            if (Math.abs(getArmExtendEncoder()
-                - ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE) < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
-
-                return Math.min(inputSpeed, ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED);
-            }
+            double distanceToMaxExtent = getArmExtendEncoder() - ArmConstants.ARM_EXTEND_LIMIT_ENCODER_VALUE;
+            return getSafeExtendSpeed(inputSpeed, distanceToMaxExtent);
         }
 
         /*
@@ -728,11 +754,8 @@ public class ArmSubsystem extends SubsystemBase {
             }
 
             // Slow down if approaching the limit
-            if (Math.abs(getArmExtendEncoder()) < ArmConstants.ARM_EXTEND_SLOW_ZONE_ENCODER_VALUE) {
-
-                return Math.max(inputSpeed, -ArmConstants.MAX_EXTEND_SLOW_ZONE_SPEED);
-            }
-
+            double distanceToMinRetract = getArmExtendEncoder();
+            return getSafeExtendSpeed(inputSpeed, distanceToMinRetract);
         }
 
         return inputSpeed;
