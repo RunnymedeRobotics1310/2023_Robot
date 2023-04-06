@@ -35,6 +35,10 @@ public class SetHoldingCubeLightsCommand extends CommandBase {
             .append(Patterns.CUBE_PICKUP)
             .append(Patterns.CUBE_PICKUP)
             .append(Patterns.CUBE_PICKUP);
+    }
+
+    @Override
+    public void execute() {
 
         lightSubsystem.setPattern(0, lightsOn);
 

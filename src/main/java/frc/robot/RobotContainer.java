@@ -246,6 +246,9 @@ public class RobotContainer {
 
         new Trigger(() -> (armSubsystem.getHeldGamePiece() == GamePiece.CUBE))
             .whileTrue(new SetHoldingCubeLightsCommand(lightSubsystem));
+
+        // new Trigger(() -> (!armSubsystem.isArmInsideFrame()))
+        // .whileTrue(new SetArmUpLightsCommand(lightSubsystem));
     }
 
     /**

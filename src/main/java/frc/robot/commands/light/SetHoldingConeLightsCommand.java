@@ -36,7 +36,10 @@ public class SetHoldingConeLightsCommand extends CommandBase {
             .append(Patterns.CONE_PICKUP)
             .append(Patterns.CONE_PICKUP)
             .append(Patterns.CONE_PICKUP);
+    }
 
+    @Override
+    public void execute() {
         lightSubsystem.setPattern(0, lightsOn);
 
 
