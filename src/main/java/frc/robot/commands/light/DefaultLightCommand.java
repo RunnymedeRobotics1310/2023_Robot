@@ -46,4 +46,11 @@ public class DefaultLightCommand extends CommandBase {
 
     }
 
+    @Override
+    public void end(boolean interrupted) {
+
+        lightSubsystem.off();
+
+    }
+
 }

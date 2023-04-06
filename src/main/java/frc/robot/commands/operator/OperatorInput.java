@@ -178,7 +178,7 @@ public class OperatorInput {
         driverController.setRumble(GenericHID.RumbleType.kBothRumble, 0);
     }
 
-    public boolean isPickUpConeVision() {
+    public boolean isPickUpCubeVision() {
         return driverController.getPOV() == 90;
     }
 

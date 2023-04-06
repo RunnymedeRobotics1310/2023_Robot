@@ -224,7 +224,8 @@ public class RobotContainer {
                 .andThen(new CompactCommand(armSubsystem)));
 
         new Trigger(() -> (operatorInput.isVisionSubstationConePickup()))
-            .onTrue(new PickUpSubstationVisionCommand(operatorInput, armSubsystem, driveSubsystem, visionSubsystem));
+            .onTrue(new PickUpSubstationVisionCommand(operatorInput, armSubsystem, driveSubsystem, visionSubsystem)
+                .deadlineWith(new SetConePickUpLightsCommand(lightSubsystem)));
 
         new Trigger(() -> (operatorInput.isCameraViewHigh()))
             .onTrue(new SetVisionTargetCommand(Constants.VisionConstants.VisionTarget.FIELD, visionSubsystem));
@@ -232,12 +233,13 @@ public class RobotContainer {
         new Trigger(() -> (operatorInput.isCameraViewLow()))
             .onTrue(new SetVisionTargetCommand(Constants.VisionConstants.VisionTarget.CUBE_GROUND, visionSubsystem));
 
-        new Trigger(() -> (operatorInput.isPickUpConeVision()))
+        new Trigger(() -> (operatorInput.isPickUpCubeVision()))
             .onTrue(new StartIntakeCommand(GamePiece.CUBE, armSubsystem, visionSubsystem)
                 .deadlineWith(new WaitCommand(.5)
                     .andThen(
                         new DriveToGamePieceCommand(VisionTarget.CUBE_GROUND, .3, driveSubsystem, visionSubsystem, armSubsystem)))
-                .andThen(new PickupGamePieceCommand(GamePiece.CUBE, operatorInput, armSubsystem)));
+                .andThen(new PickupGamePieceCommand(GamePiece.CUBE, operatorInput, armSubsystem))
+                .deadlineWith(new SetCubePickUpLightsCommand(lightSubsystem)));
 
         new Trigger(() -> (armSubsystem.getHeldGamePiece() == GamePiece.CONE))
             .whileTrue(new SetHoldingConeLightsCommand(lightSubsystem));
