@@ -245,7 +245,12 @@ public class PickUpSubstationVisionCommand extends BaseArmCommand {
         // In Teleop, pick the next command
         if (DriverStation.isTeleopEnabled()) {
 
-            CommandScheduler.getInstance().schedule(new PickupGamePieceCommand(gamePiece, operatorInput, armSubsystem));
+            if (interrupted) {
+                CommandScheduler.getInstance().schedule(new CompactCommand_SafeForGamePiece(armSubsystem));
+            } else {
+                CommandScheduler.getInstance().schedule(new PickupGamePieceCommand(gamePiece, operatorInput, armSubsystem));
+            }
+
         }
     }
 

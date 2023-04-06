@@ -107,7 +107,7 @@ public class CompactCommand_SafeForGamePiece extends BaseArmCommand {
                 openPincher();
 
                 // Raise the arm until a game piece is not detected.
-                moveArmLiftToAngle(ArmConstants.SCORE_BOTTOM_CONE_POSITION.angle);
+                moveArmLiftToAngle(ArmConstants.SCORE_MIDDLE_CONE_POSITION.angle);
 
             }
             else {
