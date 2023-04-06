@@ -11,6 +11,7 @@ import frc.robot.commands.arm.ReleaseCommand;
 import frc.robot.commands.arm.ScoreAutoCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
+import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -29,6 +30,7 @@ public class MiddleMayhem1AutoCommand extends SequentialCommandGroup {
          * Set the to be facing the grid
          */
         addCommands(new SetGyroHeadingCommand(180, driveSubsystem));
+        addCommands(new ResetGyroPitchCommand(driveSubsystem));
 
         /*
          * Robot is holding a cone

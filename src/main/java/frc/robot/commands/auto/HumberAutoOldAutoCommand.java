@@ -15,6 +15,7 @@ import frc.robot.commands.auto.oldHumberCommands.HA_CompactCommand;
 import frc.robot.commands.auto.oldHumberCommands.HA_DriveOnHeadingCommand;
 import frc.robot.commands.auto.oldHumberCommands.HA_ReleaseCommand;
 import frc.robot.commands.auto.oldHumberCommands.HA_ScoreAutoCommand;
+import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -66,6 +67,7 @@ public class HumberAutoOldAutoCommand extends SequentialCommandGroup {
          * Set the gyro heading if required
          */
         addCommands(new SetGyroHeadingCommand(180, driveSubsystem));
+        addCommands(new ResetGyroPitchCommand(driveSubsystem));
 
         /**
          * Step 1 - Score first game piece

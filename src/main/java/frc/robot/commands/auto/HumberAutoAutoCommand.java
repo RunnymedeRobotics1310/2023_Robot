@@ -19,6 +19,7 @@ import frc.robot.commands.arm.ScoreAutoCommand;
 import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DriveFastOnHeadingCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
+import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.RotateToHeadingCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -54,6 +55,7 @@ public class HumberAutoAutoCommand extends SequentialCommandGroup {
         }
 
         addCommands(new SetGyroHeadingCommand(180, driveSubsystem));
+        addCommands(new ResetGyroPitchCommand(driveSubsystem));
 
         addCommands(new InstantCommand(() -> {
             armSubsystem.setPincherEncoder(GamePiece.CONE.pincherEncoderCount);

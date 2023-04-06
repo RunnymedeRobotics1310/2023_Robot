@@ -23,6 +23,7 @@ import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
 import frc.robot.commands.drive.DriveToFieldElementCommand;
 import frc.robot.commands.drive.DriveToGamePieceCommand;
+import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.RotateToHeadingCommand;
 import frc.robot.commands.drive.RotateToHeadingCommand.DirectionOfRotation;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
@@ -128,6 +129,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
         else {
             addCommands(new SetGyroHeadingCommand(0, driveSubsystem));
         }
+        addCommands(new ResetGyroPitchCommand(driveSubsystem));
 
         /*
          * Compose the required auto commands for each of the steps in the auto

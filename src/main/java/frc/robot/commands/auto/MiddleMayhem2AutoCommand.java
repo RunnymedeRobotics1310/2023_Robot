@@ -20,6 +20,7 @@ import frc.robot.commands.drive.BalanceCommand;
 import frc.robot.commands.drive.DriveFastOnHeadingCommand;
 import frc.robot.commands.drive.DriveOnHeadingCommand;
 import frc.robot.commands.drive.DriveToGamePieceCommand;
+import frc.robot.commands.drive.ResetGyroPitchCommand;
 import frc.robot.commands.drive.RotateToHeadingCommand;
 import frc.robot.commands.drive.SetGyroHeadingCommand;
 import frc.robot.commands.vision.SetVisionTargetCommand;
@@ -40,6 +41,7 @@ public class MiddleMayhem2AutoCommand extends SequentialCommandGroup {
          * Set the to be facing the grid
          */
         addCommands(new SetGyroHeadingCommand(180, driveSubsystem));
+        addCommands(new ResetGyroPitchCommand(driveSubsystem));
 
         /*
          * Robot is holding a cone
