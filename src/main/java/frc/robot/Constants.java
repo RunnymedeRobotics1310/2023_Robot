@@ -263,7 +263,7 @@ public final class Constants {
         public static final int     PINCHER_MOTOR_CURRENT_LIMIT         = 20;
 
         public static final double  MAX_PINCHER_SPEED                   = 1;
-        public static final double  MAX_PINCHER_SLOW_ZONE_SPEED         = .15;
+        public static final double  MAX_PINCHER_SLOW_ZONE_SPEED         = .5;
         public static final double  PINCHER_CLOSE_LIMIT_ENCODER_VALUE   = 125;
         public static final double  PINCHER_POSITION_TOLERANCE          = 2;
         public static final double  PINCHER_SLOW_ZONE_ENCODER_VALUE     = 8;
