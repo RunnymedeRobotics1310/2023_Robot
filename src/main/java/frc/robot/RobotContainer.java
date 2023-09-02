@@ -212,13 +212,13 @@ public class RobotContainer {
             .onTrue(new StartIntakeCommand(operatorInput, armSubsystem, visionSubsystem));
 
         new Trigger(() -> (operatorInput.isPickUpCone()))
-            .onTrue(new SetConePickUpLightsCommand(lightSubsystem));
+            .whileTrue(new SetConePickUpLightsCommand(lightSubsystem));
 
         new Trigger(() -> (operatorInput.isPickUpCube()))
             .onTrue(new StartIntakeCommand(operatorInput, armSubsystem, visionSubsystem));
 
         new Trigger(() -> (operatorInput.isPickUpCube()))
-            .onTrue(new SetCubePickUpLightsCommand(lightSubsystem));
+            .whileTrue(new SetCubePickUpLightsCommand(lightSubsystem));
 
         new Trigger(() -> (operatorInput.balance()))
             .onTrue(new BalanceCommand(driveSubsystem));

@@ -58,7 +58,7 @@ public class SystemTestCommand extends RunnymedeCommandBase {
 
     @Override
     public boolean runsWhenDisabled() {
-        return true;
+        return false;
     }
 
     @Override

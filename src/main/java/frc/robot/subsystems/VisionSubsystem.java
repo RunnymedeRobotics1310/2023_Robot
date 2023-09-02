@@ -199,7 +199,7 @@ public class VisionSubsystem extends SubsystemBase {
         double ty = getTargetY();
         switch (currentVisionTarget) {
         case POST_HIGH:
-            return 14 - ty;
+            return 13 - ty;
         case POST_LOW:
         case APRILTAG_GRID:
         case CONE_GROUND:
