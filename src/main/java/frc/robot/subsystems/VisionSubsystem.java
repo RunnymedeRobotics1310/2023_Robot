@@ -29,7 +29,9 @@ public class VisionSubsystem extends SubsystemBase {
 
     private static final long            LED_MODE_PIPELINE           = 0;
     private static final long            LED_MODE_OFF                = 1;
+    @SuppressWarnings("unused")
     private static final long            LED_MODE_BLINK              = 2;
+    @SuppressWarnings("unused")
     private static final long            LED_MODE_ON                 = 3;
 
     private static final long            CAM_MODE_VISION             = 0;
