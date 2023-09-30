@@ -71,7 +71,7 @@ public class RobotContainer {
     private final DriveSubsystem  driveSubsystem                = new DriveSubsystem(armSubsystem);
     private final LightSubsystem  lightSubsystem                = new LightSubsystem();
 
-    // A set of choosers for autonomous patterns
+    // A set of choosers for autonomous patterns...
     SendableChooser<AutoPattern>  autoPatternChooser            = new SendableChooser<>();
     SendableChooser<AutoLane>     startingLaneChooser           = new SendableChooser<>();
     SendableChooser<GamePiece>    startingGamePieceChooser      = new SendableChooser<>();
