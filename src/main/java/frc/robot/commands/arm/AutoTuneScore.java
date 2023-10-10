@@ -35,6 +35,7 @@ public class AutoTuneScore extends RunnymedeCommandBase {
 
     @Override
     public void initialize() {
+    	
         super.initialize();
     }
 
