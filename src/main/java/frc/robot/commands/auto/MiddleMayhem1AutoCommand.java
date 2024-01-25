@@ -52,7 +52,7 @@ public class MiddleMayhem1AutoCommand extends SequentialCommandGroup {
             .alongWith(new CompactCommand(armSubsystem)));
 
         // Mount charger again
-        addCommands(new WaitCommand(.5));
+        addCommands(new WaitCommand(1));
         addCommands(new DriveOnHeadingCommand(180, .3, 190, driveSubsystem));
 
         /*

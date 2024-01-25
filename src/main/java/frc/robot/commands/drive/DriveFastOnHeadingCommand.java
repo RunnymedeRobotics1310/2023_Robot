@@ -3,7 +3,7 @@ package frc.robot.commands.drive;
 import static frc.robot.RunnymedeUtils.calculateFastestSpeed;
 
 import frc.robot.Constants;
-import frc.robot.commands.RunnymedeCommandBase;
+import frc.robot.commands.RunnymedeCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
 /**
@@ -16,7 +16,7 @@ import frc.robot.subsystems.DriveSubsystem;
  * <p>
  * Tested successfully in the field March 26, 2023
  */
-public class DriveFastOnHeadingCommand extends RunnymedeCommandBase {
+public class DriveFastOnHeadingCommand extends RunnymedeCommand {
 
     public enum Direction { forward, backward }
 

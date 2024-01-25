@@ -1,9 +1,9 @@
 package frc.robot.commands.light;
 
-import frc.robot.commands.RunnymedeCommandBase;
+import frc.robot.commands.RunnymedeCommand;
 import frc.robot.subsystems.LightSubsystem;
 
-public class SetFrenchPatternCommand extends RunnymedeCommandBase {
+public class SetFrenchPatternCommand extends RunnymedeCommand {
 
     private final LightSubsystem lightSubsystem;
 

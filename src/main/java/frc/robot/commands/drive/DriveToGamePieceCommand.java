@@ -8,13 +8,13 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.VisionTarget;
-import frc.robot.commands.RunnymedeCommandBase;
+import frc.robot.commands.RunnymedeCommand;
 import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
-public class DriveToGamePieceCommand extends RunnymedeCommandBase {
+public class DriveToGamePieceCommand extends RunnymedeCommand {
 
     private static final List<VisionTarget>    SUPPORTED_DRIVE_TARGETS              = Arrays.asList(
         VisionTarget.CONE_GROUND,

@@ -17,7 +17,7 @@ import frc.robot.Constants.AutoConstants.AutoLane;
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
 import frc.robot.Constants.VisionConstants.VisionTarget;
-import frc.robot.commands.RunnymedeCommandBase;
+import frc.robot.commands.RunnymedeCommand;
 import frc.robot.commands.arm.CompactCommand;
 import frc.robot.commands.arm.ExtendArmCommand;
 import frc.robot.commands.arm.MoveArmToPositionCommand;
@@ -43,7 +43,7 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         SendableChooser<AutoLane> startingLaneChooser) {
 
         final AutoLane startingLane = startingLaneChooser.getSelected();
-        final Alliance alliance     = DriverStation.getAlliance();
+        final Alliance alliance     = DriverStation.getAlliance().orElse(null);
 
         StringBuilder  sb           = new StringBuilder("Auto Selections: ");
         sb.append("Pattern: The Double Down ");
@@ -59,9 +59,6 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
         // Print an error if the alliance is not set
         if (alliance == null) {
             System.out.println("*** ERROR **** null Alliance ");
-        }
-        else if (alliance == Alliance.Invalid) {
-            System.out.println("*** ERROR *** Invalid alliance");
         }
 
         /*
@@ -100,7 +97,7 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          * while setting up the vision target
          * and arm for intake
          */
-        RunnymedeCommandBase driveOutCmd;
+        RunnymedeCommand driveOutCmd;
         if (startingLane == AutoLane.BOTTOM) {
             // drive over the bump
             driveOutCmd = new DriveFastOnHeadingCommand(180, backward, 380, false, driveSubsystem);
@@ -174,7 +171,7 @@ public class DoubleDownAutoCommand extends SequentialCommandGroup {
          * Set the Vision target so that it is ready
          */
         Constants.ArmPosition scorePosition = getScoringPosition(GamePiece.CUBE, ScoringRow.TOP);
-        RunnymedeCommandBase  driveBackCmd;
+        RunnymedeCommand      driveBackCmd;
         if (startingLane == AutoLane.BOTTOM) {
             // bump - drive safely
             driveBackCmd = new DriveFastOnHeadingCommand(180.0, forward, 230, false, driveSubsystem);

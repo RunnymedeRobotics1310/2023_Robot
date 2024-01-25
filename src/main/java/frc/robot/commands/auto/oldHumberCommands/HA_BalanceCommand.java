@@ -2,10 +2,10 @@
 
 package frc.robot.commands.auto.oldHumberCommands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class HA_BalanceCommand extends CommandBase {
+public class HA_BalanceCommand extends Command {
 
     private final DriveSubsystem driveSubsystem;
     long                         startTime                  = 0;

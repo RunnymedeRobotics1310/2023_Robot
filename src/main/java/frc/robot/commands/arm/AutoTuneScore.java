@@ -4,11 +4,11 @@ import static frc.robot.Constants.GameConstants.GamePiece.NONE;
 
 import frc.robot.Constants.GameConstants.GamePiece;
 import frc.robot.Constants.GameConstants.ScoringRow;
-import frc.robot.commands.RunnymedeCommandBase;
+import frc.robot.commands.RunnymedeCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
-public class AutoTuneScore extends RunnymedeCommandBase {
+public class AutoTuneScore extends RunnymedeCommand {
 
     private final DriveSubsystem  driveSubsystem;
     private final VisionSubsystem visionSubsystem;

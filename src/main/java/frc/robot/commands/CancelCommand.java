@@ -8,7 +8,7 @@ import frc.robot.subsystems.VisionSubsystem;
  * This command is used to safely stop the robot in its current position, and to cancel any running
  * commands
  */
-public class CancelCommand extends RunnymedeCommandBase {
+public class CancelCommand extends RunnymedeCommand {
 
     private final DriveSubsystem  driveSubsystem;
     private final ArmSubsystem    armSubsystem;

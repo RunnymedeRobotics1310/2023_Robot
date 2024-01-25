@@ -4,11 +4,11 @@ import static frc.robot.Constants.ArmConstants.MAX_EXTEND_SPEED;
 import static frc.robot.Constants.ArmConstants.MAX_PINCHER_SPEED;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.ArmSubsystem;
 
-abstract class HA_BaseArmCommand extends CommandBase {
+abstract class HA_BaseArmCommand extends Command {
 
     protected final ArmSubsystem armSubsystem;
 

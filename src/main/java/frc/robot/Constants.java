@@ -294,7 +294,11 @@ public final class Constants {
         public static final ArmPosition SAFELY_ABOVE_FRAME_AUTO_POSITION = new ArmPosition(CLEAR_FRAME_ARM_ANGLE + 10, 9.5);
         public static final ArmPosition GROUND_PICKUP_AUTO_POSITION      = new ArmPosition(CLEAR_FRAME_ARM_ANGLE, 9.5);
         public static final ArmPosition GROUND_PICKUP_POSITION           = new ArmPosition(CLEAR_FRAME_ARM_ANGLE, 14);          // Confirmed
-        public static final ArmPosition SUBSTATION_PICKUP_POSITION       = new ArmPosition(86.5, 30);
+        public static final ArmPosition SUBSTATION_PICKUP_POSITION       = new ArmPosition(87.5, 30);                           // previously
+                                                                                                                                // 86.5
+                                                                                                                                // Changed
+                                                                                                                                // Sept
+                                                                                                                                // 3
 
         // Drive with Piece constants
         public static final ArmPosition DRIVE_WITH_CONE_POSITION         = new ArmPosition(SCORE_BOTTOM_CONE_POSITION.angle, 0);

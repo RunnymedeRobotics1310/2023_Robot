@@ -6,10 +6,10 @@ import static frc.robot.Constants.VisionConstants.CameraView.MID;
 
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants.CameraView;
-import frc.robot.commands.RunnymedeCommandBase;
+import frc.robot.commands.RunnymedeCommand;
 import frc.robot.subsystems.VisionSubsystem;
 
-public class SetVisionTargetCommand extends RunnymedeCommandBase {
+public class SetVisionTargetCommand extends RunnymedeCommand {
 
     private final VisionSubsystem                        visionSubsystem;
     private final Constants.VisionConstants.VisionTarget target;

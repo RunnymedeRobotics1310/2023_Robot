@@ -5,10 +5,10 @@ import static frc.robot.Constants.ArmConstants.MAX_PINCHER_SPEED;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.commands.RunnymedeCommandBase;
+import frc.robot.commands.RunnymedeCommand;
 import frc.robot.subsystems.ArmSubsystem;
 
-abstract class BaseArmCommand extends RunnymedeCommandBase {
+abstract class BaseArmCommand extends RunnymedeCommand {
 
     protected final ArmSubsystem armSubsystem;
 

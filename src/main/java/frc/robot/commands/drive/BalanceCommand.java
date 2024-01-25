@@ -2,10 +2,10 @@
 
 package frc.robot.commands.drive;
 
-import frc.robot.commands.RunnymedeCommandBase;
+import frc.robot.commands.RunnymedeCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class BalanceCommand extends RunnymedeCommandBase {
+public class BalanceCommand extends RunnymedeCommand {
 
     private final DriveSubsystem driveSubsystem;
     long                         startTime                  = 0;

@@ -4,10 +4,10 @@ package frc.robot.commands.drive;
 
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.commands.RunnymedeCommandBase;
+import frc.robot.commands.RunnymedeCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class RotateToHeadingCommand extends RunnymedeCommandBase {
+public class RotateToHeadingCommand extends RunnymedeCommand {
 
     public enum DirectionOfRotation {
         CLOCKWISE, COUNTER_CLOCKWISE, SHORTEST_PATH

@@ -3,10 +3,10 @@
 package frc.robot.commands.drive;
 
 import frc.robot.Constants;
-import frc.robot.commands.RunnymedeCommandBase;
+import frc.robot.commands.RunnymedeCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class DriveOnHeadingCommand extends RunnymedeCommandBase {
+public class DriveOnHeadingCommand extends RunnymedeCommand {
 
     final double                 factor         = 0.01;
 

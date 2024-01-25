@@ -7,12 +7,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants.VisionTarget;
-import frc.robot.commands.RunnymedeCommandBase;
+import frc.robot.commands.RunnymedeCommand;
 import frc.robot.commands.vision.SetVisionTargetCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
-public class DriveToFieldElementCommand extends RunnymedeCommandBase {
+public class DriveToFieldElementCommand extends RunnymedeCommand {
 
     private static final List<VisionTarget> SUPPORTED_DRIVE_TARGETS              = Arrays.asList(
         VisionTarget.APRILTAG_GRID,

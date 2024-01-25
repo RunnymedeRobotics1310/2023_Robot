@@ -33,7 +33,7 @@ public class HumberAutoOldAutoCommand extends SequentialCommandGroup {
 
         AutoLane      startingLane = startingLaneChooser.getSelected();
 
-        Alliance      alliance     = DriverStation.getAlliance();
+        Alliance      alliance     = DriverStation.getAlliance().orElse(null);
 
         StringBuilder sb           = new StringBuilder();
         sb.append("Auto Selections");
@@ -53,10 +53,6 @@ public class HumberAutoOldAutoCommand extends SequentialCommandGroup {
         // Print an error if the alliance is not set
         if (alliance == null) {
             System.out.println("*** ERROR **** null Alliance ");
-            return;
-        }
-        else if (alliance == Alliance.Invalid) {
-            System.out.println("*** ERROR *** Invalid alliance");
             return;
         }
 

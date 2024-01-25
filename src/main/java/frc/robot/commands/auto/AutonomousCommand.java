@@ -78,7 +78,7 @@ public class AutonomousCommand extends SequentialCommandGroup {
         secondGamePieceScoring = secondGamePieceScoringChooser.getSelected();
         balanceAction          = balanceChooser.getSelected();
 
-        alliance               = DriverStation.getAlliance();
+        alliance               = DriverStation.getAlliance().orElse(null);
 
         StringBuilder sb = new StringBuilder();
         sb.append("Auto Selections");
@@ -112,11 +112,6 @@ public class AutonomousCommand extends SequentialCommandGroup {
             System.out.println("*** ERROR **** null Alliance ");
             return;
         }
-        else if (alliance == Alliance.Invalid) {
-            System.out.println("*** ERROR *** Invalid alliance");
-            return;
-        }
-
         // The robot always starts next to the grid
         currentZone = Zone.COMMUNITY;
 

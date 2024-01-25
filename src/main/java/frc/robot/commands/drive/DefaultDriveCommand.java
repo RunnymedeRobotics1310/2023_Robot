@@ -1,13 +1,13 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.RunnymedeCommandBase;
+import frc.robot.commands.RunnymedeCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.commands.operator.OperatorInput.Axis;
 import frc.robot.commands.operator.OperatorInput.Stick;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class DefaultDriveCommand extends RunnymedeCommandBase {
+public class DefaultDriveCommand extends RunnymedeCommand {
 
     private final DriveSubsystem driveSubsystem;
     private final OperatorInput  driverController;

@@ -1,9 +1,9 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.revrobotics.CANSparkBase.ExternalFollower;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.ExternalFollower;
-import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
@@ -112,8 +112,6 @@ public class DriveSubsystem extends SubsystemBase {
     public void calibrateGyro() {
 
         gyroHeadingOffset = 0;
-
-        navXGyro.calibrate();
     }
 
     /**

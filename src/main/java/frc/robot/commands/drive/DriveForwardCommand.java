@@ -1,12 +1,12 @@
 package frc.robot.commands.drive;
 
-import frc.robot.commands.RunnymedeCommandBase;
+import frc.robot.commands.RunnymedeCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
 /**
  * Drive the robot forward at a specific speed for a specific distance. Orientation does not matter.
  */
-public class DriveForwardCommand extends RunnymedeCommandBase {
+public class DriveForwardCommand extends RunnymedeCommand {
     private final DriveSubsystem driveSubsystem;
     private final double speed, distance;
     private final boolean brakeAtEnd;

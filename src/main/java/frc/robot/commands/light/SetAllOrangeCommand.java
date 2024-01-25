@@ -1,10 +1,10 @@
 package frc.robot.commands.light;
 
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.LightSubsystem;
 
-public class SetAllOrangeCommand extends CommandBase {
+public class SetAllOrangeCommand extends Command {
 
     private final LightSubsystem lightSubsystem;
 

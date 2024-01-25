@@ -9,8 +9,8 @@ import static frc.robot.Constants.VisionConstants.VisionTarget.NONE;
 import static frc.robot.Constants.VisionConstants.VisionTarget.POST_HIGH;
 import static frc.robot.Constants.VisionConstants.VisionTarget.POST_LOW;
 
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 

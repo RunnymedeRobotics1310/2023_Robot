@@ -1,10 +1,10 @@
 package frc.robot.commands.vision;
 
-import frc.robot.commands.RunnymedeCommandBase;
+import frc.robot.commands.RunnymedeCommand;
 import frc.robot.commands.operator.OperatorInput;
 import frc.robot.subsystems.VisionSubsystem;
 
-public class DefaultVisionCommand extends RunnymedeCommandBase {
+public class DefaultVisionCommand extends RunnymedeCommand {
 
     private final VisionSubsystem visionSubsystem;
     private final OperatorInput   driverController;

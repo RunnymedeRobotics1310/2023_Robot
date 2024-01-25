@@ -6,24 +6,25 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
  * The Base Runnymede Command implements command helpers to aid with logging
  */
-public class RunnymedeCommandBase extends CommandBase {
+public class RunnymedeCommand extends Command {
 
     SimpleDateFormat START_TIMESTAMP_FMT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
-    protected long  initializeTime = 0;
-    private String  finishReason   = null;
+    protected long   initializeTime      = 0;
+    private String   finishReason        = null;
 
-    List<Subsystem> subsystemList  = new ArrayList<>();
+    List<Subsystem>  subsystemList       = new ArrayList<>();
 
     /**
      * Default implementation automatically logs start of command with required subsystems
      */
+    @Override
     public void initialize() {
         logCommandStart();
     }
@@ -60,8 +61,10 @@ public class RunnymedeCommandBase extends CommandBase {
 
     /**
      * Default implementation logs command end
+     *
      * @param interrupted whether the command was interrupted/canceled
      */
+    @Override
     public void end(boolean interrupted) {
         logCommandEnd(interrupted);
     }
@@ -118,7 +121,8 @@ public class RunnymedeCommandBase extends CommandBase {
 
         if (initializeTime == 0) {
             sb.append(" at ").append(START_TIMESTAMP_FMT.format(new Date()));
-        } else {
+        }
+        else {
             sb.append(" at ").append(System.currentTimeMillis() - initializeTime).append("ms");
         }
 

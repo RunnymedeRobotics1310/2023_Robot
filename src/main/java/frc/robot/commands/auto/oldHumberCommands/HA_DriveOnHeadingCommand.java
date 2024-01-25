@@ -2,11 +2,11 @@
 
 package frc.robot.commands.auto.oldHumberCommands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class HA_DriveOnHeadingCommand extends CommandBase {
+public class HA_DriveOnHeadingCommand extends Command {
 
     final double                 factor         = 0.01;
 
