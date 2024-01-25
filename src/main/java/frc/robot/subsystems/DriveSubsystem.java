@@ -3,8 +3,8 @@ package frc.robot.subsystems;
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkBase.ExternalFollower;
 import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.util.sendable.SendableBuilder;

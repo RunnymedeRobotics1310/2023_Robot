@@ -2,11 +2,11 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkBase.ExternalFollower;
 import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxLimitSwitch;
-import com.revrobotics.SparkMaxLimitSwitch.Type;
+import com.revrobotics.SparkLimitSwitch;
+import com.revrobotics.SparkLimitSwitch.Type;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -77,13 +77,13 @@ public class ArmSubsystem extends SubsystemBase {
      * the pincher SparkMAX reverse
      * limit.
      */
-    private SparkMaxLimitSwitch    pincherOpenDetector     = pincherMotor.getReverseLimitSwitch(Type.kNormallyOpen);
+    private SparkLimitSwitch       pincherOpenDetector     = pincherMotor.getReverseLimitSwitch(Type.kNormallyOpen);
 
     /**
      * The game piece detector is an infra-red sensor that is normally open, plugged into the
      * pincher SparkMAX forward limit.
      */
-    private SparkMaxLimitSwitch    gamePieceDetector       = pincherMotor.getForwardLimitSwitch(Type.kNormallyOpen);
+    private SparkLimitSwitch       gamePieceDetector       = pincherMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
     /** Creates a new ArmSubsystem */
     public ArmSubsystem() {
